@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tentang RUANG SADAR - Berhenti Main Judol</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Plus Jakarta Sans',sans-serif}
+</style>
+</head>
+<body class="bg-[#f5f7ff] text-slate-800">
+
+<!-- Header -->
+<header class="bg-white border-b sticky top-0 z-50">
+<div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+<a href="portal.html" class="flex items-center gap-2 font-extrabold text-[#1a4aff] text-xl">
+<span class="bg-[#1a4aff] text-white w-8 h-8 rounded-lg grid place-items-center">R</span> RUANG SADAR
+</a>
+<a href="portal.html" class="text-sm bg-slate-100 px-4 py-2 rounded-full font-semibold">✕ Tutup</a>
+</div>
+</header>
+
+<div class="max-w-3xl mx-auto px-4 py-8">
+
+<!-- Hero -->
+<div class="bg-gradient-to-br from-[#1a4aff] to-[#0f2da0] text-white rounded-[28px] p-7 md:p-10 relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
+<h1 class="text-[28px] md:text-4xl font-extrabold leading-tight">Tentang<br>RUANG SADAR</h1>
+<p class="mt-4 text-white/80 leading-relaxed text-[15px]">RUANG SADAR adalah portal edukasi interaktif untuk membongkar ilusi judi online (judol). Kami tidak mengajarkan cara main, tapi cara SADAR kalau kamu sedang ditipu sistem.</p>
+<div class="mt-5 inline-flex bg-white text-[#1a4aff] text-xs font-extrabold px-4 py-2 rounded-full">100% EDUKASI - BUKAN JUDI BENERAN</div>
+</div>
+
+<!-- Apa itu -->
+<div class="mt-6 bg-white rounded-[20px] p-6 border shadow-sm">
+<h2 class="font-extrabold text-lg flex items-center gap-2">💡 Apa Itu RUANG SADAR?</h2>
+<p class="mt-3 text-[14px] leading-7 text-slate-600">
+RUANG SADAR lahir dari keresahan melihat banyak teman, adik, bahkan bapak-bapak yang kalah total karena judol. Polanya sama semua: <b>menang di awal, ditahan di tengah, disedot habis di akhir.</b>
+<br><br>
+Di sini kamu bisa masuk ke 4 simulasi tanpa modal asli, tanpa resiko, untuk merasakan sendiri bagaimana algoritma bandar bekerja. Tujuannya cuma satu: <span class="text-[#1a4aff] font-bold">Biar kamu muak dan berhenti sebelum terlambat.</span>
+</p>
+</div>
+
+<!-- 4 Fase -->
+<h3 class="mt-8 font-extrabold text-base">4 FASE JEBAKAN YANG KAMU PELAJARI:</h3>
+<div class="grid gap-3 mt-3">
+<div class="bg-white border-l-4 border-amber-400 rounded-xl p-4 flex gap-3">
+<div class="text-2xl">🎁</div><div><div class="font-bold text-sm">FASE 1 - DIKASIH MENANG</div><p class="text-xs text-slate-500 mt-1">Bandar sengaja kasih menang biar kamu merasa jago dan ketagihan.</p></div>
+</div>
+<div class="bg-white border-l-4 border-blue-500 rounded-xl p-4 flex gap-3">
+<div class="text-2xl">⚖️</div><div><div class="font-bold text-sm">FASE 2 - DITAHAN</div><p class="text-xs text-slate-500 mt-1">Saldo kamu dibuat naik-turun di situ-situ aja. Bikin kamu buang waktu & penasaran.</p></div>
+</div>
+<div class="bg-white border-l-4 border-purple-500 rounded-xl p-4 flex gap-3">
+<div class="text-2xl">🌀</div><div><div class="font-bold text-sm">FASE 3 - DIKURAS</div><p class="text-xs text-slate-500 mt-1">Mulai kalah beruntun. Kamu deposit lagi karena merasa "hampir menang".</p></div>
+</div>
+<div class="bg-white border-l-4 border-slate-900 rounded-xl p-4 flex gap-3">
+<div class="text-2xl">🕳️</div><div><div class="font-bold text-sm">FASE 4 - DISEDOT HABIS</div><p class="text-xs text-slate-500 mt-1">Total kalah, semua hilang. Sistem memang didesain begitu. Tidak ada yang menang lawan bandar.</p></div>
+</div>
+</div>
+
+<!-- Visi Misi -->
+<div class="mt-6 grid md:grid-cols-2 gap-4">
+<div class="bg-[#eef2ff] rounded-[18px] p-5">
+<h4 class="font-extrabold text-sm text-[#1a4aff]">VISI</h4>
+<p class="text-[13px] mt-2 leading-6">Menjadi ruang aman pertama untuk edukasi bahaya judol bagi Gen-Z Indonesia tanpa menghakimi.</p>
+</div>
+<div class="bg-[#fff7ed] rounded-[18px] p-5">
+<h4 class="font-extrabold text-sm text-orange-600">MISI</h4>
+<p class="text-[13px] mt-2 leading-6">Buka mata lewat simulasi, bukan ceramah. Karena orang berhenti bukan karena takut, tapi karena SADAR.</p>
+</div>
+</div>
+
+<!-- Disclaimer -->
+<div class="mt-8 bg-slate-900 text-white rounded-[18px] p-6">
+<h4 class="font-bold text-sm">⚠️ Disclaimer Penting</h4>
+<p class="text-xs text-white/70 mt-2 leading-6">1. Website ini tidak terafiliasi dengan situs judi manapun.<br>2. Tidak ada uang asli, tidak ada deposit asli, semua simulasi pakai coin edukasi.<br>3. Jika kamu sudah kecanduan berat, hubungi orang terdekat atau layanan konseling profesional.<br><br><span class="text-white font-bold">Dibuat oleh Ayudi Thea - 2026 | Untuk Edukasi, bukan untuk dimainkan.</span></p>
+</div>
+
+<!-- Donasi & Bagikan -->
+<div class="mt-8 bg-white rounded-[22px] p-6 border shadow-sm text-center">
+<h3 class="font-extrabold text-[15px]">🤝 Dukung Gerakan Berhenti Judol</h3>
+<p class="text-[13px] text-slate-600 mt-2 leading-6">
+Jika kamu setuju dengan misi RUANG SADAR untuk menyelamatkan lebih banyak orang dari jerat judi online,<br>
+<b>tolong bagikan link website ini ke teman, keluarga, atau grup kamu.</b><br><br>
+Satu share dari kamu bisa menyelamatkan satu keluarga dari kebangkrutan.<br><br>
+Dan jika kamu berkenan ikut berkontribusi untuk pengembangan aplikasi, server, dan konten edukasi selanjutnya, kamu bisa memberikan donasi seikhlasnya melalui QRIS di bawah ini.
+</p>
+
+<!-- QRIS Button -->
+<div class="mt-5">
+<button onclick="document.getElementById('qrisModal').classList.remove('hidden')" class="w-full bg-gradient-to-r from-[#1a4aff] to-[#3b66ff] text-white py-4 rounded-full font-extrabold text-sm shadow-lg shadow-blue-200 active:scale-95 transition">
+📱 Tap di sini untuk Donasi via QRIS
+</button>
+<p class="text-[11px] text-slate-400 mt-2">Support QRIS - DANA / OVO / Gopay / ShopeePay / MBanking</p>
+</div>
+
+<div class="mt-5 flex gap-3">
+<button onclick="shareLink()" class="flex-1 bg-[#25D366] text-white py-3.5 rounded-full font-bold text-sm">🔗 Bagikan ke WA</button>
+<a href="portal.html" class="flex-1 bg-slate-900 text-white py-3.5 rounded-full font-bold text-sm text-center">Kembali ke Beranda</a>
+</div>
+</div>
+
+<!-- QRIS Modal -->
+<div id="qrisModal" class="hidden fixed inset-0 z-[99] bg-black/60 backdrop-blur-sm grid place-items-center p-4" onclick="this.classList.add('hidden')">
+<div class="bg-white rounded-[24px] p-5 max-w-sm w-full text-center" onclick="event.stopPropagation()">
+<div class="flex justify-between items-center">
+<h4 class="font-extrabold text-sm">Donasi Pengembangan RUANG SADAR</h4>
+<button onclick="document.getElementById('qrisModal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full">✕</button>
+</div>
+<div class="mt-4 bg-slate-50 border-2 border-dashed rounded-2xl p-3">
+<img src="qris.jpg" alt="QRIS RUANG SADAR" class="w-full rounded-xl" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ayudithea.github.io/Berhenti_main_judol/'">
+</div>
+<p class="text-[12px] text-slate-500 mt-3 leading-5">Terima kasih orang baik! 🙏<br>Setiap donasi akan kami gunakan untuk biaya hosting, riset, dan pembuatan simulasi edukasi baru. Semoga rezekimu dilipatgandakan dan dijauhkan dari judol.</p>
+<div class="mt-4 bg-amber-50 text-amber-800 text-[11px] p-3 rounded-xl">💡 Cara: Screenshot QRIS di atas, buka e-wallet kamu, pilih Bayar / Scan, pilih dari Galeri.</div>
+</div>
+</div>
+
+<script>
+function shareLink(){
+  const url = window.location.origin + window.location.pathname.replace('tentang-ruang-sadar.html','portal.html');
+  const text = `Aku baru sadar judol itu nipu sistem! Coba cek RUANG SADAR ini biar kamu juga sadar:\n\n${url}\n\nShare ke keluarga biar gak ada yang ketipu lagi 🙏`;
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(waUrl, '_blank');
+}
+</script>
+
+<p class="text-center text-[11px] text-slate-400 mt-6">© 2026 RUANG SADAR - Berhenti Main Judol | Dibuat dengan kepedulian</p>
+
+</div>
+
+</body>
+</html>
