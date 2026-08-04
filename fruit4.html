@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) options = { passive: true };
+      else if (typeof options === 'boolean') options = { capture: options, passive: true };
+      else options = Object.assign({}, options, { passive: true });
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>FRUIT BOBANZA - SIMULASI 4 SEDOT</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+:root{--safe-top: env(safe-area-inset-top, 0px);--safe-bottom: env(safe-area-inset-bottom, 0px);}
+html{font-size:16px;height:100%;overflow-x:hidden;}
+body{width:100%;min-height:100dvh;font-family:Arial,Helvetica,sans-serif;background:#000 url("portal.png") no-repeat center top/cover;display:flex;justify-content:center;align-items:flex-start;overflow-x:hidden;}
+.mainShell{width:100%;max-width:540px;min-height:100dvh;margin:0 auto;display:flex;flex-direction:column;gap:8px;padding:calc(var(--safe-top) + 6px) 10px calc(var(--safe-bottom) + 12px);}
+.panel-sadow{background:linear-gradient(180deg, rgba(38,38,42,0.96) 0%, rgba(18,18,20,0.98) 100%);border:1px solid rgba(255,255,255,0.13);border-radius:16px;box-shadow:0 0 0 1px rgba(0,0,0,0.9),0 12px 32px rgba(0,0,0,0.8);backdrop-filter:blur(14px);position:relative;width:100%;}
+.panel-sadow::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 40%);pointer-events:none;}
+.panel-inner{position:relative;z-index:2;}
+.topPanel{padding:12px 14px 10px;text-align:center;color:#fff;}
+#topWinDisplay{font-size:clamp(14px,4.2vw,18px);font-weight:900;text-shadow:0 2px 0 #000,0 0 12px rgba(255,0,0,0.5);}
+#poolDisplay{font-size:10px;color:#ff5555;margin-top:4px;font-weight:700;}
+#tierDisplay{font-size:9px;color:#ffaa88;margin-top:3px;font-weight:800;background:rgba(0,0,0,0.4);padding:3px 8px;border-radius:20px;border:1px solid rgba(255,80,80,0.25);display:inline-block;}
+#cycleDisplay{font-size:9px;color:#ff5555;margin-top:4px;font-weight:800;letter-spacing:0.6px;background:rgba(255,80,80,0.12);padding:5px 10px;border-radius:20px;border:1px solid rgba(255,80,80,0.3);display:inline-block;max-width:100%;line-height:1.4;}
+#eduPanel{font-size:8.5px;color:#ffaaaa;margin-top:6px;background:rgba(255,50,50,0.08);border:1px dashed rgba(255,80,80,0.4);padding:7px 9px;border-radius:10px;line-height:1.45;text-align:left;}
+#chartWrap{margin-top:8px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px;border:1px solid rgba(255,80,80,0.15);}
+#saldoChart{width:100%;height:70px;display:block;}
+.board{flex:1 1 auto;padding:10px 8px 10px 12px;display:flex;justify-content:center;align-items:center;border-radius:18px;background:radial-gradient(ellipse at center, rgba(25,15,15,0.9) 0%, rgba(8,3,3,0.98) 100%);border:1px solid rgba(255,80,80,0.15);overflow:hidden;}
+#grid{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:100%;max-width:100%;aspect-ratio:1/1;max-height:min(92vw, 62vh, 480px);}
+.cell{position:relative;aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:clamp(20px,7vw,38px);background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);border-radius:8px;overflow:visible;box-shadow:inset 0 1px 0 rgba(255,255,255,0.03), 0 2px 4px rgba(0,0,0,0.3);filter:grayscale(0.15) brightness(0.92);}
+.cell::after{content:"";position:absolute;left:50%;bottom:6px;width:38%;height:10%;transform:translateX(-50%);background:rgba(0,0,0,.35);border-radius:50%;filter:blur(4px);pointer-events:none;}
+.cell.scatter{background:radial-gradient(circle at 50% 50%, rgba(255,100,100,0.25), rgba(255,100,100,0.05) 45%, transparent 78%);opacity:0.7;}
+.cell .scatter-img{width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6)) drop-shadow(0 0 8px rgba(255,80,80,0.5));animation:scatterFloat 2.5s ease-in-out infinite alternate;opacity:0.8;}
+@keyframes scatterFloat{from{transform:scale(1) rotate(-1deg);}to{transform:scale(1.05) rotate(1deg);}}
+@keyframes shatterAnim{0%{transform:scale(1);opacity:1;}100%{transform:scale(0.1) translateY(20px);filter:blur(6px);opacity:0;}}
+.cell.shattering{animation:shatterAnim 0.35s cubic-bezier(.7,0,.85,.6) forwards;z-index:20;}
+.particle-piece{position:absolute;left:50%;top:50%;pointer-events:none;font-size:16px;z-index:50;opacity:0.7;}
+@keyframes pieceFly{0%{transform:translate(-50%,-50%) scale(1);opacity:0.7;}100%{transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0);opacity:0;}}
+.controlArea{padding:10px;display:flex;flex-direction:column;gap:8px;}
+.featureRow{width:100%;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:linear-gradient(180deg, rgba(35,20,20,0.9), rgba(18,10,10,0.95));border-radius:12px;border:1px solid rgba(255,80,80,0.12);}
+.sadow-btn{background:linear-gradient(180deg, rgba(60,35,35,0.95) 0%, rgba(30,15,15,0.98) 100%);border:1px solid rgba(255,80,80,0.18);border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.6);color:#fff;font-weight:900;text-shadow:0 1px 0 #000;cursor:pointer;transition:0.12s;}
+.sadow-btn:active{transform:scale(0.93);}
+.sadow-btn.disabled{opacity:0.25;pointer-events:none;filter:grayscale(1);}
+.autoWrap,.buyWrap{display:flex;flex-direction:column;align-items:center;min-width:60px;}
+.autoBox,.buyBox{padding:6px 8px;min-width:60px;text-align:center;font-size:9px;line-height:1.1;}
+.autoBox i,.buyBox i{font-style:normal;font-size:18px;display:block;}
+.autoBox b,.buyBox b{display:block;font-size:8px;margin-top:2px;color:#ff8888;}
+.autoBox.active{color:#ff4a4a;animation:pulse 0.7s infinite;border-color:rgba(255,74,74,0.4) !important;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+#message{font-size:9px;font-weight:800;color:#ffaaaa;text-shadow:1px 1px 2px #000;min-height:18px;text-align:center;flex:1;padding:5px 8px;background:rgba(50,0,0,0.35);border-radius:8px;border:1px solid rgba(255,80,80,0.15);display:flex;align-items:center;justify-content:center;margin:0 6px;line-height:1.2;}
+.spinRow{width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:linear-gradient(180deg, rgba(35,20,20,0.9), rgba(18,10,10,0.95));border-radius:12px;border:1px solid rgba(255,80,80,0.12);gap:6px;}
+.betBtn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0;}
+#speedBtn{width:62px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;flex-shrink:0;}
+#speedBtn i{font-style:normal;font-size:11px;} #speedBtn b{font-size:6px;margin-top:2px;}
+#spinBtn{width:68px;height:68px;border-radius:50%;border:3px solid #ffaaaa;background:linear-gradient(180deg,#ff6b6b 0%,#cc0000 30%,#660000 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 2px #000,0 0 12px rgba(255,0,0,0.4),0 8px 18px rgba(0,0,0,.7), inset 0 2px 4px rgba(255,255,255,0.25);transition:.15s;flex-shrink:0;}
+#spinBtn span{font-size:30px;color:#fff;font-weight:bold;text-shadow:0 2px 0 #660000;} #spinBtn:active{transform:scale(.92);} #spinBtn.hidden{opacity:0;pointer-events:none;transform:scale(.5);}
+#soundToggle{width:60px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;flex-shrink:0;}
+#soundToggle i{font-style:normal;font-size:14px;} #soundToggle b{font-size:6px;margin-top:2px;}
+.bottomStats{display:flex;justify-content:space-between;gap:8px;}
+.saldoDisplay,.betDisplay{flex:1;text-align:center;padding:8px 6px;background:linear-gradient(180deg, rgba(45,25,25,0.95), rgba(20,10,10,0.98));border:1px solid rgba(255,80,80,0.18);border-radius:10px;cursor:pointer;}
+.saldoDisplay span,.betDisplay span{display:block;font-size:7px;font-weight:900;color:#ff8888;letter-spacing:1px;}
+.saldoDisplay b,.betDisplay b{font-size:13px;color:#fff;font-weight:900;display:block;margin-top:3px;}
+.comboPopup{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);font-size:28px;font-weight:bold;color:#ffaaaa;text-shadow:0 0 16px #000,0 0 28px #ff0000;pointer-events:none;animation:comboPopup 1s forwards;z-index:9999;text-align:center;max-width:90vw;}
+@keyframes comboPopup{0%{opacity:0;transform:translate(-50%,-50%) scale(.2);}25%{opacity:1;transform:translate(-50%,-50%) scale(1.15);}100%{opacity:0;transform:translate(-50%,-160%) scale(1);}}
+.bigFlash{animation:bigFlash .5s;}@keyframes bigFlash{0%{filter:brightness(1);}50%{filter:brightness(1.5);}100%{filter:brightness(1);}}
+#freeSpinPopup,#autoPopup,#buyPopup,#betPopup,#resetPopup{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;justify-content:center;align-items:center;z-index:99999;backdrop-filter:blur(8px);padding:10px 12px;}
+.popupBox{width:min(92vw,400px);max-height:90dvh;overflow-y:auto;background:linear-gradient(180deg,#2a1a1a,#111010);border:1px solid rgba(255,80,80,0.2);border-radius:20px;text-align:center;padding:18px;animation:popupScale .3s;}
+@keyframes popupScale{from{transform:scale(.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.autoGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0;max-height:40vh;overflow-y:auto;}
+.autoOpt{padding:8px 2px;border-radius:10px;border:1px solid rgba(255,80,80,0.15);background:#2a1a1a;font-weight:900;color:#cc8888;cursor:pointer;font-size:13px;}
+.autoOpt.selected{background:linear-gradient(180deg,#ff8888,#cc0000);color:#fff;border-color:#ffaaaa;}
+.buyGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0;}
+.buyCard{padding:10px;border-radius:12px;border:1px solid rgba(255,80,80,0.12);background:#2a1a1a;cursor:pointer;text-align:left;opacity:0.6;}
+.buyCard.selected{background:linear-gradient(180deg,#4a1a1a,#cc0000);border-color:#ff5555;}
+.buyCardTitle{font-size:12px;font-weight:900;color:#ff8888;}
+.buyCardDesc{font-size:8px;color:#aa7777;margin-top:2px;}
+.buyCardPrice{font-size:12px;font-weight:900;color:#ff5555;margin-top:4px;}
+.betHeaderTabs{display:flex;gap:6px;margin:10px 0;overflow-x:auto;padding-bottom:6px;}
+.betTab{padding:5px 9px;border-radius:20px;border:1px solid rgba(255,80,80,0.15);background:rgba(255,80,80,0.06);font-size:8px;font-weight:900;color:#aa7777;cursor:pointer;white-space:nowrap;}
+.betTab.active{background:#ff5555;color:#fff;border-color:#ffaaaa;}
+.betGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0;max-height:38vh;overflow-y:auto;}
+.betOpt{padding:7px 4px;border-radius:10px;border:1px solid rgba(255,80,80,0.1);background:#221111;cursor:pointer;}
+.betOpt.selected{background:linear-gradient(180deg,#ff8888,#cc0000);color:#fff;}
+.betOpt b{display:block;font-size:11px;font-weight:900;}
+.betOpt span{display:block;font-size:6px;margin-top:2px;color:#aa7777;}
+#popupDiamond{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;min-height:48px;}
+#popupDiamond img{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 0 6px #ff5555);opacity:0.7;}
+</style>
+</head>
+<body>
+<div class="mainShell">
+  <div class="panel-sadow topPanel"><div class="panel-inner">
+    <div id="topWinDisplay">💸 MENANG : Rp 0</div>
+    <div id="poolDisplay">GLOBAL POOL: - | MODE SEDOT</div>
+    <div id="tierDisplay">TIER: SEDOT</div>
+    <div id="cycleDisplay">SIMULASI 4 - MODE SEDOT | Spin: 0 | Saldo turun pelan 📉</div>
+    <div id="eduPanel">🎓 <b>MODE SEDOT:</b> Cascade jarang, 70% ZONK, menang pun kecil (0.1x-0.8x BET). Saldo turun sedikit demi sedikit. Ketika habis → reset ke awal. Memperlihatkan bagaimana sesi panjang tetap menghabiskan saldo meski sempat menang.</div>
+    <div id="chartWrap"><canvas id="saldoChart" width="500" height="70"></canvas><div style="display:flex;justify-content:space-between;font-size:7px;color:#ff8888;margin-top:2px;"><span>Spin awal</span><span style="color:#ff5555;">● Saldo terus turun</span><span>→ Habis → Reset</span></div></div>
+  </div></div>
+  <div class="panel-sadow board"><div class="panel-inner" style="width:100%;display:flex;justify-content:center;"><div id="grid"></div></div></div>
+  <div class="panel-sadow controlArea"><div class="panel-inner" style="width:100%;display:flex;flex-direction:column;gap:8px;">
+      <div class="featureRow">
+        <div class="autoWrap"><div class="sadow-btn autoBox" id="autoSpinBtn"><i>🎡</i>AUTO<b id="autoText">10</b></div></div>
+        <div id="message">MODE SEDOT AKTIF - 70% ZONK</div>
+        <div class="buyWrap"><div class="sadow-btn buyBox" id="buySpinBtn" style="opacity:0.4;"><i>🚫</i>BUY<b id="buyPriceText">OFF</b></div></div>
+      </div>
+      <div class="spinRow">
+        <div class="sadow-btn betBtn" id="betMinus">−</div>
+        <div id="speedBtn" class="sadow-btn"><i id="speedIcon">🐢</i><b id="speedText">LAMBAT</b></div>
+        <button id="spinBtn"><span>⟳</span></button>
+        <div id="soundToggle" class="sadow-btn sound-on"><i id="soundIcon">🔊</i><b id="soundText">SOUND</b></div>
+        <div class="sadow-btn betBtn" id="betPlus">+</div>
+      </div>
+      <div class="bottomStats">
+        <div class="saldoDisplay"><span>SALDO (TERUS TURUN)</span><b id="score">0</b></div>
+        <div class="betDisplay" id="betDisplayBtn"><span>BET - TAP PILIH</span><b id="betText">200</b></div>
+      </div>
+  </div></div>
+</div>
+
+<div id="resetPopup" style="position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;justify-content:center;align-items:center;z-index:100000;backdrop-filter:blur(8px);padding:10px;"><div class="popupBox" style="border:2px solid #ff5555;"><div style="font-size:20px;font-weight:900;color:#ff5555;">💸 SALDO HABIS - MODE SEDOT 💸</div><div style="font-size:50px;margin:10px 0;">📉</div><div id="resetTotal" style="font-size:14px;font-weight:900;color:#fff;margin:8px 0;"></div><div id="resetDetail" style="font-size:10px;color:#ffaaaa;margin-bottom:12px;line-height:1.4;"></div><button id="resetOk" style="width:100%;padding:14px;background:linear-gradient(180deg,#ff5555,#cc0000);color:#fff;border:2px solid #ffaaaa;border-radius:12px;font-weight:900;font-size:14px;">RESET KE AWAL</button></div></div>
+<div id="freeSpinPopup"><div class="popupBox"><div id="popupTitle" style="font-size:18px;font-weight:bold;color:#ff8888;">💸 SCATTER SEDOT</div><div style="font-size:48px;margin:8px 0;" id="popupDiamond"></div><div id="scatterInfo" style="font-size:11px;margin:8px 0;color:#ffaaaa;"></div><button id="popupOk" style="width:100%;padding:12px;background:linear-gradient(180deg,#ff8888,#cc0000);color:#fff;border:2px solid #ffaaaa;border-radius:12px;font-weight:bold;">LANJUT SEDOT</button></div></div>
+<div id="autoPopup"><div class="popupBox" style="width:380px;"><div style="font-size:18px;font-weight:900;color:#ff5555;">🎡 AUTO SEDOT</div><div class="autoGrid" id="autoGrid"></div><div style="display:flex;gap:8px;"><button id="autoCancel" style="flex:1;padding:10px;background:#2a1a1a;border:1px solid #444;border-radius:10px;color:#fff;">BATAL</button><button id="autoStart" style="flex:1;padding:10px;background:linear-gradient(180deg,#ff5555,#cc0000);color:#fff;border:1px solid #ffaaaa;border-radius:10px;font-weight:900;">MULAI SEDOT</button></div></div></div>
+<div id="buyPopup"><div class="popupBox" style="width:420px;"><div style="font-size:18px;font-weight:900;color:#ff5555;">🚫 BUY DINONAKTIFKAN - MODE SEDOT</div><div style="font-size:11px;color:#ffaaaa;margin:10px 0;line-height:1.5;">Di mode sedot, Buy dimatikan untuk menunjukkan:<br>• Bahkan tanpa Buy, saldo tetap habis<br>• Kemenangan kecil tidak bisa menutupi kekalahan<br>• Edukasi: sesi panjang = sedot</div><button id="buyCancel" style="width:100%;padding:11px;background:#2a1a1a;border:1px solid #444;border-radius:10px;color:#fff;">TUTUP</button></div></div>
+<div id="betPopup"><div class="popupBox" style="width:420px;"><div style="font-size:18px;font-weight:900;color:#ff5555;">🎲 PILIH BET - MODE SEDOT</div><div style="font-size:9px;color:#ffaaaa;margin-top:4px;">Saldo: <span id="betPopupSaldo" style="color:#ff5555;">0</span> | Semakin besar BET, semakin cepat habis</div><div class="betHeaderTabs" id="betTabs"></div><div class="betGrid" id="betGrid"></div><div style="display:flex;gap:8px;"><button id="betCancel" style="flex:1;padding:10px;background:#2a1a1a;border:1px solid #444;border-radius:10px;color:#fff;">BATAL</button><button id="betConfirm" style="flex:1;padding:10px;background:linear-gradient(180deg,#ff5555,#cc0000);color:#fff;border:1px solid #ffaaaa;border-radius:10px;font-weight:900;">PAKAI</button></div></div></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
+firebase.initializeApp(firebaseConfig); const auth=firebase.auth(); const db=firebase.firestore();
+let soundEnabled=true;
+const AUDIO_SRC={sorak:'sorak.mp3',scatter:'scatter.mp3',pecah:'pecah.mp3',spin:'spin.mp3',win:'win.mp3'};
+let audioCache={};
+function initAudio(){for(let k in AUDIO_SRC){if(!audioCache[k]){try{let a=new Audio();a.src=AUDIO_SRC[k];a.preload='auto';audioCache[k]=a;}catch(e){}}}}
+function ensureAudio(){if(soundEnabled)initAudio();}
+function playSound(name,vol=1,allowOverlap=false){if(!soundEnabled)return;try{let base=audioCache[name];if(!base){base=new Audio(AUDIO_SRC[name]);base.preload='auto';audioCache[name]=base;}if(allowOverlap||name==='pecah'||name==='spin'){let c=base.cloneNode();c.volume=vol;c.play().catch(()=>{});}else{base.pause();base.currentTime=0;base.volume=vol;base.play().catch(()=>{});}}catch(e){}}
+function playFruitFall(){playSound('spin',0.5,true);}function playShatter(){playSound('pecah',0.6,true);}
+
+function generateBetLevels(){let l=[];for(let v=200;v<=10000;v+=200)l.push(v);for(let v=12000;v<=100000;v+=2000)l.push(v);for(let v=120000;v<=1000000;v+=20000)l.push(v);return l;}
+let BET_LEVELS=generateBetLevels();let betIndex=0,currentBet=200;
+let AUTO_LEVELS=[];for(let i=10;i<=500;i+=10)AUTO_LEVELS.push(i);
+let autoIndex=0,autoCount=10,isAutoSpin=false,autoRemaining=0,isStoppingAuto=false,tempAutoIndex=0;
+let SPEED_CONFIG=[{label:'LAMBAT',icon:'🐢',speed:0.30},{label:'SEDANG',icon:'⚡',speed:1},{label:'CEPAT',icon:'⚡⚡',speed:2.5}];
+let speedIndex=0,currentSpeed=0.55,tumbleWin=0;
+
+// === SIMULASI 4 SEDOT ===
+let spinSedotCount=0;
+let initialSaldoSedot=0;
+let saldoHistory=[];
+let totalLoss=0;
+let totalWin=0;
+let faseSedot="SEDOT - CASCADE JARANG";
+
+function getTier(bet){if(bet<=1000)return{pct:0.20,label:"KECIL 20% SEDOT",tab:"KECIL"};if(bet<=10000)return{pct:0.15,label:"MENENGAH 15% SEDOT",tab:"MENENGAH"};if(bet<=100000)return{pct:0.10,label:"BESAR 10% SEDOT",tab:"BESAR"};return{pct:0.05,label:"SULTAN 5% SEDOT",tab:"SULTAN"};}
+let globalPool=0,houseProfit=0,totalBetGlobal=0,globalPoolFirebase=0;
+const POOL_KEY="fruitBobanza_sedot_pool";const SAVE_KEY="fruitBobanza_sedot_state";
+let poolDocRef=db.collection("global").doc("pool");
+async function initGlobalPool(){try{let doc=await poolDocRef.get();if(!doc.exists){await poolDocRef.set({pool:0,profit:0,totalBet:0,lastUpdate:Date.now()});}else{let d=doc.data();globalPool=d.pool||0;houseProfit=d.profit||0;totalBetGlobal=d.totalBet||0;globalPoolFirebase=d.pool||0;}poolDocRef.onSnapshot(snap=>{if(snap.exists){let d=snap.data();globalPoolFirebase=d.pool||0;globalPool=globalPoolFirebase;houseProfit=d.profit||0;totalBetGlobal=d.totalBet||0;updatePoolUI();}});}catch(e){loadLocalPool();}}
+function loadLocalPool(){try{let d=JSON.parse(localStorage.getItem(POOL_KEY));if(d){globalPool=d.pool||0;houseProfit=d.profit||0;totalBetGlobal=d.totalBet||0;}}catch(e){}}
+function saveLocalPool(){localStorage.setItem(POOL_KEY,JSON.stringify({pool:globalPool,profit:houseProfit,totalBet:totalBetGlobal}));}
+async function addToGlobalPool(poolAdd,houseCut,bet){try{await db.runTransaction(async (tx)=>{let doc=await tx.get(poolDocRef);if(!doc.exists){tx.set(poolDocRef,{pool:poolAdd,profit:houseCut,totalBet:bet,lastUpdate:Date.now()});}else{let data=doc.data();tx.update(poolDocRef,{pool:(data.pool||0)+poolAdd,profit:(data.profit||0)+houseCut,totalBet:(data.totalBet||0)+bet,lastUpdate:Date.now()});}});}catch(e){globalPool+=poolAdd;houseProfit+=houseCut;totalBetGlobal+=bet;saveLocalPool();}}
+async function takeFromGlobalPool(winAmount){try{let taken=0;await db.runTransaction(async (tx)=>{let doc=await tx.get(poolDocRef);if(!doc.exists){taken=0;return;}let pool=doc.data().pool||0;if(pool>=winAmount){tx.update(poolDocRef,{pool:pool-winAmount,lastUpdate:Date.now()});taken=winAmount;}else{let give=Math.floor(pool*0.5);tx.update(poolDocRef,{pool:pool-give,lastUpdate:Date.now()});taken=give;}});return taken;}catch(e){if(globalPool>=winAmount){globalPool-=winAmount;saveLocalPool();return winAmount;}else{let give=Math.floor(globalPool*0.5);globalPool-=give;saveLocalPool();return give;}}}
+
+function saveState(){try{const data={board,score,betIndex,autoIndex,speedIndex,freeSpins,inFreeSpin,isAutoSpin,autoRemaining,tumbleWin,combo,spinSedotCount,initialSaldoSedot,saldoHistory,totalLoss,totalWin,faseSedot,ts:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(data));}catch(e){}}
+function loadState(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;const d=JSON.parse(raw);if(Date.now()-d.ts>60*60*1000){localStorage.removeItem(SAVE_KEY);return null;}return d;}catch(e){return null;}}
+
+function updateSedotDisplay(){
+  let el=document.getElementById('cycleDisplay');
+  if(!el) return;
+  let lossPct = initialSaldoSedot>0 ? ((initialSaldoSedot - score)/initialSaldoSedot*100).toFixed(1) : 0;
+  let winRate = spinSedotCount>0 ? ((totalWin/spinSedotCount)*100).toFixed(0) : 0;
+  el.innerHTML=`MODE SEDOT | Spin: ${spinSedotCount} | Saldo: ${score.toLocaleString('id-ID')} dari ${initialSaldoSedot.toLocaleString('id-ID')} | Turun: ${lossPct}% | WinRate: ${100-parseInt(winRate)}% ZONK 📉<br><span style="color:#ff8888;">${faseSedot}</span>`;
+}
+
+function drawSaldoChart(){
+  const canvas=document.getElementById('saldoChart');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='rgba(255,80,80,0.08)'; ctx.lineWidth=1;
+  for(let i=0;i<4;i++){ ctx.beginPath(); ctx.moveTo(0, i*h/4); ctx.lineTo(w, i*h/4); ctx.stroke(); }
+  if(saldoHistory.length<2) return;
+  let min=Math.min(...saldoHistory, initialSaldoSedot*0.3);
+  let max=Math.max(...saldoHistory, initialSaldoSedot*1.1);
+  let range=Math.max(1, max-min);
+  // garis awal
+  let y0 = h - ((initialSaldoSedot - min)/range)*h;
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(w,y0); ctx.stroke(); ctx.setLineDash([]);
+  // line saldo turun
+  ctx.strokeStyle='#ff4444'; ctx.lineWidth=2.5; ctx.beginPath();
+  saldoHistory.forEach((val,i)=>{
+    let x = (i/(saldoHistory.length-1))*w;
+    let y = h - ((val - min)/range)*h;
+    if(i==0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // area red
+  ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); ctx.fillStyle='rgba(255,60,60,0.10)'; ctx.fill();
+}
+
+function pushSaldoHistory(){ saldoHistory.push(score); if(saldoHistory.length>50) saldoHistory.shift(); drawSaldoChart(); updateSedotDisplay(); }
+
+function updatePoolUI(){let tier=getTier(currentBet);let poolToShow=globalPoolFirebase>0?globalPoolFirebase:globalPool;document.getElementById('poolDisplay').innerHTML=`🌐 GLOBAL POOL: ${Math.floor(poolToShow).toLocaleString('id-ID')} | SEDOT ${spinSedotCount} SPIN | LOSS ${totalLoss.toLocaleString('id-ID')}`;document.getElementById('tierDisplay').textContent=`${tier.label} | ${faseSedot}`;updateSedotDisplay();saveLocalPool();saveState();}
+function updateSpeedUI(){let cfg=SPEED_CONFIG[speedIndex];currentSpeed=cfg.speed;document.getElementById('speedText').textContent=cfg.label;document.getElementById('speedIcon').textContent=cfg.icon;saveState();}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms/currentSpeed));}function sleepReal(ms){return new Promise(r=>setTimeout(r,ms));}
+function setControlsLock(locked){const a=document.getElementById('autoSpinBtn');const m=document.getElementById('betMinus');const p=document.getElementById('betPlus');const bd=document.getElementById('betDisplayBtn');if(locked){a.classList.add('disabled');m.classList.add('disabled');p.classList.add('disabled');bd.classList.add('disabled');}else{a.classList.remove('disabled');m.classList.remove('disabled');p.classList.remove('disabled');bd.classList.remove('disabled');}}
+function updateBetUI(){currentBet=BET_LEVELS[betIndex];document.getElementById('betText').textContent=currentBet.toLocaleString('id-ID');document.getElementById('betMinus').style.opacity=betIndex===0?'0.3':'1';document.getElementById('betPlus').style.opacity=betIndex===BET_LEVELS.length-1?'0.3':'1';checkSaldoForSpin();updatePoolUI();}
+function updateAutoUI(){autoCount=AUTO_LEVELS[autoIndex];document.getElementById('autoText').textContent=isAutoSpin?autoRemaining:autoCount;saveState();}
+function updateTopWin(){document.getElementById('topWinDisplay').textContent=`💸 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')} (KECIL)`;saveState();}
+function buildAutoGrid(){const g=document.getElementById('autoGrid');g.innerHTML="";AUTO_LEVELS.forEach((v,i)=>{const d=document.createElement('div');d.className='autoOpt'+(i===tempAutoIndex?' selected':'');d.textContent=v;d.onclick=()=>{tempAutoIndex=i;document.querySelectorAll('.autoOpt').forEach(e=>e.classList.remove('selected'));d.classList.add('selected');};g.appendChild(d);});}
+function openAutoPopup(){if(isAutoSpin)return;tempAutoIndex=autoIndex;buildAutoGrid();document.getElementById('autoPopup').style.display='flex';}
+function closeAutoPopup(){document.getElementById('autoPopup').style.display='none';}
+let tempBetIndex=0;let betFilter='ALL';
+function openBetPopup(){ensureAudio();tempBetIndex=betIndex;document.getElementById('betPopupSaldo').textContent=score.toLocaleString('id-ID');buildBetTabs();buildBetGrid();document.getElementById('betPopup').style.display='flex';}
+function closeBetPopup(){document.getElementById('betPopup').style.display='none';}
+function buildBetTabs(){const tabs=document.getElementById('betTabs');tabs.innerHTML="";const allTabs=['ALL','KECIL','MENENGAH','BESAR','SULTAN'];allTabs.forEach(t=>{const el=document.createElement('div');el.className='betTab'+(betFilter===t?' active':'');el.textContent=t;el.onclick=()=>{betFilter=t;buildBetTabs();buildBetGrid();};tabs.appendChild(el);});}
+function buildBetGrid(){const g=document.getElementById('betGrid');g.innerHTML="";let filtered=BET_LEVELS.map((v,i)=>({v,i,tier:getTier(v).tab})).filter(o=>{if(betFilter==='ALL')return true;return o.tier===betFilter;});filtered.forEach(obj=>{const div=document.createElement('div');div.className='betOpt'+(obj.i===tempBetIndex?' selected':'');const tier=getTier(obj.v);div.innerHTML=`<b>${obj.v.toLocaleString('id-ID')}</b><span>${tier.tab} SEDOT</span>`;div.onclick=()=>{tempBetIndex=obj.i;document.querySelectorAll('.betOpt').forEach(e=>e.classList.remove('selected'));div.classList.add('selected');};g.appendChild(div);});}
+let player=null;
+auth.onAuthStateChanged(async u=>{
+  if(!u){location.replace("index.html");return;}
+  const doc=await db.collection("players").doc(u.uid).get();if(!doc.exists)return;
+  player=doc.data();
+  await initGlobalPool();
+  const saved=loadState();
+  if(saved&&saved.score>0){score=saved.score;}else{score=player.wallet?.coin||0;}
+  if(saved){
+    if(saved.betIndex!=null&&saved.betIndex<BET_LEVELS.length)betIndex=saved.betIndex;
+    if(saved.autoIndex!=null)autoIndex=saved.autoIndex;
+    if(saved.speedIndex!=null)speedIndex=saved.speedIndex;
+    if(saved.board&&saved.board.length===ROWS){board=saved.board;drawBoard();}
+    freeSpins=saved.freeSpins||0;inFreeSpin=saved.inFreeSpin||false;isAutoSpin=saved.isAutoSpin||false;autoRemaining=saved.autoRemaining||0;tumbleWin=saved.tumbleWin||0;combo=saved.combo||0;
+    if(saved.spinSedotCount) spinSedotCount=saved.spinSedotCount;
+    if(saved.initialSaldoSedot) initialSaldoSedot=saved.initialSaldoSedot; else initialSaldoSedot=score;
+    if(saved.saldoHistory) saldoHistory=saved.saldoHistory; else saldoHistory=[score];
+    if(saved.totalLoss) totalLoss=saved.totalLoss;
+    if(saved.totalWin) totalWin=saved.totalWin;
+    if(saved.faseSedot) faseSedot=saved.faseSedot;
+    updateBetUI();updateAutoUI();updateSpeedUI();updateTopWin();updatePoolUI();drawSaldoChart();
+    if(isAutoSpin){showMessage(`♻️ Lanjut AUTO SEDOT ${autoRemaining} | Spin ${spinSedotCount}`);setTimeout(()=>{if(isAutoSpin)spin();},800);}
+  }else{
+    initialSaldoSedot=score; saldoHistory=[score];
+    updateBetUI();updateAutoUI();updateSpeedUI();updateTopWin();updatePoolUI();drawSaldoChart();
+  }
+  updatePanel();
+});
+const SCATTER="SCATTER";const SCATTER_IMG="scatter.png";let TRANSPARENT_SCATTER_URL=null;
+let freeSpins=0,inFreeSpin=false,ROWS=5,COLS=5;const symbols=["🍎","🍓","🍍","🥝","🍇","🥭","🍒","🍉","🥥"];let board=[],score=0,combo=0,spinning=false;const grid=document.getElementById("grid");let cells=[];const scoreText=document.getElementById("score"),message=document.getElementById("message"),spinBtn=document.getElementById("spinBtn");
+let _spinLock = false;let _lastSpinTime = 0;
+function isDoubleClickBlocked(){const now=Date.now();if(_spinLock) return true;if(spinning) return true;if(now-_lastSpinTime<500) return true;return false;}
+async function buildTransparentScatter(){try{const img=new Image();img.crossOrigin="anonymous";img.src=SCATTER_IMG+"?t="+Date.now();await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;});const canvas=document.createElement('canvas');canvas.width=img.naturalWidth||200;canvas.height=img.naturalHeight||200;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);const d=imageData.data;for(let i=0;i<d.length;i+=4){let r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];let lum=(r+g+b)/3;if(lum<22&&a>10){d[i+3]=0;}else if(lum<45){d[i+3]=Math.floor(a*(lum/45)*0.35);}}ctx.putImageData(imageData,0,0);TRANSPARENT_SCATTER_URL=canvas.toDataURL('image/png');}catch(e){TRANSPARENT_SCATTER_URL=SCATTER_IMG;}}
+function checkSaldoForSpin(){
+  if(score<currentBet){
+    spinBtn.classList.add('hidden');
+    showResetPopup();
+  }else{
+    spinBtn.classList.remove('hidden');
+  }
+}
+function showResetPopup(){
+  return new Promise(res=>{
+    const p=document.getElementById("resetPopup");
+    document.getElementById("resetTotal").innerHTML=`SALDO AWAL: ${initialSaldoSedot.toLocaleString('id-ID')}<br>SALDO AKHIR: ${score.toLocaleString('id-ID')}<br><span style="color:#ff5555;">RUGI: ${(initialSaldoSedot-score).toLocaleString('id-ID')} (${((initialSaldoSedot-score)/initialSaldoSedot*100).toFixed(1)}%)</span><br>Spin: ${spinSedotCount}`;
+    document.getElementById("resetDetail").innerHTML=`Total BET: ${totalLoss.toLocaleString('id-ID')} | Total Win Kecil: ${totalWin.toLocaleString('id-ID')}<br>Edukasi: Meski sempat menang kecil, sesi panjang tetap habis karena 70% ZONK & cascade jarang.<br>Reset ke kondisi awal untuk simulasi lagi.`;
+    p.style.display="flex";
+    document.getElementById("resetOk").onclick=()=>{
+      p.style.display="none";
+      // RESET KE KONDISI AWAL
+      spinSedotCount=0;
+      totalLoss=0;
+      totalWin=0;
+      initialSaldoSedot = initialSaldoSedot; // tetap saldo awal yang sama untuk edukasi, atau refill
+      score = initialSaldoSedot;
+      saldoHistory=[score];
+      faseSedot="RESET - Kembali ke awal, akan disedot lagi";
+      updatePanel(); drawSaldoChart(); updatePoolUI();
+      spinBtn.classList.remove('hidden');
+      showMessage("🔄 RESET KE AWAL - Mode sedot dimulai lagi");
+      saveState();
+      res();
+    };
+  });
+}
+function randomFruit(){return symbols[Math.floor(Math.random()*symbols.length)];}
+function randomFruitNoScatter(){return symbols[Math.floor(Math.random()*symbols.length)];}
+function updatePanel(){scoreText.textContent=score.toLocaleString("id-ID");checkSaldoForSpin();saveState();}
+function showMessage(t){message.textContent=t;}
+function createBoard(){const saved=loadState();if(saved&&saved.board&&saved.board.length===ROWS){board=saved.board;}else{board=[];for(let r=0;r<ROWS;r++){let row=[];for(let c=0;c<COLS;c++)row.push(randomFruitNoScatter());board.push(row);}limitScatter(1);}drawBoard();updatePanel();setTimeout(buildTransparentScatter,300);}
+function isScatter(v){return v===SCATTER;}
+function renderCellContent(cellEl,value){cellEl.innerHTML="";cellEl.classList.remove("scatter","shattering","scatter-last");const oldP=cellEl.querySelectorAll('.particle-piece');oldP.forEach(p=>p.remove());if(isScatter(value)){cellEl.classList.add("scatter");let img=document.createElement("img");img.src=TRANSPARENT_SCATTER_URL||SCATTER_IMG;img.className="scatter-img";img.alt="SCATTER";img.onerror=()=>{cellEl.textContent="💎";};cellEl.appendChild(img);}else{cellEl.textContent=value??"";}}
+function drawBoard(){grid.innerHTML="";cells=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const cell=document.createElement("div");cell.className="cell";renderCellContent(cell,board[r][c]);grid.appendChild(cell);cells.push(cell);}}
+function countScatter(){let cnt=0;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(isScatter(board[r][c]))cnt++;return cnt;}
+function limitScatter(max){let positions=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(isScatter(board[r][c]))positions.push({r,c});if(positions.length<=max)return;for(let i=positions.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[positions[i],positions[j]]=[positions[j],positions[i]];}let toRemove=positions.slice(0,positions.length-max);toRemove.forEach(p=>{board[p.r][p.c]=randomFruitNoScatter();updateCell(p.r,p.c);});}
+function hasMatch(b){const cnt={};for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){let v=b[r][c];if(!v||isScatter(v))continue;cnt[v]=(cnt[v]||0)+1;}return Object.values(cnt).some(x=>x>=6);}
+
+// === LOGIKA SEDOT ===
+function getSedotCategory(){
+  spinSedotCount++;
+  // Cascade jarang, ZONK dominan
+  let r=Math.random();
+  if(r<0.70){
+    faseSedot="ZONK - Kalah, tidak ada pecah";
+    return "ZONK";
+  } else if(r<0.88){
+    faseSedot="MENANG SANGAT KECIL - 0.1x-0.35x BET, tetap rugi";
+    return "RENDAH_SEDIT";
+  } else if(r<0.97){
+    faseSedot="MENANG KECIL - 0.4x-0.8x BET, masih rugi";
+    return "SEDANG_KECIL";
+  } else {
+    faseSedot="JARANG - Menang 0.9x-1.1x (hampir impas) - Tease";
+    return "TINGGI_KECIL";
+  }
+}
+
+function calculateSedotWin(category){
+  let win=0;
+  if(category==="ZONK") win=0;
+  else if(category==="RENDAH_SEDIT") win=Math.floor(currentBet*(0.08+Math.random()*0.27)); // 0.08-0.35x
+  else if(category==="SEDANG_KECIL") win=Math.floor(currentBet*(0.35+Math.random()*0.45)); // 0.35-0.8x
+  else if(category==="TINGGI_KECIL") win=Math.floor(currentBet*(0.85+Math.random()*0.30)); // 0.85-1.15x jarang
+  else win=0;
+  // Batasi pool - sedot masuk pool banyak
+  return win;
+}
+
+function generateSedotBoard(category){
+  let newBoard=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  let scatterCount=0;
+  // Di mode sedot, scatter sangat jarang
+  if(Math.random()<0.02) scatterCount=1; // 2% chance 1 scatter, tidak pernah 3/4
+  else scatterCount=0;
+
+  let allPos=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) allPos.push({r,c});
+  for(let i=allPos.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [allPos[i],allPos[j]]=[allPos[j],allPos[i]];}
+  let scatterPositions=allPos.slice(0,scatterCount);
+  scatterPositions.forEach(p=>newBoard[p.r][p.c]=SCATTER);
+
+  if(category==="ZONK"){
+    let tries=0;
+    while(true){
+      let cnt={};
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(newBoard[r][c]!==SCATTER){
+        let fruit, at=0; do{ fruit=randomFruitNoScatter(); at++; }while((cnt[fruit]||0)>=5 && at<20);
+        newBoard[r][c]=fruit; cnt[fruit]=(cnt[fruit]||0)+1;
+      }
+      if(Math.max(...Object.values(cnt),0)<6) break;
+      tries++; if(tries>30) break;
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(newBoard[r][c]!==SCATTER) newBoard[r][c]=null;
+    }
+  } else {
+    // Menang sangat kecil - cuma 6 simbol, tidak cascade
+    let winSym=symbols[Math.floor(Math.random()*symbols.length)];
+    let winCount=6; // minimal biar cascade jarang
+    let available=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(newBoard[r][c]!==SCATTER) available.push({r,c});
+    for(let i=available.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [available[i],available[j]]=[available[j],available[i]];}
+    for(let i=0;i<winCount;i++){ newBoard[available[i].r][available[i].c]=winSym; }
+    let cnt={[winSym]:winCount};
+    for(let i=winCount;i<available.length;i++){
+      let p=available[i]; let fruit, at=0;
+      do{ fruit=randomFruitNoScatter(); at++; }while((cnt[fruit]||0)>=5 && at<20 && fruit!==winSym);
+      if((cnt[fruit]||0)>=5){ let other=symbols.filter(s=>s!==winSym && (cnt[s]||0)<5); if(other.length>0) fruit=other[Math.floor(Math.random()*other.length)]; }
+      newBoard[p.r][p.c]=fruit; cnt[fruit]=(cnt[fruit]||0)+1;
+    }
+  }
+  return {board:newBoard, scatterPositions};
+}
+
+async function animateReelDrop(targetData){
+  const existingOverlay=document.getElementById('trainOverlay'); if(existingOverlay) existingOverlay.remove();
+  cells.forEach(c=>{try{c.getAnimations().forEach(a=>a.cancel());}catch(e){}});
+  const targetBoard=targetData.board; const scatterPositions=targetData.scatterPositions;
+  const firstCell=cells[0]; const cellH=firstCell?firstCell.offsetHeight:68; const gap=3; const trainH=5*(cellH+gap); const initialY=-trainH;
+  grid.style.opacity='0';
+  const boardInner=document.querySelector('.board .panel-inner'); boardInner.style.position='relative';
+  let overlay=document.createElement('div'); overlay.id='trainOverlay'; overlay.style.position='absolute'; overlay.style.inset='0'; overlay.style.display='grid'; overlay.style.gridTemplateColumns='repeat(5,1fr)'; overlay.style.gap=gap+'px'; overlay.style.pointerEvents='none'; overlay.style.overflow='hidden'; overlay.style.zIndex='5'; boardInner.appendChild(overlay);
+  let columns=[];
+  for(let c=0;c<COLS;c++){
+    let colDiv=document.createElement('div'); colDiv.style.display='flex'; colDiv.style.flexDirection='column'; colDiv.style.gap=gap+'px'; colDiv.style.transform=`translateY(${initialY}px)`;
+    for(let r=0;r<ROWS;r++){let val=targetBoard[r][c];let el=document.createElement('div');el.className='cell'+(isScatter(val)?' scatter':'');if(isScatter(val)){let img=document.createElement('img');img.src=TRANSPARENT_SCATTER_URL||SCATTER_IMG;img.className='scatter-img';el.appendChild(img);}else{el.textContent=val??'';}colDiv.appendChild(el);}
+    for(let r=0;r<ROWS;r++){let val=board[r][c];let el=document.createElement('div');el.className='cell'+(isScatter(val)?' scatter':'');if(isScatter(val)){let img=document.createElement('img');img.src=TRANSPARENT_SCATTER_URL||SCATTER_IMG;img.className='scatter-img';el.appendChild(img);}else{el.textContent=val??'';}colDiv.appendChild(el);}
+    overlay.appendChild(colDiv); columns.push(colDiv);
+  }
+  playFruitFall();
+  let anims=[];
+  for(let c=0;c<COLS;c++){
+    let colDiv=columns[c]; let delay=c*70;
+    try{let anim=colDiv.animate([{transform:`translateY(${initialY}px)`},{transform:`translateY(0px)`}],{duration:450/currentSpeed,delay:delay,easing:'cubic-bezier(.2,.9,.25,1)',fill:'forwards'});anims.push(anim.finished.catch(()=>{}));}catch(e){}
+  }
+  await Promise.all(anims);
+  overlay.remove(); grid.style.opacity='1'; board=targetBoard; drawBoard(); saveState();
+}
+async function performTumbleGravity(){
+  let newBoard=Array.from({length:ROWS},()=>Array(COLS).fill(null)); let moves=[];
+  for(let c=0;c<COLS;c++){let write=ROWS-1; for(let r=ROWS-1;r>=0;r--){if(board[r][c]!==null){newBoard[write][c]=board[r][c]; if(write!==r) moves.push({from:r,to:write,col:c,isNew:false,value:board[r][c]}); write--;}} for(let r=write;r>=0;r--){let v=randomFruitNoScatter(); newBoard[r][c]=v; moves.push({from:-100-r,to:r,col:c,isNew:true,value:v});}}
+  board=newBoard; let anims=[];
+  for(let c=0;c<COLS;c++){let colMoves=moves.filter(m=>m.col===c); let colDelay=c*35; for(let m of colMoves){let idx=m.to*COLS+m.col; let cell=cells[idx]; if(!cell) continue; renderCellContent(cell,m.value); let distance=m.isNew?(m.to+4):(m.to-m.from); let h=cell.offsetHeight||68; let fromY= -distance*(h+6) - (m.isNew?80:0); cell.style.transform=`translateY(${fromY}px)`; if(m.isNew) cell.style.opacity='0'; try{let anim=cell.animate([{transform:`translateY(${fromY}px)`,opacity:m.isNew?0:1},{transform:'translateY(0)',opacity:1}],{duration:300/currentSpeed,delay:colDelay,easing:'cubic-bezier(.2,.78,.3,1)',fill:'forwards'}); anims.push(anim.finished.catch(()=>{}));}catch(e){cell.style.transform=''; cell.style.opacity='';}}}
+  await Promise.all(anims); cells.forEach(c=>{c.style.transform=''; c.style.opacity='';}); playFruitFall(); limitScatter(1); drawBoard(); await sleep(60);
+}
+function findMatches(){const counts={},pos={};for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const f=board[r][c];if(isScatter(f)||!f)continue;if(!counts[f]){counts[f]=0;pos[f]=[];}counts[f]++;pos[f].push({r,c});}const m=[];for(const f in counts)if(counts[f]>=6)m.push(pos[f]);return m;}
+async function destroyMatchesWithShatter(groups){
+  let allPos=[];groups.forEach(g=>allPos.push(...g));if(allPos.length===0)return;
+  playShatter();
+  for(let p of allPos){let idx=p.r*COLS+p.c;let cell=cells[idx];if(!cell)continue;cell.classList.add('shattering');}
+  await sleep(300);for(let p of allPos){board[p.r][p.c]=null;let idx=p.r*COLS+p.c;let cell=cells[idx];if(cell){cell.innerHTML='';cell.classList.remove('shattering','scatter');cell.style.opacity='0';}}await sleep(50);await performTumbleGravity();saveState();
+  // Di mode sedot, cascade kedua sangat jarang (10% chance)
+  let again=findMatches();
+  if(again.length>0 && Math.random()<0.10){
+    combo++;showWin(`CASCADE x${combo+1} (JARANG)`);
+    await sleep(100);await destroyMatchesWithShatter(again);
+  }
+}
+async function animateSpin(category,winAmount){
+  showMessage(`📉 SEDOT ${spinSedotCount} [${category}] ${faseSedot} | Saldo ${score.toLocaleString('id-ID')}`);
+  let targetData=generateSedotBoard(category);
+  await animateReelDrop(targetData);
+  saveState();
+}
+function updateCell(r,c){const i=r*COLS+c;if(!cells[i])return;renderCellContent(cells[i],board[r][c]);}
+function showWin(t){const d=document.createElement("div");d.className="comboPopup";d.innerHTML=t;document.body.appendChild(d);setTimeout(()=>d.remove(),900);grid.classList.add("bigFlash");setTimeout(()=>grid.classList.remove("bigFlash"),400);}
+function renderScatterPopup(count){let cont=document.getElementById('popupDiamond');cont.innerHTML="";for(let i=0;i<count;i++){let img=document.createElement("img");img.src=TRANSPARENT_SCATTER_URL||SCATTER_IMG;img.alt="scatter";cont.appendChild(img);}}
+async function spin(){
+  if(isDoubleClickBlocked()){ return; }
+  if(score<currentBet){
+    await showResetPopup();
+    return;
+  }
+  _spinLock = true; spinning = true; _lastSpinTime = Date.now(); spinBtn.disabled = true; setControlsLock(true);
+  try{
+    ensureAudio();
+    if(!isAutoSpin){combo=0;tumbleWin=0;updateTopWin();}
+    if(initialSaldoSedot==0){initialSaldoSedot=score; saldoHistory=[score];}
+    let tier=getTier(currentBet);let houseCut=Math.floor(currentBet*tier.pct);let poolAdd=currentBet-houseCut;
+    await addToGlobalPool(poolAdd,houseCut,currentBet);
+    totalLoss+=currentBet;
+    let category=getSedotCategory();
+    let winAmount=calculateSedotWin(category);
+    await animateSpin(category,winAmount);
+    if(winAmount===0){
+      score=Math.max(0,score-currentBet);
+      if(player){player.wallet.coin=score;const u=auth.currentUser;if(u)await db.collection("players").doc(u.uid).update({"wallet.coin":score});}
+      updatePanel(); pushSaldoHistory();
+      showWin(`ZONK -${currentBet.toLocaleString('id-ID')}`);
+      return;
+    }
+    let actualWin=await takeFromGlobalPool(winAmount);
+    totalWin+=actualWin;
+    tumbleWin=actualWin;let groups=findMatches();if(groups.length>0)await destroyMatchesWithShatter(groups);
+    score=Math.max(0,score-currentBet+actualWin);if(player){player.wallet.coin=score;const u=auth.currentUser;if(u)await db.collection("players").doc(u.uid).update({"wallet.coin":score});}
+    updateTopWin();updatePanel();pushSaldoHistory();
+    let net = actualWin - currentBet;
+    showWin(net>=0?`💸 +${actualWin.toLocaleString('id-ID')} (masih rugi ${currentBet-actualWin})`:`💸 +${actualWin.toLocaleString('id-ID')} -${currentBet-actualWin}`);
+  }catch(e){console.error(e);showMessage(e.message);}finally{
+    spinning=false;_spinLock=false;spinBtn.disabled=false;setControlsLock(false);saveState();handleAutoNext();
+  }
+}
+function handleAutoNext(){if(isAutoSpin){if(isStoppingAuto){stopAuto();return;}autoRemaining--;updateAutoUI();if(autoRemaining<=0){stopAuto();showMessage(`✅ Auto sedot selesai - Rugi ${(initialSaldoSedot-score).toLocaleString('id-ID')}`);return;}if(score<currentBet){stopAuto();showResetPopup();return;}saveState();setTimeout(()=>{if(isAutoSpin)spin();},500/currentSpeed);}else{saveState();}}
+function startAutoSpin(){if(isDoubleClickBlocked()) return; if(isAutoSpin)return;if(score<currentBet){showMessage("❌ Saldo habis");return;}ensureAudio();isAutoSpin=true;isStoppingAuto=false;autoRemaining=AUTO_LEVELS[autoIndex];document.getElementById('autoSpinBtn').classList.add('active');document.getElementById('autoText').textContent=autoRemaining;showMessage(`▶ AUTO SEDOT ${autoRemaining} - Lihat saldo turun`);saveState();spin();}
+function stopAuto(){isAutoSpin=false;autoRemaining=0;isStoppingAuto=false;document.getElementById('autoSpinBtn').classList.remove('active');updateAutoUI();if(!inFreeSpin)setControlsLock(false);saveState();}
+document.getElementById('betMinus').onclick=()=>{if(spinning||_spinLock)return;ensureAudio();if(betIndex>0){betIndex--;updateBetUI();playSound('spin',0.4,true);}};
+document.getElementById('betPlus').onclick=()=>{if(spinning||_spinLock)return;ensureAudio();if(betIndex<BET_LEVELS.length-1){betIndex++;updateBetUI();playSound('spin',0.4,true);}};
+document.getElementById('autoSpinBtn').onclick=()=>{if(spinning||_spinLock)return;ensureAudio();if(isAutoSpin){isStoppingAuto=true;showMessage("⏹ Stop Auto...");if(!spinning)stopAuto();}else{openAutoPopup();}};
+document.getElementById('buySpinBtn').onclick=()=>{document.getElementById('buyPopup').style.display='flex';};
+document.getElementById('betDisplayBtn').onclick=()=>{if(spinning||_spinLock) return; openBetPopup();};
+document.getElementById('autoCancel').onclick=closeAutoPopup;
+document.getElementById('autoStart').onclick=()=>{autoIndex=tempAutoIndex;updateAutoUI();closeAutoPopup();startAutoSpin();};
+document.getElementById('buyCancel').onclick=()=>{document.getElementById('buyPopup').style.display='none';};
+document.getElementById('betCancel').onclick=closeBetPopup;
+document.getElementById('betConfirm').onclick=()=>{if(spinning||_spinLock) return; betIndex=tempBetIndex;updateBetUI();closeBetPopup();showMessage(`✅ BET ${currentBet.toLocaleString('id-ID')} - Mode sedot`);playSound('spin',0.5,true);};
+document.getElementById('speedBtn').onclick=()=>{ensureAudio();speedIndex=(speedIndex+1)%SPEED_CONFIG.length;updateSpeedUI();showMessage(`⚡ ${SPEED_CONFIG[speedIndex].label}`);playSound('spin',0.5,true);};
+spinBtn.addEventListener("click", (e)=>{e.preventDefault();if(isDoubleClickBlocked()) return;ensureAudio();if(isAutoSpin){isStoppingAuto=true;showMessage("⏹ Auto Dihentikan");if(!spinning)stopAuto();return;}spin();});
+function updateSoundUI(){const btn=document.getElementById('soundToggle');const icon=document.getElementById('soundIcon');const txt=document.getElementById('soundText');if(soundEnabled){btn.classList.remove('sound-off');btn.classList.add('sound-on');icon.textContent='🔊';txt.textContent='SOUND';}else{btn.classList.remove('sound-on');btn.classList.add('sound-off');icon.textContent='🔇';txt.textContent='OFF';}}
+document.getElementById('soundToggle').onclick=()=>{soundEnabled=!soundEnabled;updateSoundUI();if(soundEnabled){initAudio();playSound('spin',0.5,true);}else{for(let k in audioCache){try{audioCache[k].pause();}catch(e){}}}};
+function showFreeSpinPopup(){return new Promise(res=>{const p=document.getElementById("freeSpinPopup");p.style.display="flex";document.getElementById("popupOk").onclick=()=>{p.style.display="none";res();};});}
+window.addEventListener('beforeunload',(e)=>{if(isAutoSpin||spinning){saveState();e.preventDefault();e.returnValue='Yakin?';}});
+setInterval(()=>{if(isAutoSpin||spinning)saveState();},1000);
+updateBetUI();updateAutoUI();updateSpeedUI();updateTopWin();updateSoundUI();createBoard();showMessage("📉 SIMULASI 4 SEDOT AKTIF - 70% ZONK, cascade jarang, saldo turun pelan");
+</script>
+</body>
+</html>

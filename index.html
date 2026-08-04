@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Ruang Sadar - Pembukaan</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{min-height:100dvh;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#000 url("portal.png") no-repeat center top/cover fixed;color:#fff;display:flex;justify-content:center;}
+.main{width:100%;max-width:560px;padding:8px 10px 20px;display:flex;flex-direction:column;gap:10px;}
+.panel{background:linear-gradient(180deg, rgba(38,38,42,0.96), rgba(18,18,20,0.98));border:1px solid rgba(255,255,255,0.13);border-radius:18px;box-shadow:0 12px 32px rgba(0,0,0,0.8);position:relative;overflow:hidden;}
+.panel::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.06), transparent 40%);pointer-events:none;}
+.inner{position:relative;z-index:2;padding:14px;}
+.badge-top{text-align:center;background:rgba(0,0,0,0.6);border:1px solid rgba(0,255,136,0.25);border-radius:100px;padding:8px 10px;font-size:9px;font-weight:900;letter-spacing:0.8px;color:#aaffcc;line-height:1.4;}
+.badge-warn{text-align:center;background:#000;border:1px solid rgba(255,215,0,0.3);border-radius:100px;padding:6px;font-size:8px;font-weight:900;letter-spacing:1px;color:#ffcc00;margin-top:6px;}
+.warning{display:flex;gap:10px;background:linear-gradient(180deg, rgba(255,215,0,0.18), rgba(255,160,0,0.1));border:2px solid #ffcc00;border-radius:16px;padding:12px;margin-top:10px;}
+.warning .icon{width:40px;height:40px;background:#ffcc00;border-radius:50%;display:grid;place-items:center;font-size:22px;flex-shrink:0;}
+h1{font-size:32px;font-weight:900;line-height:0.9;letter-spacing:-1px;margin-top:12px;}
+h1 span.gold{background:linear-gradient(90deg,#ffcc00,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sub{font-size:12px;color:#ddd;margin-top:8px;line-height:1.5;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.chip{font-size:8px;font-weight:900;padding:6px 10px;border-radius:100px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);}
+.chip.gold{background:#ffcc00;color:#000;}
+.faktaBox{margin-top:10px;background:linear-gradient(180deg, rgba(255,0,0,0.12), rgba(80,0,0,0.25));border:1px solid rgba(255,80,80,0.3);border-radius:16px;padding:12px;}
+.faktaItem{display:flex;gap:8px;margin-top:8px;font-size:11px;line-height:1.4;}
+.faktaIcon{flex:0 0 22px;height:22px;background:#ff4444;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#fff;font-weight:900;}
+.adminPanel{background:#0a0a0a;border:1px solid rgba(255,80,80,0.2);border-radius:12px;overflow:hidden;margin-top:10px;}
+.adminHead{background:#1a1a1a;padding:8px 10px;display:flex;justify-content:space-between;font-size:8px;font-family:monospace;color:#ff8888;border-bottom:1px solid #222;}
+.adminGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;}
+.adminBtn{padding:8px;border-radius:10px;border:1px solid rgba(255,80,80,0.15);background:rgba(255,80,80,0.08);text-align:left;}
+.adminBtn b{display:block;font-size:8px;color:#ff8888;}
+.adminBtn span{display:block;font-size:6px;color:#777;margin-top:2px;}
+.ctaBox{margin-top:12px;background:linear-gradient(180deg, rgba(255,204,0,0.15), rgba(255,140,0,0.08));border:2px solid #ffcc00;border-radius:18px;padding:14px;text-align:center;}
+.ctaBtn{width:100%;height:52px;border-radius:100px;border:2px solid #fff;background:linear-gradient(180deg,#ffcc00,#ff8c00);color:#000;font-weight:900;font-size:14px;cursor:pointer;box-shadow:0 8px 20px rgba(255,204,0,0.4);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;}
+.ctaBtn:active{transform:scale(0.97);}
+.stopBox{background:linear-gradient(180deg, #1e1e20, #0a0a0a);border:1px solid rgba(255,204,0,0.2);border-radius:16px;padding:14px;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="main">
+  <div class="panel"><div class="inner">
+    <div class="badge-top">🤲 DENGAN HADIRNYA APLIKASI INI, SEMOGA ALLAH MEMBERIKAN HIDAYAH DAN JALAN TERBAIK UNTUK ANDA ✨</div>
+    <div class="badge-warn">⚠️ EDUKASI • TANPA UANG ASLI • TANPA DEPOSIT • PAKAI KOIN POIN</div>
+
+    <div class="warning">
+      <div class="icon">⚠️</div>
+      <div>
+        <div style="font-size:13px;font-weight:900;color:#ffcc00;">PERINGATAN SEBELUM LANJUT</div>
+        <div style="font-size:11px;color:#fff;line-height:1.45;margin-top:4px;">
+          Baca dulu sampai habis. Halaman ini adalah <b>himbauan dan pembukaan</b> sebelum kamu masuk ke simulator pembongkaran pola judol.<br><br>
+          Jika kamu belum yakin dengan edukasi ini, silakan lanjut ke simulator — supaya kamu benar-benar bisa berhenti.
+        </div>
+      </div>
+    </div>
+
+    <h1>BUAH KOIN<br><span class="gold">DIBONGKAR</span></h1>
+    <div class="sub">Kenapa di situs ilegal hasilnya bisa diatur manual? Ini faktanya. Bukan sulap, bukan hoki — tapi <span style="background:#fff;color:#000;padding:2px 6px;border-radius:6px;font-weight:900;">panel settingan</span> bajakan.</div>
+    <div class="chips">
+      <div class="chip gold">🛡️ 100% Edukasi</div>
+      <div class="chip">👁️ Tanpa Uang Asli</div>
+      <div class="chip">📖 Ada Himbauan Dulu</div>
+    </div>
+  </div></div>
+
+  <div class="panel"><div class="inner">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="width:34px;height:34px;background:#ff4444;border-radius:50%;display:grid;place-items:center;">🐛</div>
+      <div><div style="font-weight:900;font-size:14px;">FAKTA SETTING MANUAL DI INDONESIA</div><div style="font-size:9px;color:#aaa;">Semua situs ilegal pakai game bajakan + panel admin</div></div>
+    </div>
+
+    <div class="faktaBox">
+      <div style="font-weight:900;font-size:10px;color:#ff5555;display:flex;align-items:center;gap:6px;"><span style="background:#ff4444;color:#fff;padding:2px 6px;border-radius:20px;font-size:7px;">BAJAKAN</span> GAME BAJAKAN ILEGAL (SETTING MANUAL)</div>
+      <div class="faktaItem"><div class="faktaIcon">✕</div><div>Ada panel admin — bisa atur kapan pemain menang/kalah</div></div>
+      <div class="faktaItem"><div class="faktaIcon">✕</div><div>Bisa set jackpot muncul cuma untuk pancingan testimoni palsu</div></div>
+      <div class="faktaItem"><div class="faktaIcon">✕</div><div>Deposit masuk ke rekening pribadi / e-wallet pribadi, bukan perusahaan resmi</div></div>
+      <div class="faktaItem"><div class="faktaIcon">✕</div><div>Domain ganti-ganti tiap minggu karena diblokir Kominfo</div></div>
+
+      <div class="adminPanel">
+        <div class="adminHead"><span>● ADMIN PANEL BAJAKAN • ILUSTRASI</span><span>v3.7.1 crack</span></div>
+        <div class="adminGrid">
+          <div class="adminBtn"><b>[DEPOSIT MANUAL]</b><span>TF ke rek pribadi admin</span></div>
+          <div class="adminBtn"><b>[SET MENANG]</b><span>Bikin menang dulu biar betah</span></div>
+          <div class="adminBtn"><b>[SET KALAH]</b><span>Setelah depo besar, atur kalah terus</span></div>
+          <div class="adminBtn"><b>[SET JACKPOT]</b><span>Jackpot fake buat testimoni</span></div>
+        </div>
+        <div style="padding:6px 8px;background:#000;font-family:monospace;font-size:6px;color:#555;line-height:1.4;">> user_62812 deposit 500rb → set win 3x → tunggu depo 2jt → set lose 100%<br>> WARNING: domain .com blocked, ganti ke .vip</div>
+      </div>
+      <div style="margin-top:6px;font-size:7px;color:#777;text-align:center;">Ilustrasi edukasi non-fungsional. Tidak bisa mengatur game apapun.</div>
+    </div>
+
+    <div style="margin-top:10px;background:#222;border-radius:12px;padding:10px;">
+      <div style="font-weight:900;font-size:11px;color:#ffcc00;">🎯 3 CIRI SITUS SETTINGAN - LANGSUNG TUTUP</div>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;">
+        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;display:flex;gap:8px;"><div style="background:#fff;color:#000;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:10px;">1</div><div><b style="font-size:11px;">Deposit ke rekening pribadi</b><div style="font-size:9px;color:#aaa;margin-top:2px;">Disuruh TF ke BCA/Mandiri/Dana atas nama orang, bukan PT. Uang langsung masuk kantong bandar.</div></div></div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;display:flex;gap:8px;"><div style="background:#fff;color:#000;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:10px;">2</div><div><b style="font-size:11px;">Ada promo jam gacor / menang pasti</b><div style="font-size:9px;color:#aaa;margin-top:2px;">Game resmi tidak ada jam gacor. Kalau ada yang bilang jam 2 malam gacor = settingan manual.</div></div></div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;display:flex;gap:8px;"><div style="background:#fff;color:#000;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:10px;">3</div><div><b style="font-size:11px;">Domain ganti-ganti + CS spam depo</b><div style="font-size:9px;color:#aaa;margin-top:2px;">Situs resmi tidak ganti domain tiap minggu. Situs settingan diblokir terus, CS spam 'depo lagi kak'.</div></div></div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="panel"><div class="inner">
+    <div class="stopBox">
+      <div style="font-size:14px;font-weight:900;">🛑 UDAH TAU FAKTANYA, SIAP LIHAT BUKTINYA?</div>
+      <div style="font-size:10px;color:#aaa;margin-top:6px;line-height:1.5;">Di halaman selanjutnya kamu akan masuk ke <b>4 Simulator Bongkar Pola</b> yang pakai sistem Global Pool sama kayak bandar:<br>
+      • SIM1 RTP 5JT • SIM2 Ditahan • SIM3 Jackpot 50JT • SIM4 Sedot<br>
+      Semua pakai koin poin, tanpa uang asli.
+      </div>
+      <div class="ctaBox">
+        <div style="font-size:11px;font-weight:900;color:#ffcc00;">⚠️ PERINGATAN SEBELUM MASUK SIMULATOR</div>
+        <div style="font-size:10px;color:#fff;margin-top:4px;line-height:1.4;">Jika kamu belum yakin dengan edukasi di atas, klik tombol di bawah untuk melanjutkan edukasi melalui simulator permainannya, supaya kamu benar-benar bisa berhenti bermain judol.</div>
+        <button class="ctaBtn" id="toSimulator">Lanjutkan ke Simulator Lengkap →</button>
+        <div style="font-size:8px;color:#aaa;margin-top:8px;" id="visitInfo">Menghitung pengunjung...</div>
+      </div>
+      <div style="margin-top:12px;background:#fff;color:#000;border-radius:10px;padding:8px 10px;font-size:9px;line-height:1.4;"><b>Butuh bantuan?</b> Hubungi layanan konseling kecanduan di daerahmu. Kamu tidak sendirian. Edukasi ini tanpa uang asli, tanpa deposit.</div>
+    </div>
+    <div style="margin-top:10px;text-align:center;font-size:7px;color:#666;">© 2025 Ruang Sadar - Edukasi Anti Judol • Tanpa uang asli • Simbol buah hanya ilustrasi</div>
+  </div></div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(), db=firebase.firestore();
+
+const VISITOR_KEY="rs_visitor_id";
+let visitorId=localStorage.getItem(VISITOR_KEY);
+if(!visitorId){ visitorId="vis_"+Date.now()+"_"+Math.random().toString(36).substr(2,6); localStorage.setItem(VISITOR_KEY, visitorId); }
+
+auth.signInAnonymously().then(async ()=>{
+  try{
+    let now=new Date();
+    let ref=db.collection("visitors").doc(visitorId);
+    let snap=await ref.get();
+    if(!snap.exists){
+      await ref.set({firstVisit:now, lastVisit:now, visitCount:1, userAgent:navigator.userAgent, modes:["PEMBUKAAN"]});
+    } else {
+      let modes=snap.data().modes||[];
+      if(!modes.includes("PEMBUKAAN")) modes.push("PEMBUKAAN");
+      await ref.update({lastVisit:now, visitCount: firebase.firestore.FieldValue.increment(1), modes:modes});
+    }
+    await db.collection("stats").doc("global").set({totalVisits: firebase.firestore.FieldValue.increment(1), lastVisit:now}, {merge:true});
+    await db.collection("stats").doc("mode_PEMBUKAAN").set({visits: firebase.firestore.FieldValue.increment(1)}, {merge:true});
+    let dayId=now.toISOString().slice(0,10);
+    await db.collection("stats_daily").doc(dayId).set({visits: firebase.firestore.FieldValue.increment(1)}, {merge:true});
+    
+    let g=await db.collection("stats").doc("global").get();
+    if(g.exists){
+      document.getElementById('visitInfo').textContent = `👁️ ${ (g.data().totalVisits||0).toLocaleString('id-ID')} orang sudah melihat himbauan ini • ID kamu: ${visitorId.slice(0,12)}...`;
+    }
+  }catch(e){ console.log(e); document.getElementById('visitInfo').textContent="Mode offline - tetap bisa lanjut ke simulator"; }
+});
+
+document.getElementById('toSimulator').onclick=()=>{
+  let btn=document.getElementById('toSimulator');
+  btn.textContent="Membuka simulator...";
+  setTimeout(()=>{ window.location.href="simulator.html"; }, 400);
+};
+</script>
+</body>
+</html>

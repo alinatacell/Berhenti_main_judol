@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Register - RUANG SADAR</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;min-height:100vh;background:url('ruang-sadar-bg.png') no-repeat center center fixed;background-size:cover;background-color:#dbeafe;display:flex;justify-content:center;align-items:flex-start;padding:18px;overflow-y:auto}
+.container{position:relative;width:min(100vw,500px);background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-radius:24px;padding:22px 18px 20px;box-shadow:0 20px 50px rgba(13,71,161,.18);border:1.5px solid #bfdbfe;margin-top:10px}
+.header{text-align:center;margin-bottom:16px}
+.logo-icon{width:64px;height:64px;margin:0 auto 8px;background:linear-gradient(135deg,#1a73e8,#0d47a1);border-radius:16px;display:flex;justify-content:center;align-items:center;font-size:30px;color:#fff;box-shadow:0 8px 20px rgba(26,115,232,.3)}
+.header h2{color:#0d47a1;font-size:22px;font-weight:900}
+.header p{color:#64748b;font-size:11px;margin-top:3px}
+.badge{display:inline-block;background:#22c55e;color:#fff;font-size:10px;padding:4px 10px;border-radius:20px;margin-top:6px;font-weight:bold}
+input,select{width:100%;height:46px;padding:0 14px;margin-bottom:10px;border:1.5px solid #93c5fd;border-radius:12px;background:#fff;color:#0f172a;font-size:13px;font-weight:600;outline:none}
+input:focus,select:focus{border-color:#1a73e8;box-shadow:0 0 0 3px rgba(26,115,232,.15)}
+input::placeholder{color:#94a3b8}
+.error-text{font-size:10px;color:#ef4444;display:none;margin:-6px 0 8px 4px;font-weight:700}
+.checking{font-size:11px;color:#0d47a1;text-align:center;display:none;margin-bottom:8px;font-weight:700}
+#registerBtn{width:100%;height:50px;border:none;border-radius:14px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 8px 20px rgba(26,115,232,.35);margin-top:6px}
+#registerBtn:disabled{background:#94a3b8;box-shadow:none;cursor:not-allowed}
+.back{display:block;text-align:center;margin-top:12px;color:#0d47a1;text-decoration:none;font-size:12px;font-weight:700;background:#e3f2fd;padding:10px;border-radius:10px;border:1px solid #bfdbfe}
+.popup{position:fixed;inset:0;background:rgba(0,20,40,.75);display:none;justify-content:center;align-items:center;z-index:9999;padding:20px}
+.popup-box{width:100%;max-width:360px;background:#fff;border:2px solid #1a73e8;border-radius:18px;padding:24px;text-align:center}
+.popup-box h2{color:#0d47a1;margin-bottom:10px;font-size:18px}
+.popup-box p{margin-bottom:18px;white-space:pre-line;font-size:12px;line-height:1.6;color:#334155}
+.popup-box button{width:140px;height:44px;border:none;border-radius:10px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-weight:bold;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo-icon">🛡️</div>
+<h2>RUANG SADAR</h2>
+<p>Ruang Belajar Sadar Bahaya Judol</p>
+<span class="badge">🎁 DAFTAR GRATIS - AKSES 2 SIMULATOR</span>
+</div>
+
+<input type="email" id="email" placeholder="Email Gmail (nama@gmail.com)">
+<div id="emailError" class="error-text">Email harus Gmail valid</div>
+<input type="password" id="password" placeholder="Password (min 6 karakter)">
+<input type="password" id="confirm" placeholder="Konfirmasi Password">
+<input type="tel" id="wa" placeholder="No WhatsApp (angka saja)" inputmode="numeric">
+<div id="waError" class="error-text">WA harus angka saja min 10 digit</div>
+
+<!-- PENJELASAN KENAPA ISI EWALLET -->
+<div style="background:#fffbeb;border:1.5px dashed #f59e0b;border-radius:12px;padding:12px;margin-bottom:10px;">
+<p style="font-size:11.5px;color:#78350f;line-height:1.5;text-align:left">
+<b>💙 Kenapa harus isi E-Wallet / Rekening?</b><br>
+Aplikasi <b>RUANG SADAR</b> ini 100% GRATIS & EDUKASI, bukan judi.<br>
+Data rekening ini <b>BUKAN untuk potongan</b>, tapi untuk <b>berbagi rezeki</b> jika nanti aplikasi ini mendapat apresiasi, donasi, atau menghasilkan rezeki dari iklan edukasi.<br>
+<b>Jika ada rezeki, saya akan berbagi dengan kalian pengguna awal.</b> Satu rekening 1 akun biar adil. 🙏
+</p>
+</div>
+
+<select id="bank" required>
+<option value="" disabled selected>Pilih Bank / E-Wallet</option>
+<option value="DANA">DANA</option>
+<option value="GOPAY">GOPAY</option>
+<option value="BRI">BRI</option>
+<option value="BCA">BCA</option>
+<option value="MANDIRI">MANDIRI</option>
+<option value="SEABANK">SEABANK</option>
+</select>
+<div id="bankError" class="error-text">Pilih bank valid</div>
+<input type="text" id="namaRekening" placeholder="Nama Pemilik Rekening">
+<input type="text" id="noRekening" placeholder="Nomor Rekening (angka saja)" inputmode="numeric">
+<div id="noRekError" class="error-text">No Rek harus angka min 8 digit</div>
+<div id="checkingRek" class="checking">⏳ Mengecek no rekening...</div>
+
+<button id="registerBtn" type="button">DAFTAR AKUN RUANG SADAR</button>
+<a class="back" href="simulator.html">Sudah punya akun? Kembali ke LOGIN</a>
+
+<!-- KOMITMEN LENGKAP -->
+<div style="margin-top:14px;background:#f0fdf4;border:2px solid #22c55e;border-radius:14px;padding:14px;">
+<h4 style="font-size:12px;color:#15803d;text-align:center;margin-bottom:6px">🤝 KOMITMEN BERBAGI REZEKI</h4>
+<p style="font-size:11px;color:#334155;line-height:1.6;text-align:left">
+1. <b>BUKAN JUDI:</b> RUANG SADAR adalah simulator edukasi, tidak ada taruhan uang asli.<br>
+2. <b>TUJUAN REKENING:</b> Jika aplikasi RUANG SADAR mendapat apresiasi / sponsor / rezeki, saya berniat <b>berbagi rezeki kepada kalian</b> yang sudah mendukung dari awal.<br>
+3. <b>ADIL:</b> 1 No. Rekening hanya 1 akun agar pembagian adil & transparan.<br><br>
+<span style="color:#15803d;font-weight:800">Terima kasih sudah belajar sadar bareng di RUANG SADAR. Semoga kita dijauhkan dari jerat judol.</span>
+</p>
+</div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();const db=firebase.firestore();
+function showPopup(pesan,cb=null){document.getElementById("popupText").textContent=pesan;document.getElementById("successPopup").style.display="flex";window.popupCallback=cb}
+function closePopup(){document.getElementById("successPopup").style.display="none";if(window.popupCallback){window.popupCallback();window.popupCallback=null}}
+function isValidGmail(e){return /^[a-z0-9._%+-]+@gmail\.com$/.test(e.toLowerCase())}
+function isOnlyNumbers(s){return /^[0-9]+$/.test(s)}
+function showError(id,show){document.getElementById(id).style.display=show?"block":"none"}
+document.getElementById("wa").addEventListener("input",function(){this.value=this.value.replace(/[^0-9]/g,"");showError("waError",this.value.length>0&&(!isOnlyNumbers(this.value)||this.value.length<10))});
+document.getElementById("noRekening").addEventListener("input",function(){this.value=this.value.replace(/[^0-9]/g,"");showError("noRekError",this.value.length>0&&(!isOnlyNumbers(this.value)||this.value.length<8))});
+document.getElementById("email").addEventListener("input",function(){showError("emailError",this.value.length>0&&!isValidGmail(this.value.trim()))});
+document.getElementById("bank").addEventListener("change",function(){showError("bankError",!this.value)});
+async function isRekeningTerdaftar(noRek){
+try{let s=await db.collection("players").where("bank.noRekening","==",noRek).limit(1).get();if(!s.empty){let d=s.docs[0].data();return{terdaftar:true,email:d.profile?.email||"unknown",bank:d.bank?.namaBank||""}}return{terdaftar:false}}catch(e){
+try{let snap=await db.collection("players").limit(100).get();let found=null;snap.forEach(doc=>{let b=doc.data().bank||{};if(b.noRekening===noRek)found={email:doc.data().profile?.email||"unknown",bank:b.namaBank||""}});if(found)return{terdaftar:true,email:found.email,bank:found.bank};return{terdaftar:false}}catch(e2){return{terdaftar:false}}
+}
+}
+document.getElementById("registerBtn").addEventListener("click",async function(){
+const email=document.getElementById("email").value.trim().toLowerCase();const pass=document.getElementById("password").value;const conf=document.getElementById("confirm").value;const wa=document.getElementById("wa").value.trim();const bank=document.getElementById("bank").value.trim();const namaRekening=document.getElementById("namaRekening").value.trim();const noRekening=document.getElementById("noRekening").value.trim();const btn=document.getElementById("registerBtn");const checkingEl=document.getElementById("checkingRek");
+if(!email||!pass||!conf||!wa||!bank||!namaRekening||!noRekening){showPopup("Lengkapi semua data RUANG SADAR.");return}
+if(!isValidGmail(email)){showError("emailError",true);showPopup("Email harus Gmail valid!");return}
+if(!["DANA","GOPAY","BRI","BCA","MANDIRI","SEABANK"].includes(bank.toUpperCase())){showError("bankError",true);showPopup("Pilih Bank valid.");return}
+if(!isOnlyNumbers(noRekening)||noRekening.length<8){showError("noRekError",true);showPopup("No Rekening angka min 8 digit!");return}
+if(!isOnlyNumbers(wa)||wa.length<10){showError("waError",true);showPopup("WA angka min 10 digit!");return}
+if(pass!==conf){showPopup("Konfirmasi password tidak cocok.");return}
+if(pass.length<6){showPopup("Password min 6 karakter.");return}
+btn.disabled=true;btn.textContent="CEK REKENING...";checkingEl.style.display="block";
+let cek=await isRekeningTerdaftar(noRekening);checkingEl.style.display="none";
+if(cek.terdaftar){btn.disabled=false;btn.textContent="DAFTAR AKUN RUANG SADAR";showError("noRekError",true);showPopup("❌ REKENING SUDAH TERDAFTAR!\nNo: "+noRekening+"\nBank: "+cek.bank+"\nEmail: "+cek.email+"\n\n1 Rekening 1 akun!");return}
+btn.textContent="MENDAFTAR...";
+try{await auth.createUserWithEmailAndPassword(email,pass);const user=auth.currentUser;await db.collection("players").doc(user.uid).set({profile:{email:user.email,wa:wa,nickname:"",avatar:"",createdAt:Date.now()},bank:{namaBank:bank.toUpperCase(),namaRekening:namaRekening,noRekening:noRekening},wallet:{coin:0,diamond:0,ticket:0},settings:{music:true,sound:true,vibration:true},statistics:{totalPlay:0,totalWin:0,totalLose:0},games:{}});await auth.signOut();btn.disabled=false;btn.textContent="DAFTAR AKUN RUANG SADAR";showPopup("🎉 Akun RUANG SADAR berhasil!\nKamu dapat akses Simulator Kedua Gratis.\nJika nanti ada rezeki dari aplikasi, akan saya bagikan. Silakan login.",function(){location.replace("index.html")})}catch(err){btn.disabled=false;btn.textContent="DAFTAR AKUN RUANG SADAR";if(err.code==="auth/email-already-in-use")showPopup("Email sudah terdaftar.");else if(err.code==="auth/weak-password")showPopup("Password min 6 karakter.");else showPopup(err.message)}
+});
+</script>
+<div id="successPopup" class="popup"><div class="popup-box"><h2>RUANG SADAR</h2><p id="popupText"></p><button onclick="closePopup()">OK</button></div></div>
+</body>
+</html>

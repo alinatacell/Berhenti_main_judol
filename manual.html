@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SIMULASI 5 MANUAL - SETTING SEMAUMU - KAMU BANDARNYA</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+body{min-height:100dvh;background:#000 url("portal.png") no-repeat center top/cover fixed;color:#fff;font-family:Arial,sans-serif;display:flex;justify-content:center;}
+.main{width:100%;max-width:560px;padding:8px 10px 20px;display:flex;flex-direction:column;gap:8px;}
+.panel{background:linear-gradient(180deg, rgba(38,38,42,0.96), rgba(18,18,20,0.98));border:1px solid rgba(255,255,255,0.13);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,0.8);position:relative;overflow:hidden;}
+.inner{position:relative;z-index:2;padding:10px;}
+.top{font-size:14px;font-weight:900;text-align:center;color:#ffcc00;line-height:1.2;}
+.sub{font-size:9px;color:#aaa;text-align:center;margin-top:4px;line-height:1.4;}
+.checkBoxWrap{background:rgba(0,0,0,0.5);border:1px solid rgba(255,204,0,0.25);border-radius:12px;padding:8px;margin-top:8px;display:flex;flex-direction:column;gap:8px;}
+.item{display:flex;align-items:flex-start;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;cursor:pointer;transition:.15s;}
+.item.active{border-color:#ffcc00;background:rgba(255,204,0,0.12);box-shadow:0 0 10px rgba(255,204,0,0.2);}
+.item input[type=radio]{width:20px;height:20px;accent-color:#ffcc00;flex-shrink:0;margin-top:2px;}
+.item .txt{flex:1;}
+.item .txt b{display:block;font-size:11px;color:#fff;line-height:1.2;}
+.item .txt span{display:block;font-size:8px;color:#aaa;margin-top:3px;line-height:1.3;}
+.val{font-size:9px;font-weight:900;color:#ffcc00;background:#000;border:1px solid rgba(255,204,0,0.3);padding:4px 8px;border-radius:20px;min-width:36px;text-align:center;}
+.sliderRow{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.sliderRow input[type=range]{flex:1;accent-color:#ffcc00;}
+.board{padding:8px;display:flex;justify-content:center;align-items:center;border-radius:18px;background:radial-gradient(ellipse at center, rgba(20,20,25,0.9), rgba(5,5,8,0.98));border:1px solid rgba(255,255,255,0.1);min-height:320px;}
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:100%;aspect-ratio:1/1;max-height:58vh;}
+.cell{aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:26px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);border-radius:8px;}
+.cell.scatter{background:radial-gradient(circle, rgba(255,215,0,0.4), transparent 70%);position:relative;}
+.cell .scatter-img{width:78%;height:78%;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));animation:scatterPop .4s ease;}
+@keyframes scatterPop{0%{transform:scale(0.2)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes shatter{0%{transform:scale(1);opacity:1;}100%{transform:scale(0.1) translateY(20px);opacity:0;}}
+.cell.shattering{animation:shatter 0.3s forwards;}
+.controls{padding:8px;display:flex;flex-direction:column;gap:6px;}
+.row{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:6px 8px;background:rgba(30,30,34,0.9);border-radius:12px;border:1px solid rgba(255,255,255,0.08);}
+.btn{background:linear-gradient(180deg, rgba(55,55,60,0.95), rgba(22,22,26,0.98));border:1px solid rgba(255,255,255,0.14);border-radius:10px;color:#fff;font-weight:900;padding:6px 10px;cursor:pointer;font-size:10px;text-align:center;}
+.btn:active{transform:scale(0.95);}
+#spinBtn{width:64px;height:64px;border-radius:50%;border:3px solid #fff;background:linear-gradient(180deg,#ffcc00,#ff4500);display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(255,215,0,0.6);flex-shrink:0;}
+.badge{font-size:8px;font-weight:900;padding:3px 6px;border-radius:20px;background:rgba(255,204,0,0.15);border:1px solid rgba(255,204,0,0.3);color:#ffcc00;}
+.comboPopup{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);font-size:22px;font-weight:900;color:#fff;text-shadow:0 0 10px #000;pointer-events:none;animation:pop 1s forwards;z-index:9999;text-align:center;}
+
+.infoPopupOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:99999;padding:16px;}
+.infoPopupBox{background:linear-gradient(180deg,#2a2a2e,#111113);border:2px solid #ffcc00;border-radius:18px;padding:16px;width:100%;max-width:360px;text-align:center;box-shadow:0 0 20px rgba(255,204,0,0.3);}
+
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-50%) scale(0.2);}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-140%) scale(1);}}
+</style>
+</head>
+<body>
+<div class="main">
+  <div class="panel"><div class="inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <a href="#" id="backToPortal" style="font-size:9px;color:#aaa;text-decoration:none;background:rgba(255,255,255,0.08);padding:6px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);">← Kembali ke Portal</a>
+      <span style="font-size:8px;background:#a855f7;color:#fff;padding:4px 8px;border-radius:20px;font-weight:900;">GOD MODE - JADI BANDAR</span>
+    </div>
+    <div class="top" style="margin-top:8px;">🎛️ SIMULASI 5 MANUAL<br>SETTING SEMAUMU - SEOLAH-OLAH KAMU BANDARNYA</div>
+    <div class="sub">Kamu atur sendiri kapan scatter, kapan zonk, kapan jackpot. Simak naik turun saldo nya sesuai yang kamu ceklis - itulah cara bandar atur emosi pemain.</div>
+
+    <div class="checkBoxWrap">
+      <div style="text-align:center;font-size:8px;color:#ffcc00;background:rgba(255,204,0,0.15);padding:6px;border-radius:20px;margin-bottom:4px;">⚠️ HANYA BOLEH PILIH 1 CEKLIS SAJA - AUTO RESET TIAP PINDAH CEKLIS</div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:4px;"><span id="checklistProgress" style="font-size:9px;font-weight:900;background:rgba(255,204,0,0.15);border:1px solid rgba(255,204,0,0.3);color:#ffcc00;padding:5px 10px;border-radius:20px;">0/6 Ceklis Dicoba</span><span style="font-size:8px;background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.2);color:#88ff88;padding:5px 10px;border-radius:20px;">🎁 Popup Share muncul setelah semua dicoba</span></div>
+      
+      <div class="item" id="item1">
+        <input type="radio" name="ceklis" id="c1">
+        <div class="txt">
+          <b>Ceklis 1. Spin 1 sampai 10 dapat Scatter (bisa digeser)</b>
+          <span>Kalau dicentang, geser mau scatter muncul di spin ke berapa (1-10). Buat pancingan awal.</span>
+          <div class="sliderRow"><span style="font-size:8px;">Geser ke spin:</span><input type="range" id="r1" min="1" max="10" value="5"><span class="val" id="v1">5</span></div>
+        </div>
+      </div>
+
+      <div class="item" id="item2">
+        <input type="radio" name="ceklis" id="c2">
+        <div class="txt">
+          <b>Ceklis 2. 3 kali Spin dapat Scatter nilai 10jt dalam 10 Free Spin (bet berapapun tetap 10jt)</b>
+          <span>Spin ke-3 langsung scatter 10jt dibagi 10 free spin. Bet kecil pun tetap 10jt biar terlihat gacor.</span>
+        </div>
+      </div>
+
+      <div class="item" id="item3">
+        <input type="radio" name="ceklis" id="c3">
+        <div class="txt">
+          <b>Ceklis 3. 10 kali Spin ZONK terus</b>
+          <span>10 spin pertama ZONK terus. Mode sedot setelah pancingan.</span>
+        </div>
+      </div>
+
+      <div class="item" id="item4">
+        <input type="radio" name="ceklis" id="c4">
+        <div class="txt">
+          <b>Ceklis 4. 2 kali Spin dapat Scatter ZONK (scatter muncul tapi nilai 0)</b>
+          <span>Scatter muncul 2x tapi isi free ZONK 0 rupiah. Buat tease biar dikira hampir JP.</span>
+        </div>
+      </div>
+
+      <div class="item" id="item5">
+        <input type="radio" name="ceklis" id="c5">
+        <div class="txt">
+          <b>Ceklis 5. Spin pertama dapat Scatter</b>
+          <span>Spin pertama langsung scatter. Pancingan orang baru daftar.</span>
+        </div>
+      </div>
+
+      <div class="item" id="item6">
+        <input type="radio" name="ceklis" id="c6">
+        <div class="txt">
+          <b>Ceklis 6. Spin 1 kali dapat Scatter 100jt dalam 10 Free Spin</b>
+          <span>Spin pertama langsung scatter 100jt dibagi 10 free spin. Bet berapapun tetap 100jt - pamer jackpot besar.</span>
+        </div>
+      </div>
+
+      <div class="item" id="item0" style="border-style:dashed;">
+        <input type="radio" name="ceklis" id="c0" checked>
+        <div class="txt">
+          <b>Tidak pakai ceklis (Mode Fair)</b>
+          <span>Random normal tanpa setting. Buat bandingin sama mode jebakan.</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+      <span class="badge" id="poolD">POOL: -</span>
+      <span class="badge" id="cycleD">Spin: 0</span>
+      <span class="badge" id="saldoD">Saldo: 0</span>
+      <span class="badge" id="modeD" style="background:rgba(0,255,136,0.15);border-color:rgba(0,255,136,0.3);color:#88ff88;">Mode: -</span>
+    </div>
+
+    <div style="margin-top:8px;background:linear-gradient(180deg, rgba(0,255,136,0.15), rgba(0,100,50,0.2));border:2px solid #00ff88;border-radius:12px;padding:10px;text-align:center;">
+      <div style="font-size:12px;font-weight:900;color:#00ff88;">👁️ SIMAK NAIK TURUN SALDO NYA SESUAI YANG KAMU CEKLIS</div>
+      <div style="font-size:9px;color:#ccffdd;margin-top:4px;line-height:1.5;">Setiap ceklis punya pola saldo beda. Ceklis 1,2,5,6 = saldo naik drastis (pancingan). Ceklis 3,4 = saldo turun / zonk terus. Lihat grafik di bawah - itulah cara bandar atur emosi kamu. Auto reset tiap pindah ceklis!</div>
+    </div>
+  </div></div>
+
+  <div class="panel board"><div class="inner" style="width:100%;display:flex;justify-content:center;"><div id="grid"></div></div></div>
+
+  <div class="panel"><div class="inner controls">
+    <div class="row">
+      <div class="btn" id="resetBtn">🔄 RESET</div>
+      <div id="msg" style="flex:1;text-align:center;font-size:8px;font-weight:800;background:rgba(0,0,0,0.3);padding:6px;border-radius:8px;">CENTANG 1 CEKLIS LALU SPIN - SIMAK SALDO</div>
+      <div class="btn" id="buyBtn">💰 BUY 10jt</div>
+    </div>
+    <div class="row">
+      <div class="btn" id="betMinus" style="width:36px;">−</div>
+      <div style="flex:1;text-align:center;"><span style="font-size:7px;color:#aaa;">SALDO</span><br><b id="score" style="font-size:14px;">0</b></div>
+      <button id="spinBtn"><span>⟳</span></button>
+      <div style="flex:1;text-align:center;"><span style="font-size:7px;color:#aaa;">BET</span><br><b id="betText" style="font-size:12px;">200</b></div>
+      <div class="btn" id="betPlus" style="width:36px;">+</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.4);border-radius:8px;padding:5px;margin-top:4px;"><canvas id="chart" width="500" height="60" style="width:100%;height:60px;"></canvas></div>
+    <div style="margin-top:8px;background:linear-gradient(180deg, #1a1a1a, #0a0a0a);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:10px;text-align:center;">
+      <div style="font-size:11px;font-weight:900;color:#00ff88;">📈 GRAFIK SALDO - NAIK TURUN SESUAI CEKLIS YANG KAMU PILIH</div>
+      <div style="font-size:8px;color:#888;margin-top:3px;line-height:1.4;">Ceklis 6 (100jt) = naik tajam. Ceklis 3 (10x ZONK) = turun terus. Inilah bukti game bisa diatur manual. Seolah-olah kamu bandarnya!</div>
+    </div>
+    <div style="margin-top:8px;background:#fffbeb;border:2px solid #f59e0b;border-radius:10px;padding:10px;text-align:center;">
+      <div style="font-size:10px;font-weight:900;color:#92400e;">⚠️ EDUKASI: INI BUKAN JUDI - INI CARA BANDAR NGATUR</div>
+      <div style="font-size:8px;color:#78350f;margin-top:3px;line-height:1.4;">Semua setting di atas adalah simulasi bagaimana situs ilegal mengatur hasil. Di dunia nyata, kamu tidak bisa atur - bandar yang atur. Makanya berhenti sekarang!</div>
+    </div>
+  </div></div>
+</div>
+
+
+
+<div id="infoPopup" class="infoPopupOverlay">
+  <div class="infoPopupBox">
+    <div id="infoPopupIcon" style="font-size:32px;">ℹ️</div>
+    <div id="infoPopupTitle" style="font-size:16px;font-weight:900;color:#ffcc00;margin-top:8px;">Info</div>
+    <div id="infoPopupMsg" style="font-size:11px;color:#fff;margin-top:8px;line-height:1.5;"></div>
+    <button id="infoPopupOk" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(180deg,#ffcc00,#ff8c00);border:none;border-radius:12px;font-weight:900;color:#000;cursor:pointer;">OK, Mengerti</button>
+  </div>
+</div>
+
+<div id="sharePopup" style="position:fixed;inset:0;background:rgba(0,0,0,0.92);display:none;justify-content:center;align-items:center;z-index:100000;padding:16px;">
+  <div style="background:linear-gradient(180deg,#1a2a1a,#0a1a0a);border:2px solid #00ff88;border-radius:20px;padding:18px;width:100%;max-width:380px;text-align:center;box-shadow:0 0 30px rgba(0,255,136,0.3);">
+    <div style="width:60px;height:60px;background:linear-gradient(135deg,#00ff88,#00cc66);border-radius:50%;display:grid;place-items:center;font-size:30px;margin:0 auto;">🙏</div>
+    <div style="font-size:18px;font-weight:900;color:#00ff88;margin-top:12px;line-height:1.2;">Alhamdulillah,<br>Anda Sudah Sadar?</div>
+    <div style="font-size:11px;color:#ccffdd;margin-top:10px;line-height:1.6;text-align:left;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:10px;">
+      Jika Anda sudah paham betapa liciknya settingan ini, <b style="color:#fff;">bantu teman atau keluarga Anda agar ikut sadar juga</b>.<br><br>
+      Satu share dari Anda bisa menyelamatkan tabungan, keluarga, dan masa depan seseorang dari jebakan judol.<br><br>
+      <span style="color:#00ff88;font-weight:800;">Bagikan link edukasi Ruang Sadar ini sekarang, biar makin banyak yang berhenti.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+      <button id="btnShareWA" style="width:100%;padding:12px;background:linear-gradient(90deg,#25D366,#128C7E);color:#fff;border:none;border-radius:12px;font-weight:900;font-size:12px;cursor:pointer;">📲 Bagikan via WhatsApp</button>
+      <button id="btnCopyLink" style="width:100%;padding:12px;background:#fff;color:#000;border:none;border-radius:12px;font-weight:900;font-size:12px;cursor:pointer;">🔗 Salin Link Edukasi</button>
+      <button id="btnShareClose" style="width:100%;padding:10px;background:transparent;color:#888;border:1px solid #333;border-radius:12px;font-weight:700;font-size:11px;cursor:pointer;">Saya Sudah Share - Kembali ke Portal</button>
+    </div>
+    <div style="font-size:7px;color:#555;margin-top:10px;">Ruang Sadar - Edukasi Tanpa Uang Asli • 100% Gratis</div>
+  </div>
+</div>
+
+<div id="freePopup" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);display:none;justify-content:center;align-items:center;z-index:99999;padding:10px;"><div style="background:linear-gradient(180deg,#2a2a2e,#111113);border:2px solid #ffcc00;border-radius:18px;padding:14px;text-align:center;width:90%;max-width:360px;"><div id="freeTitle" style="font-weight:900;color:#ffcc00;font-size:16px;"></div><div id="freeInfo" style="font-size:10px;margin:8px 0;color:#fff;line-height:1.4;"></div><button id="freeOk" style="width:100%;padding:12px;background:linear-gradient(180deg,#ffcc00,#ff8c00);border-radius:12px;font-weight:900;border:1px solid #fff;">GASS</button></div></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
+firebase.initializeApp(firebaseConfig); const auth=firebase.auth(); const db=firebase.firestore();
+let poolRef=db.collection("global").doc("pool"); let globalPool=0;
+async function initPool(){ try{ let d=await poolRef.get(); if(d.exists) globalPool=d.data().pool||0; poolRef.onSnapshot(s=>{ if(s.exists) globalPool=s.data().pool||0; document.getElementById('poolD').textContent=`POOL: ${Math.floor(globalPool).toLocaleString('id-ID')}`; }); }catch(e){} }
+async function addPool(p){ try{ await db.runTransaction(async tx=>{ let d=await tx.get(poolRef); tx.update(poolRef,{pool:(d.data().pool||0)+p}); }); }catch(e){ globalPool+=p; } }
+async function takePool(a){ try{ let t=0; await db.runTransaction(async tx=>{ let d=await tx.get(poolRef); let pool=d.data().pool||0; if(pool>=a){ tx.update(poolRef,{pool:pool-a}); t=a; } else { let g=Math.floor(pool*0.7); tx.update(poolRef,{pool:pool-g}); t=g; } }); return t; }catch(e){ let g=Math.min(a, Math.floor(globalPool*0.7)); globalPool-=g; return g; } }
+
+let ROWS=5,COLS=5,symbols=["🍎","🍓","🍍","🥝","🍇","🥭","🍒","🍉","🥥"],board=[],cells=[],SCATTER="SCATTER";
+let score=1000000, BETS=[]; for(let v=200;v<=10000;v+=200) BETS.push(v); let currentBet=200, spinCount=0, spinning=false, history=[1000000];
+let cfg={c1:false, c1_at:5, c2:false, c3:false, c4:false, c5:false, c6:false};
+let usedChecklists=new Set();
+let totalChecklists=6;
+
+
+function showInfoPopup(title, msg, icon='ℹ️'){
+  document.getElementById('infoPopupIcon').textContent=icon;
+  document.getElementById('infoPopupTitle').textContent=title;
+  document.getElementById('infoPopupMsg').innerHTML=msg;
+  document.getElementById('infoPopup').style.display='flex';
+}
+function hideInfoPopup(){ document.getElementById('infoPopup').style.display='none'; }
+
+function markChecklistUsed(){
+  if(cfg.c1) usedChecklists.add('c1');
+  if(cfg.c2) usedChecklists.add('c2');
+  if(cfg.c3) usedChecklists.add('c3');
+  if(cfg.c4) usedChecklists.add('c4');
+  if(cfg.c5) usedChecklists.add('c5');
+  if(cfg.c6) usedChecklists.add('c6');
+  updateChecklistProgress();
+  checkAllChecklistsUsed();
+}
+
+function updateChecklistProgress(){
+  let el=document.getElementById('checklistProgress');
+  if(el){
+    el.textContent=`${usedChecklists.size}/${totalChecklists} Ceklis Dicoba`;
+    el.style.background= usedChecklists.size==totalChecklists ? 'rgba(0,255,136,0.2)' : 'rgba(255,204,0,0.15)';
+    el.style.borderColor= usedChecklists.size==totalChecklists ? 'rgba(0,255,136,0.4)' : 'rgba(255,204,0,0.3)';
+    el.style.color= usedChecklists.size==totalChecklists ? '#00ff88' : '#ffcc00';
+  }
+  // tandai item yang sudah pernah dipakai dengan checklist kecil
+  for(let i=1;i<=6;i++){
+    let item=document.getElementById('item'+i);
+    if(item){
+      if(usedChecklists.has('c'+i)){
+        item.style.borderColor='rgba(0,255,136,0.3)';
+        if(!item.querySelector('.usedBadge')){
+          let b=document.createElement('span'); b.className='usedBadge'; b.textContent='✅ Sudah dicoba'; b.style.cssText='font-size:7px;background:#00ff88;color:#000;padding:2px 6px;border-radius:20px;font-weight:900;margin-left:6px;';
+          let title=item.querySelector('b'); if(title) title.appendChild(b);
+        }
+      }
+    }
+  }
+}
+
+function checkAllChecklistsUsed(){
+  if(usedChecklists.size>=totalChecklists && !shareShown){
+    shareShown=true;
+    setTimeout(()=>{
+      document.getElementById('sharePopup').style.display='flex';
+    }, 1000);
+  }
+}
+
+
+function resetGameAuto(){
+  score=1000000; spinCount=0; history=[score];
+  createBoard(); updateUI();
+  document.getElementById('msg').textContent=`AUTO RESET - Simak naik turun saldo sesuai ceklis`;
+  showPopup("🔄 AUTO RESET");
+}
+function bind(){
+  function clearAll(){ document.querySelectorAll('.item').forEach(el=>el.classList.remove('active')); cfg.c1=false; cfg.c2=false; cfg.c3=false; cfg.c4=false; cfg.c5=false; cfg.c6=false; }
+  document.getElementById('c0').onchange=e=>{ if(e.target.checked){ clearAll(); document.getElementById('item0').classList.add('active'); resetGameAuto(); } };
+  document.getElementById('c1').onchange=e=>{ if(e.target.checked){ clearAll(); cfg.c1=true; document.getElementById('item1').classList.add('active'); resetGameAuto(); } };
+  document.getElementById('r1').oninput=e=>{cfg.c1_at=parseInt(e.target.value); document.getElementById('v1').textContent=cfg.c1_at;};
+  document.getElementById('r1').onchange=e=>{ if(cfg.c1){ resetGameAuto(); } };
+  document.getElementById('c2').onchange=e=>{ if(e.target.checked){ clearAll(); cfg.c2=true; document.getElementById('item2').classList.add('active'); resetGameAuto(); } };
+  document.getElementById('c3').onchange=e=>{ if(e.target.checked){ clearAll(); cfg.c3=true; document.getElementById('item3').classList.add('active'); resetGameAuto(); } };
+  document.getElementById('c4').onchange=e=>{ if(e.target.checked){ clearAll(); cfg.c4=true; document.getElementById('item4').classList.add('active'); resetGameAuto(); } };
+  document.getElementById('c5').onchange=e=>{ if(e.target.checked){ clearAll(); cfg.c5=true; document.getElementById('item5').classList.add('active'); resetGameAuto(); } };
+  document.getElementById('c6').onchange=e=>{ if(e.target.checked){ clearAll(); cfg.c6=true; document.getElementById('item6').classList.add('active'); resetGameAuto(); } };
+  document.getElementById('item0').classList.add('active');
+  let backBtn=document.getElementById('backToPortal'); if(backBtn){ backBtn.onclick=(e)=>{ e.preventDefault(); if(spinCount>=3){ showSharePopup(); } else { window.location.href='data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImlkIj48aGVhZD4KPG1ldGEgY2hhcnNldD0iVVRGLTgiPgo8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLGluaXRpYWwtc2NhbGU9MSxtYXhpbXVtLXNjYWxlPTEsdXNlci1zY2FsYWJsZT1ubyI+Cjx0aXRsZT5SVUFORyBTQURBUiAtIFBvcnRhbCBFZHVrYXNpPC90aXRsZT4KPHN0eWxlPgoqe21hcmdpbjowO3BhZGRpbmc6MDtib3gtc2l6aW5nOmJvcmRlci1ib3g7LXdlYmtpdC10YXAtaGlnaGxpZ2h0LWNvbG9yOnRyYW5zcGFyZW50fWJvZHl7Zm9udC1mYW1pbHk6QXJpYWw7YmFja2dyb3VuZDojZjBmN2ZmO2NvbG9yOiMwZjE3MmE7b3ZlcmZsb3cteDpoaWRkZW59CmhlYWRlcntwb3NpdGlvbjpzdGlja3k7dG9wOjA7YmFja2dyb3VuZDojZmZmO2JvcmRlci1ib3R0b206MnB4IHNvbGlkICNiZmRiZmU7cGFkZGluZzoxNHB4IDE4cHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6MThweDt6LWluZGV4OjEwMDtwb3NpdGlvbjpyZWxhdGl2ZTt9Ci5saXZlQ2hhdEJ0bntwb3NpdGlvbjphYnNvbHV0ZTt0b3A6MTRweDtyaWdodDoxNnB4O3dpZHRoOjQ0cHg7aGVpZ2h0OjQ0cHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2JvcmRlci1yYWRpdXM6MTJweDtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgjMWE3M2U4LCMwZDQ3YTEpO2NvbG9yOiNmZmY7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Zm9udC1zaXplOjIwcHg7fQoubWVudXtmb250LXNpemU6MzJweDtjdXJzb3I6cG9pbnRlcjtjb2xvcjojMGQ0N2ExfS5sb2dve2ZvbnQtc2l6ZToyMHB4O2ZvbnQtd2VpZ2h0OjkwMDtsaW5lLWhlaWdodDoxLjE7Y29sb3I6IzBkNDdhMTtmbGV4OjE7fS5sb2dvIHNtYWxse2Rpc3BsYXk6YmxvY2s7Zm9udC1zaXplOjExcHg7bWFyZ2luLXRvcDo0cHg7Y29sb3I6IzY0NzQ4Yjtmb250LXdlaWdodDo2MDA7fQouZ3JpZHtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOnJlcGVhdCgyLDFmcik7Z2FwOjEycHg7cGFkZGluZzoxMnB4fQouY2FyZHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyOjJweCBzb2xpZCAjYmZkYmZlO2JvcmRlci1yYWRpdXM6MThweDtvdmVyZmxvdzpoaWRkZW47Ym94LXNoYWRvdzowIDRweCAxNnB4IHJnYmEoMjYsMTE1LDIzMiwuMTIpfQouY292ZXJ7aGVpZ2h0OjExMHB4O2JhY2tncm91bmQtc2l6ZTpjb3ZlcjtiYWNrZ3JvdW5kLXBvc2l0aW9uOmNlbnRlcjtwb3NpdGlvbjpyZWxhdGl2ZX0KLmJhZGdle3Bvc2l0aW9uOmFic29sdXRlO2xlZnQ6MTBweDt0b3A6MTBweDtjb2xvcjojZmZmO3BhZGRpbmc6NHB4IDhweDtib3JkZXItcmFkaXVzOjhweDtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo4MDB9Ci5pbmZve3BhZGRpbmc6MTJweH0udGl0bGV7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6OTAwO21hcmdpbi1ib3R0b206NHB4O2NvbG9yOiMwZDQ3YTF9LnN1Yntjb2xvcjojNjQ3NDhiO2ZvbnQtc2l6ZToxMHB4O21hcmdpbi1ib3R0b206MTBweDtsaW5lLWhlaWdodDoxLjR9Ci5wbGF5e2Rpc3BsYXk6YmxvY2s7dGV4dC1kZWNvcmF0aW9uOm5vbmU7dGV4dC1hbGlnbjpjZW50ZXI7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsIzFhNzNlOCwjMGQ0N2ExKTtjb2xvcjojZmZmO2ZvbnQtd2VpZ2h0OjgwMDtwYWRkaW5nOjEwcHg7Ym9yZGVyLXJhZGl1czoxMHB4O2ZvbnQtc2l6ZToxMnB4fQouc2lkZU1lbnV7cG9zaXRpb246Zml4ZWQ7dG9wOjA7bGVmdDotMjgwcHg7d2lkdGg6MjYwcHg7aGVpZ2h0OjEwMCU7YmFja2dyb3VuZDojZmZmO2JvcmRlci1yaWdodDoycHggc29saWQgI2JmZGJmZTt0cmFuc2l0aW9uOi4zczt6LWluZGV4Ojk5OTk7cGFkZGluZy10b3A6NzBweDt9Ci5zaWRlTWVudS5zaG93e2xlZnQ6MDt9LnNpZGVNZW51IGF7ZGlzcGxheTpibG9jaztwYWRkaW5nOjE0cHggMjBweDtjb2xvcjojMGYxNzJhO3RleHQtZGVjb3JhdGlvbjpub25lO2JvcmRlci1ib3R0b206MXB4IHNvbGlkICNmMWY1Zjk7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwfS5zaWRlTWVudSBhOmhvdmVye2JhY2tncm91bmQ6I2RiZWFmZTtjb2xvcjojMGQ0N2ExO30KLm1lbnVDbG9zZXtwb3NpdGlvbjphYnNvbHV0ZTt0b3A6MTVweDtyaWdodDoxNXB4O2ZvbnQtc2l6ZToyNHB4O2N1cnNvcjpwb2ludGVyO2NvbG9yOiMwZDQ3YTE7fQoub3ZlcmxheXtwb3NpdGlvbjpmaXhlZDtpbnNldDowO2JhY2tncm91bmQ6cmdiYSgxNSwyMyw0MiwuNCk7ZGlzcGxheTpub25lO3otaW5kZXg6OTk5ODt9Lm92ZXJsYXkuc2hvd3tkaXNwbGF5OmJsb2NrO30KLmhpc3RvcnlXcmFwe21hcmdpbjoxMnB4IDEycHggMCAxMnB4O3BhZGRpbmc6MDtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyOjJweCBzb2xpZCAjYmZkYmZlO2JvcmRlci1yYWRpdXM6MTZweDtvdmVyZmxvdzpoaWRkZW47fQouaGlzdG9yeUhlYWR7cGFkZGluZzoxMnB4IDE0cHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtYmV0d2Vlbjtib3JkZXItYm90dG9tOjFweCBzb2xpZCAjZTJlOGYwO2JhY2tncm91bmQ6I2VmZjZmZn0KPC9zdHlsZT48L2hlYWQ+PGJvZHk+CjxoZWFkZXI+CjxkaXYgY2xhc3M9Im1lbnUiIG9uY2xpY2s9Im9wZW5NZW51KCkiPuKYsDwvZGl2Pgo8ZGl2IGNsYXNzPSJsb2dvIj5SVUFORyBTQURBUjxicj48c21hbGw+UnVhbmcgQmVsYWphciBTYWRhciBCYWhheWEgSnVkb2w8L3NtYWxsPjxzbWFsbCBpZD0icGxheWVyRW1haWwiPjwvc21hbGw+PC9kaXY+CjxhIGhyZWY9Imh0dHBzOi8vdC5tZS9SdWFuZ1NhZGFyIiB0YXJnZXQ9Il9ibGFuayIgY2xhc3M9ImxpdmVDaGF0QnRuIj7wn5KsPC9hPgo8L2hlYWRlcj4KPGRpdiBpZD0ib3ZlcmxheSIgY2xhc3M9Im92ZXJsYXkiIG9uY2xpY2s9ImNsb3NlTWVudSgpIj48L2Rpdj4KPGRpdiBpZD0ic2lkZU1lbnUiIGNsYXNzPSJzaWRlTWVudSI+CjxkaXYgY2xhc3M9Im1lbnVDbG9zZSIgb25jbGljaz0iY2xvc2VNZW51KCkiPuKclTwvZGl2Pgo8YSBocmVmPSJwb3J0YWwuaHRtbCI+8J+PoCBCZXJhbmRhIEVkdWthc2k8L2E+CjxhIGhyZWY9Im1pbnRhLWNvaW4uaHRtbCI+8J+OkyBNaW50YSBDb2luIEVkdWthc2k8L2E+CjxhIGhyZWY9InRyYW5zYWtzaS5odG1sIj7wn5OcIFJpd2F5YXQgRWR1a2FzaTwvYT4KPGEgaHJlZj0iaHR0cHM6Ly90Lm1lL1J1YW5nU2FkYXIiIHRhcmdldD0iX2JsYW5rIj7wn5KsIExpdmUgQ2hhdCBFZHVrYXNpPC9hPgo8YSBocmVmPSJhYm91dC5odG1sIj7ihLnvuI8gVGVudGFuZyBSVUFORyBTQURBUjwvYT4KPGEgaHJlZj0iIyIgb25jbGljaz0ibG9nb3V0KCkiPvCfmqogTG9nb3V0PC9hPgo8L2Rpdj4KCjxkaXYgaWQ9IndhbGxldCIgc3R5bGU9Im1hcmdpbjoxMnB4IDEycHggMCAxMnB4O3BhZGRpbmc6MTRweDtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyOjJweCBzb2xpZCAjYmZkYmZlO2JvcmRlci1yYWRpdXM6MTZweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyOyI+CjxkaXYgc3R5bGU9ImZsZXg6MSI+PGRpdiBpZD0icGxheWVyTmFtZSIgc3R5bGU9ImZvbnQtc2l6ZToxNHB4O2ZvbnQtd2VpZ2h0OjgwMDtjb2xvcjojMGQ0N2ExOyI+UExBWUVSPC9kaXY+PGRpdiBzdHlsZT0iZm9udC1zaXplOjExcHg7Y29sb3I6IzY0NzQ4YjttYXJnaW4tdG9wOjJweCI+Q29pbiBFZHVrYXNpIEthbXU8L2Rpdj48ZGl2IHN0eWxlPSJkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2ZvbnQtc2l6ZToyMHB4O2ZvbnQtd2VpZ2h0OjkwMDttYXJnaW4tdG9wOjRweCI+PHNwYW4gaWQ9ImNvaW4iPjA8L3NwYW4+IDxzcGFuIHN0eWxlPSJtYXJnaW4tbGVmdDo4cHg7d2lkdGg6OHB4O2hlaWdodDo4cHg7YmFja2dyb3VuZDojMjJjNTVlO2JvcmRlci1yYWRpdXM6NTAlO2Rpc3BsYXk6aW5saW5lLWJsb2NrIj48L3NwYW4+PC9kaXY+PC9kaXY+CjxidXR0b24gb25jbGljaz0ibG9jYXRpb24uaHJlZj0nbWludGEtY29pbi5odG1sJyIgc3R5bGU9IndpZHRoOjkwcHg7aGVpZ2h0OjM4cHg7Ym9yZGVyOm5vbmU7Ym9yZGVyLXJhZGl1czoxMHB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCMxYTczZTgsIzBkNDdhMSk7Y29sb3I6I2ZmZjtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo4MDA7Y3Vyc29yOnBvaW50ZXI7Ij7wn46TIE1JTlRBIENPSU48L2J1dHRvbj4KPC9kaXY+Cgo8ZGl2IHN0eWxlPSJtYXJnaW46MTJweDtiYWNrZ3JvdW5kOiNmZmZiZWI7Ym9yZGVyOjJweCBzb2xpZCAjZjU5ZTBiO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHg7Ij4KPGIgc3R5bGU9ImZvbnQtc2l6ZToxMXB4O2NvbG9yOiM5MjQwMGUiPuKaoO+4jyA1IFNJTVVMQVNJIElOSSBNRU1CT05HS0FSIFNFVFRJTkcgQkFOREFSIEpVRE9MPC9iPgo8cCBzdHlsZT0iZm9udC1zaXplOjEwcHg7Y29sb3I6Izc4MzUwZjttYXJnaW4tdG9wOjRweDtsaW5lLWhlaWdodDoxLjQiPkluaSBidWthbiBqdWRpLiBJbmkgZWR1a2FzaSB1bnR1ayBzYWRhci4gTWFpbmthbiBzZW11YSBiaWFyIHBhaGFtIHBvbGFueWEuIE1vZGUgNSBrYW11IGphZGkgYmFuZGFybnlhITwvcD4KPC9kaXY+Cgo8ZGl2IGNsYXNzPSJncmlkIj4KPCEtLSBHQU1FIDEgLSBNRU5BTkcgQVdBTCAtLT4KPGRpdiBjbGFzcz0nY2FyZCc+PGRpdiBjbGFzcz0nY292ZXInIHN0eWxlPSJiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2RjZmNlNywjMjJjNTVlKTtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQwcHgiPvCfjZI8ZGl2IGNsYXNzPSdiYWRnZScgc3R5bGU9ImJhY2tncm91bmQ6IzE1ODAzZCI+U0lNVUxBU0kgMSAtIFVNUEFOPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0naW5mbyc+PGRpdiBjbGFzcz0ndGl0bGUnPklMVVNJIE1FTkFORyBBV0FMPC9kaXY+PGRpdiBjbGFzcz0nc3ViJz48Yj5TZXR0aW5nOiBQbGF5ZXIgYmFydSBzZW5nYWphIGRpYnVhdCBtZW5hbmcuPC9iPiBUcmlrIHBzaWtvbG9naSBiaWFyIGthbXUgbWVyYXNhIGhva2kgJiBrZXRhZ2loYW4gbWFpbiBsYWdpLiBQYWRhaGFsIGluaSB1bXBhbiBhd2FsIGJhbmRhci48L2Rpdj48YSBjbGFzcz0ncGxheScgaHJlZj0nZnJ1aXQuaHRtbCc+TUFJTiBTSU1VTEFTSSAxPC9hPjwvZGl2PjwvZGl2PgoKPCEtLSBHQU1FIDIgLSBEUkFXIC0tPgo8ZGl2IGNsYXNzPSdjYXJkJz48ZGl2IGNsYXNzPSdjb3Zlcicgc3R5bGU9ImJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEzNWRlZywjZGJlYWZlLCMxYTczZTgpO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmNlbnRlcjtmb250LXNpemU6NDBweCI+4pqW77iPPGRpdiBjbGFzcz0nYmFkZ2UnIHN0eWxlPSJiYWNrZ3JvdW5kOiMwZDQ3YTEiPlNJTVVMQVNJIDIgLSBESVRBSEFOPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0naW5mbyc+PGRpdiBjbGFzcz0ndGl0bGUnPlBPTEEgRFJBVyBNRU5BSEFOPC9kaXY+PGRpdiBjbGFzcz0nc3ViJz48Yj5TZXR0aW5nOiBUaWRhayBrYWxhaCB0aWRhayBtZW5hbmcuPC9iPiBTYWxkbyBuYWlrLXR1cnVuIGJpYXIgYmV0YWggbGFtYSBkaSBtZXNpbi4gS2FtdSBrZWhhYmlzYW4gd2FrdHUgJiBwZW5hc2FyYW4gdGVydXMuPC9kaXY+PGEgY2xhc3M9J3BsYXknIGhyZWY9J2ZydWl0Mi5odG1sJz5NQUlOIFNJTVVMQVNJIDI8L2E+PC9kaXY+PC9kaXY+Cgo8IS0tIEdBTUUgMyAtIEpBQ0tQT1QgR0xPQkFMIFBPT0wgLS0+CjxkaXYgY2xhc3M9J2NhcmQnPjxkaXYgY2xhc3M9J2NvdmVyJyBzdHlsZT0iYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmZmVkZDUsI2Y5NzMxNik7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2ZvbnQtc2l6ZTo0MHB4Ij7wn5KjPGRpdiBjbGFzcz0nYmFkZ2UnIHN0eWxlPSJiYWNrZ3JvdW5kOiNjMjQxMGMiPlNJTVVMQVNJIDMgLSBKQUNLUE9UPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0naW5mbyc+PGRpdiBjbGFzcz0ndGl0bGUnPkpFQkFLQU4gSkFDS1BPVCBHTE9CQUw8L2Rpdj48ZGl2IGNsYXNzPSdzdWInPjxiPlNldHRpbmc6IE1lbmFuZyBiZXNhciBoaW5nZ2EgaGFiaXNrYW4gc2FsZG8gR2xvYmFsIFBvb2wuPC9iPiBLYW11IGxpaGF0IG9yYW5nIGxhaW4gSlAgYmVzYXIsIHBhZGFoYWwgaXR1IGt1bXB1bGFuIHNhbGRvIGtvcmJhbiBsYWluIHlhbmcgZGlzZWRvdCBiYWxpay48L2Rpdj48YSBjbGFzcz0ncGxheScgaHJlZj0nZnJ1aXQzLmh0bWwnPk1BSU4gU0lNVUxBU0kgMzwvYT48L2Rpdj48L2Rpdj4KCjwhLS0gR0FNRSA0IC0gU0VET1QgMSBNRU5JVCAtLT4KPGRpdiBjbGFzcz0nY2FyZCc+PGRpdiBjbGFzcz0nY292ZXInIHN0eWxlPSJiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2ZlZTJlMiwjMGYxNzJhKTtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQwcHgiPvCflbPvuI88ZGl2IGNsYXNzPSdiYWRnZScgc3R5bGU9ImJhY2tncm91bmQ6IzAwMCI+U0lNVUxBU0kgNCAtIFNFRE9UPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0naW5mbyc+PGRpdiBjbGFzcz0ndGl0bGUnPk1PREUgU0VET1QgMSBNRU5JVDwvZGl2PjxkaXYgY2xhc3M9J3N1Yic+PGI+U2V0dGluZzogS2FsYWggdG90YWwsIGRpc2Vkb3QgaGFiaXMgZGFsYW0gMSBtZW5pdC48L2I+IFNldHRpbmcgYXNsaSBzYWF0IGJhbmRhciBidXR1aCB1YW5nLiBJbmlsYWggdWp1bmcgbnlhdGEgc2VtdWEgcGVtYWluIGp1ZG9sLjwvZGl2PjxhIGNsYXNzPSdwbGF5JyBocmVmPSdmcnVpdDQuaHRtbCcgc3R5bGU9ImJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCMzMzQxNTUsIzAwMCkiPk1BSU4gU0lNVUxBU0kgNDwvYT48L2Rpdj48L2Rpdj4KCjwhLS0gR0FNRSA1IC0gTUFOVUFMIC8gR09EIE1PREUgLSBCQVJVIC0tPgo8ZGl2IGNsYXNzPSdjYXJkJyBzdHlsZT0iYm9yZGVyLWNvbG9yOiNkOGI0ZmU7Ym94LXNoYWRvdzowIDRweCAyMHB4IHJnYmEoMTY4LDg1LDI0NywuMjUpOyI+PGRpdiBjbGFzcz0nY292ZXInIHN0eWxlPSJiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2YzZThmZiwjYTg1NWY3KTtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQwcHg7cG9zaXRpb246cmVsYXRpdmU7Ij7wn46b77iPPGRpdiBjbGFzcz0nYmFkZ2UnIHN0eWxlPSJiYWNrZ3JvdW5kOiM3ZTIyY2U7YW5pbWF0aW9uOiBwdWxzZSAxLjVzIGluZmluaXRlOyI+U0lNVUxBU0kgNSAtIE1BTlVBTCDigKIgQkFSVTwvZGl2PjxkaXYgc3R5bGU9InBvc2l0aW9uOmFic29sdXRlO3JpZ2h0OjhweDt0b3A6OHB4O2JhY2tncm91bmQ6I2ZmY2MwMDtjb2xvcjojMDAwO2ZvbnQtc2l6ZTo4cHg7Zm9udC13ZWlnaHQ6OTAwO3BhZGRpbmc6M3B4IDZweDtib3JkZXItcmFkaXVzOjIwcHg7Ij5HT0QgTU9ERTwvZGl2PjwvZGl2PjxkaXYgY2xhc3M9J2luZm8nPjxkaXYgY2xhc3M9J3RpdGxlJz5TRVRUSU5HIFNFTUFVTVUgLSBTRU9MQUgtT0xBSCBLQU1VIEJBTkRBUk5ZQTwvZGl2PjxkaXYgY2xhc3M9J3N1Yic+PGI+U2V0dGluZzogS2FtdSBhdHVyIHNlbmRpcmkga2FwYW4gc2NhdHRlciwga2FwYW4gem9uaywga2FwYW4gamFja3BvdCAxMGp0IC8gMTAwanQuPC9iPjxicj48YnI+8J+OriA2IHBpbGloYW4gY2VrbGlzLCBoYW55YSBib2xlaCAxIGFrdGlmLCBhdXRvIHJlc2V0IHRpYXAgcGluZGFoIGNla2xpcy48YnI+8J+Rge+4jyA8Yj5TaW1hayBuYWlrIHR1cnVuIHNhbGRvIG55YSBzZXN1YWkgeWFuZyBrYW11IGNla2xpczwvYj4gLSBsaWhhdCBncmFmaWsgYmlhciBzYWRhciBwb2xhbnlhLjxicj48YnI+4oCiIEMxOiBTcGluIDEtMTAgc2NhdHRlciBnZXNlcjxicj7igKIgQzI6IDN4IHNwaW4gMTBqdDxicj7igKIgQzM6IDEweCB6b25rPGJyPuKAoiBDNDogU2NhdHRlciB6b25rPGJyPuKAoiBDNTogU3BpbiAxIHNjYXR0ZXI8YnI+4oCiIEM2OiBTcGluIDEgc2NhdHRlciAxMDBqdDwvZGl2PjxhIGNsYXNzPSdwbGF5JyBocmVmPSdtYW51YWwuaHRtbCcgc3R5bGU9ImJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCNhODU1ZjcsIzdlMjJjZSk7Zm9udC1zaXplOjEzcHg7cGFkZGluZzoxMnB4OyI+8J+Om++4jyBNQUlOIFNJTVVMQVNJIDUgLSBNQU5VQUwgKEpBREkgQkFOREFSKTwvYT48L2Rpdj48L2Rpdj4KCjwvZGl2PgoKPHN0eWxlPkBrZXlmcmFtZXMgcHVsc2V7MCV7dHJhbnNmb3JtOnNjYWxlKDEpfTUwJXt0cmFuc2Zvcm06c2NhbGUoMS4wNSl9MTAwJXt0cmFuc2Zvcm06c2NhbGUoMSl9fTwvc3R5bGU+Cgo8c2NyaXB0IHNyYz0iaHR0cHM6Ly93d3cuZ3N0YXRpYy5jb20vZmlyZWJhc2Vqcy8xMC4xMy4yL2ZpcmViYXNlLWFwcC1jb21wYXQuanMiPjwvc2NyaXB0Pgo8c2NyaXB0IHNyYz0iaHR0cHM6Ly93d3cuZ3N0YXRpYy5jb20vZmlyZWJhc2Vqcy8xMC4xMy4yL2ZpcmViYXNlLWF1dGgtY29tcGF0LmpzIj48L3NjcmlwdD4KPHNjcmlwdCBzcmM9Imh0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ZpcmViYXNlanMvMTAuMTMuMi9maXJlYmFzZS1maXJlc3RvcmUtY29tcGF0LmpzIj48L3NjcmlwdD4KPHNjcmlwdD4KY29uc3QgZmlyZWJhc2VDb25maWc9e2FwaUtleToiQUl6YVN5QmVUQUxzRjQzaWozYUFsWmpGMVhlQmpCMWdOdGFUYjJJIixhdXRoRG9tYWluOiJnYW1lLWRlbW8tNGRiN2YuZmlyZWJhc2VhcHAuY29tIixwcm9qZWN0SWQ6ImdhbWUtZGVtby00ZGI3ZiIsc3RvcmFnZUJ1Y2tldDoiZ2FtZS1kZW1vLTRkYjdmLmZpcmViYXNlc3RvcmFnZS5hcHAiLG1lc3NhZ2luZ1NlbmRlcklkOiI0MDUzODE1MDYxNDMiLGFwcElkOiIxOjQwNTM4MTUwNjE0Mzp3ZWI6ZGE2M2YzNGEyNGYwMWU0ZjAzNjdlYSJ9OwpmaXJlYmFzZS5pbml0aWFsaXplQXBwKGZpcmViYXNlQ29uZmlnKTsKY29uc3QgYXV0aD1maXJlYmFzZS5hdXRoKCk7IGNvbnN0IGRiPWZpcmViYXNlLmZpcmVzdG9yZSgpOwpsZXQgcGxheWVyPW51bGw7IGxldCB1bnN1YnNjcmliZT1udWxsOwphdXRoLm9uQXV0aFN0YXRlQ2hhbmdlZChhc3luYyh1c2VyKT0+ewogICAgaWYoIXVzZXIpeyBsb2NhdGlvbi5yZXBsYWNlKCJpbmRleC5odG1sIik7IHJldHVybjsgfQogICAgaWYodW5zdWJzY3JpYmUpIHVuc3Vic2NyaWJlKCk7CiAgICB1bnN1YnNjcmliZSA9IGRiLmNvbGxlY3Rpb24oInBsYXllcnMiKS5kb2ModXNlci51aWQpLm9uU25hcHNob3QoZG9jPT57CiAgICAgICAgaWYoIWRvYy5leGlzdHMpeyByZXR1cm47IH0KICAgICAgICBwbGF5ZXI9ZG9jLmRhdGEoKTsKICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgicGxheWVyTmFtZSIpLnRleHRDb250ZW50ID0gcGxheWVyLnByb2ZpbGU/LnVzZXJuYW1lIHx8IHBsYXllci5wcm9maWxlPy5lbWFpbD8uc3BsaXQoIkAiKVswXSB8fCAiUExBWUVSIjsKICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgicGxheWVyRW1haWwiKS50ZXh0Q29udGVudCA9IHBsYXllci5wcm9maWxlPy5lbWFpbCB8fCB1c2VyLmVtYWlsOwogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJjb2luIikudGV4dENvbnRlbnQgPSBOdW1iZXIocGxheWVyLndhbGxldD8uY29pbnx8MCkudG9Mb2NhbGVTdHJpbmcoImlkLUlEIik7CiAgICB9KTsKfSk7CmZ1bmN0aW9uIGxvZ291dCgpeyBpZih1bnN1YnNjcmliZSkgdW5zdWJzY3JpYmUoKTsgYXV0aC5zaWduT3V0KCkudGhlbigoKT0+bG9jYXRpb24ucmVwbGFjZSgiaW5kZXguaHRtbCIpKTsgfQpmdW5jdGlvbiBvcGVuTWVudSgpeyBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgic2lkZU1lbnUiKS5jbGFzc0xpc3QuYWRkKCJzaG93Iik7IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJvdmVybGF5IikuY2xhc3NMaXN0LmFkZCgic2hvdyIpOyB9CmZ1bmN0aW9uIGNsb3NlTWVudSgpeyBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgic2lkZU1lbnUiKS5jbGFzc0xpc3QucmVtb3ZlKCJzaG93Iik7IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJvdmVybGF5IikuY2xhc3NMaXN0LnJlbW92ZSgic2hvdyIpOyB9Cjwvc2NyaXB0PjwvYm9keT48L2h0bWw+Cg=='; } }; }
+}
+
+function randFruit(){return symbols[Math.floor(Math.random()*symbols.length)];}
+function isScat(v){return v==SCATTER;}
+function createBoard(){board=[]; for(let r=0;r<ROWS;r++){let row=[]; for(let c=0;c<COLS;c++) row.push(randFruit()); board.push(row);} drawBoard();}
+function drawBoard(){
+  let g=document.getElementById('grid'); g.innerHTML=''; cells=[];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    let el=document.createElement('div');
+    el.className='cell'+(isScat(board[r][c])?' scatter':'');
+    if(isScat(board[r][c])){
+      el.innerHTML='<img src="scatter.png" class="scatter-img" alt="SCATTER" onerror="this.outerHTML=\'💎\'">';
+    } else {
+      el.textContent=board[r][c];
+    }
+    g.appendChild(el); cells.push(el);
+  }
+}
+function findMatches(){let cnt={},pos={}; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){let f=board[r][c]; if(isScat(f)||!f) continue; if(!cnt[f]){cnt[f]=0; pos[f]=[];} cnt[f]++; pos[f].push({r,c});} let m=[]; for(let f in cnt) if(cnt[f]>=6) m.push(pos[f]); return m;}
+async function tumble(){let nb=Array.from({length:ROWS},()=>Array(COLS).fill(null)); for(let c=0;c<COLS;c++){let w=ROWS-1; for(let r=ROWS-1;r>=0;r--) if(board[r][c]!=null){nb[w][c]=board[r][c]; w--;} for(let r=w;r>=0;r--) nb[r][c]=randFruit();} board=nb; drawBoard(); await new Promise(r=>setTimeout(r,200));}
+async function destroy(groups){let all=[]; groups.forEach(g=>all.push(...g)); for(let p of all){let idx=p.r*COLS+p.c; if(cells[idx]) cells[idx].classList.add('shattering');} await new Promise(r=>setTimeout(r,250)); for(let p of all) board[p.r][p.c]=null; await tumble();}
+
+function getForced(){
+  if(cfg.c5 && spinCount==0) return {type:"SCATTER", cap:10000000, freeN:10, label:"C5: Spin 1 Scatter"};
+  if(cfg.c6 && spinCount==0) return {type:"SCATTER", cap:100000000, freeN:10, label:"C6: Spin 1 Scatter 100jt"};
+  if(cfg.c2 && spinCount==2) return {type:"SCATTER", cap:10000000, freeN:10, label:"C2: 3x Spin Scatter 10jt"};
+  if(cfg.c1 && spinCount==cfg.c1_at-1) return {type:"SCATTER", cap:10000000, freeN:10, label:`C1: Spin ${cfg.c1_at} Scatter Geser`};
+  if(cfg.c4 && (spinCount==1 || spinCount==4)) return {type:"SCATTER_ZONK", cap:0, freeN:10, label:`C4: Scatter ZONK`};
+  if(cfg.c3 && spinCount<10) return {type:"ZONK", label:"C3: 10x ZONK"};
+  return null;
+}
+
+function genBoard(cat){
+  let nb=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  let scat=(cat=="SCATTER"||cat=="SCATTER_ZONK")?4:0;
+  let all=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) all.push({r,c});
+  for(let i=all.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]];}
+  all.slice(0,scat).forEach(p=>nb[p.r][p.c]=SCATTER);
+  if(cat=="ZONK"||cat=="SCATTER_ZONK"){
+    let cnt={}; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(nb[r][c]!=SCATTER){ let f; let at=0; do{f=randFruit(); at++;}while((cnt[f]||0)>=5 && at<20); nb[r][c]=f; cnt[f]=(cnt[f]||0)+1; }
+  } else {
+    let winSym=symbols[Math.floor(Math.random()*symbols.length)]; let winCnt=7;
+    let avail=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(nb[r][c]!=SCATTER) avail.push({r,c});
+    for(let i=avail.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [avail[i],avail[j]]=[avail[j],avail[i]];}
+    for(let i=0;i<Math.min(winCnt,avail.length);i++) nb[avail[i].r][avail[i].c]=winSym;
+    let cnt={[winSym]:winCnt};
+    for(let i=winCnt;i<avail.length;i++){let p=avail[i]; let f; let at=0; do{f=randFruit(); at++;}while((cnt[f]||0)>=5 && at<20 && f!=winSym); nb[p.r][p.c]=f; cnt[f]=(cnt[f]||0)+1;}
+  }
+  return {board:nb};
+}
+
+function updateUI(){
+  document.getElementById('score').textContent=score.toLocaleString('id-ID');
+  document.getElementById('betText').textContent=currentBet.toLocaleString('id-ID');
+  document.getElementById('saldoD').textContent=`Saldo: ${score.toLocaleString('id-ID')}`;
+  document.getElementById('cycleD').textContent=`Spin: ${spinCount}`;
+  let active=[];
+  if(cfg.c1) active.push(`C1@${cfg.c1_at}`);
+  if(cfg.c2) active.push("C2:10jt");
+  if(cfg.c3) active.push("C3:ZONK");
+  if(cfg.c4) active.push("C4:ZONK");
+  if(cfg.c5) active.push("C5:Scat");
+  if(cfg.c6) active.push("C6:100jt");
+  document.getElementById('modeD').textContent=active.length?active.join(' | '):'Fair';
+  let c=document.getElementById('chart'); let ctx=c.getContext('2d'), w=c.width, h=c.height;
+  ctx.clearRect(0,0,w,h);
+  if(history.length>1){
+    let min=Math.min(...history), max=Math.max(...history), range=Math.max(1,max-min);
+    ctx.strokeStyle=cfg.c3||cfg.c4?'#ff4444':'#00ff88'; ctx.lineWidth=2; ctx.beginPath();
+    history.forEach((v,i)=>{let x=i/(history.length-1)*w, y=h-((v-min)/range)*h; i==0?ctx.moveTo(x,y):ctx.lineTo(x,y);}); ctx.stroke();
+  }
+}
+function showPopup(t){let d=document.createElement('div'); d.className='comboPopup'; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),1000);}
+
+async function spin(){
+  if(spinning) return;
+  if(score<currentBet){ showInfoPopup("Saldo Habis", "Saldo kamu habis karena ceklis ZONK ini.<br><br>Auto reset ke 1jt biar bisa coba ceklis lain.<br><br>👁️ Simak - ini yang terjadi di dunia nyata kalau disedot bandar.", "💸"); document.getElementById("infoPopupOk").onclick=()=>{ hideInfoPopup(); resetGameAuto(); }; return; }
+  spinning=true;
+  let forced=getForced();
+  let cat, cap=0, freeN=10, label="";
+  if(forced){ cat=forced.type; cap=forced.cap||0; freeN=forced.freeN||10; label=forced.label; document.getElementById('msg').textContent=`${label} - Spin ${spinCount+1}`; }
+  else { let r=Math.random(); cat=r<0.6?"ZONK":"RENDAH"; document.getElementById('msg').textContent=`Spin ${spinCount+1} Random [${cat}] - Simak saldo`; }
+
+  let data=genBoard(cat); board=data.board; drawBoard(); await new Promise(r=>setTimeout(r,400));
+  spinCount++;
+
+  if(cat=="SCATTER" || cat=="SCATTER_ZONK"){
+    let isZonk=cat=="SCATTER_ZONK"; let capToUse=isZonk?0:cap;
+    // kasih efek setelah 4 scatter muncul - delay 5 detik baru popup free
+    if(!isZonk){
+      document.getElementById('msg').textContent=`💎 4 SCATTER MUNCUL! Menunggu 5 detik...`;
+      showPopup(`💎 4 SCATTER!`);
+      // animasi scatter berkedip
+      cells.forEach(el=>{ if(el.classList.contains('scatter')){ el.style.animation='scatterPop 0.5s ease infinite alternate'; } });
+      // countdown 5 detik di info
+      for(let i=5;i>=1;i--){
+        await new Promise(r=>setTimeout(r,1000));
+        document.getElementById('msg').textContent=`💎 4 SCATTER! Free 10 spin gratis dalam ${i}...`;
+        document.getElementById('freeInfo').innerHTML=`${label}<br><br>🎉 4 Scatter pakai <b>scatter.png</b> muncul!<br>Tunggu ${i} detik...<br><br>Total ${capToUse.toLocaleString('id-ID')} dalam ${freeN} Free Spin`;
+      }
+    } else {
+      await new Promise(r=>setTimeout(r,1500));
+    }
+    document.getElementById('freeTitle').textContent=isZonk?`💀 SCATTER ZONK!`:`💎 ${label}`;
+    document.getElementById('freeInfo').innerHTML=isZonk?`Scatter 4x <b>scatter.png</b> muncul tapi nilai 0 (Ceklis 4)<br>Simak saldo tetap / turun`:`${label}<br><img src="scatter.png" style="width:40px;height:40px;object-fit:contain;vertical-align:middle;"> 4 SCATTER!<br><br>Total <b>${capToUse.toLocaleString('id-ID')}</b> dalam ${freeN} Free Spin Gratis<br>Bet berapapun tetap ${capToUse.toLocaleString('id-ID')}<br><br>👁️ Simak naik turun saldo nya!`;
+    document.getElementById('freePopup').style.display='flex';
+    await new Promise(res=>{document.getElementById('freeOk').onclick=()=>{document.getElementById('freePopup').style.display='none'; res();};});
+    let total=0, acc=0;
+    for(let i=0;i<freeN;i++){
+      let w=isZonk?0:Math.floor(capToUse/freeN); if(i==freeN-1) w=capToUse-acc;
+      let actual=await takePool(w); if(!isZonk && acc+actual>capToUse) actual=capToUse-acc;
+      acc+=actual; total+=actual; score+=actual; history.push(score); if(history.length>50) history.shift(); updateUI();
+      let d2=genBoard("RENDAH"); board=d2.board; drawBoard(); await new Promise(r=>setTimeout(r,300));
+      let groups=findMatches(); if(groups.length>0) await destroy(groups);
+    }
+    let title = isZonk ? '💀 SCATTER ZONK!' : '💎 FREE SELESAI!';
+        let msg = isZonk ? 'Scatter muncul tapi total 0 rupiah.<br><br>Ini jebakan Ceklis 4 - bikin kamu dikira hampir JP padahal zonk.<br><br>👁️ Simak saldo tidak naik sama sekali!' : `Total ${total.toLocaleString('id-ID')} dalam ${freeN} Free Spin!<br><br>👁️ Simak grafik saldo naik tajam - inilah pancingan bandar!<br><br>Saldo sekarang: ${score.toLocaleString('id-ID')}`;
+        showInfoPopup(title, msg, isZonk?'💀':'💎');
+        document.getElementById('infoPopupOk').onclick=()=>{
+          hideInfoPopup();
+          markChecklistUsed();
+        };
+        spinning=false; updateUI(); return;
+  }
+
+  if(cat=="ZONK"){ score=Math.max(0,score-currentBet); showPopup(`ZONK -${currentBet} - Saldo turun`); }
+  else { let win=Math.floor(currentBet*2); let actual=await takePool(win); score=score-currentBet+actual; showPopup(`+${actual.toLocaleString('id-ID')} - Saldo naik`); let groups=findMatches(); if(groups.length>0) await destroy(groups); }
+  await addPool(Math.floor(currentBet*0.7));
+  history.push(score); if(history.length>50) history.shift(); updateUI(); spinning=false; markChecklistUsed();
+}
+
+document.getElementById('spinBtn').onclick=spin;
+document.getElementById('betMinus').onclick=()=>{let i=BETS.indexOf(currentBet); if(i>0){currentBet=BETS[i-1]; updateUI();}};
+document.getElementById('betPlus').onclick=()=>{let i=BETS.indexOf(currentBet); if(i<BETS.length-1){currentBet=BETS[i+1]; updateUI();}};
+document.getElementById('resetBtn').onclick=()=>{score=1000000; spinCount=0; history=[score]; document.getElementById('c0').checked=true; document.querySelectorAll('.item').forEach(el=>el.classList.remove('active')); document.getElementById('item0').classList.add('active'); cfg.c1=false; cfg.c2=false; cfg.c3=false; cfg.c4=false; cfg.c5=false; cfg.c6=false; updateUI(); createBoard();};
+document.getElementById('buyBtn').onclick=()=>{ let price=currentBet*100; if(score<price){ showInfoPopup("Saldo Tidak Cukup", "Saldo tidak cukup untuk BUY.<br><br>Butuh "+price.toLocaleString("id-ID")+" coin. Saldo kamu "+score.toLocaleString("id-ID")+"<br><br>Coba spin biasa dulu.", "⚠️"); return; } score-=price; spinCount=2; cfg.c2=true; document.getElementById('c2').checked=true; document.querySelectorAll('.item').forEach(el=>el.classList.remove('active')); document.getElementById('item2').classList.add('active'); updateUI(); spin(); };
+
+
+function showSharePopup(){
+  document.getElementById('sharePopup').style.display='flex';
+}
+function hideSharePopup(){
+  document.getElementById('sharePopup').style.display='none';
+}
+function getShareLink(){
+  // coba ambil origin, fallback ke portal.html
+  try{
+    let base = window.location.href.split('?')[0];
+    let portal = base.replace('manual.html','portal.html').replace('fruit_bobanza_sim5_5ceklis_simple.html','portal.html');
+    if(portal==base) portal = base.substring(0, base.lastIndexOf('/')+1) + 'portal.html';
+    return portal;
+  }catch(e){ return window.location.origin + '/portal.html'; }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  let waBtn = document.getElementById('btnShareWA');
+  let copyBtn = document.getElementById('btnCopyLink');
+  let closeBtn = document.getElementById('btnShareClose');
+  if(waBtn){
+    waBtn.onclick=()=>{
+      let link = getShareLink();
+      let text = `Alhamdulillah aku udah sadar judol itu settingan!%0A%0ACoba cek edukasi Ruang Sadar ini, kamu bisa jadi bandarnya dan atur sendiri scatter & jackpot biar paham liciknya:%0A${link}%0A%0ASatu share bisa selamatin keluarga temanmu dari judol.`;
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+      setTimeout(()=>{ waBtn.textContent='✅ Sudah Dibagikan!'; }, 800);
+    };
+  }
+  if(copyBtn){
+    copyBtn.onclick=async()=>{
+      let link = getShareLink();
+      try{ await navigator.clipboard.writeText(link); copyBtn.textContent='✅ Link Disalin!'; setTimeout(()=>copyBtn.textContent='🔗 Salin Link Edukasi', 2000); }catch(e){ prompt('Salin link ini:', link); }
+    };
+  }
+  if(closeBtn){
+    closeBtn.onclick=()=>{
+      hideSharePopup();
+      window.location.href='data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImlkIj48aGVhZD4KPG1ldGEgY2hhcnNldD0iVVRGLTgiPgo8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLGluaXRpYWwtc2NhbGU9MSxtYXhpbXVtLXNjYWxlPTEsdXNlci1zY2FsYWJsZT1ubyI+Cjx0aXRsZT5SVUFORyBTQURBUiAtIFBvcnRhbCBFZHVrYXNpPC90aXRsZT4KPHN0eWxlPgoqe21hcmdpbjowO3BhZGRpbmc6MDtib3gtc2l6aW5nOmJvcmRlci1ib3g7LXdlYmtpdC10YXAtaGlnaGxpZ2h0LWNvbG9yOnRyYW5zcGFyZW50fWJvZHl7Zm9udC1mYW1pbHk6QXJpYWw7YmFja2dyb3VuZDojZjBmN2ZmO2NvbG9yOiMwZjE3MmE7b3ZlcmZsb3cteDpoaWRkZW59CmhlYWRlcntwb3NpdGlvbjpzdGlja3k7dG9wOjA7YmFja2dyb3VuZDojZmZmO2JvcmRlci1ib3R0b206MnB4IHNvbGlkICNiZmRiZmU7cGFkZGluZzoxNHB4IDE4cHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6MThweDt6LWluZGV4OjEwMDtwb3NpdGlvbjpyZWxhdGl2ZTt9Ci5saXZlQ2hhdEJ0bntwb3NpdGlvbjphYnNvbHV0ZTt0b3A6MTRweDtyaWdodDoxNnB4O3dpZHRoOjQ0cHg7aGVpZ2h0OjQ0cHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2JvcmRlci1yYWRpdXM6MTJweDtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgjMWE3M2U4LCMwZDQ3YTEpO2NvbG9yOiNmZmY7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Zm9udC1zaXplOjIwcHg7fQoubWVudXtmb250LXNpemU6MzJweDtjdXJzb3I6cG9pbnRlcjtjb2xvcjojMGQ0N2ExfS5sb2dve2ZvbnQtc2l6ZToyMHB4O2ZvbnQtd2VpZ2h0OjkwMDtsaW5lLWhlaWdodDoxLjE7Y29sb3I6IzBkNDdhMTtmbGV4OjE7fS5sb2dvIHNtYWxse2Rpc3BsYXk6YmxvY2s7Zm9udC1zaXplOjExcHg7bWFyZ2luLXRvcDo0cHg7Y29sb3I6IzY0NzQ4Yjtmb250LXdlaWdodDo2MDA7fQouZ3JpZHtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOnJlcGVhdCgyLDFmcik7Z2FwOjEycHg7cGFkZGluZzoxMnB4fQouY2FyZHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyOjJweCBzb2xpZCAjYmZkYmZlO2JvcmRlci1yYWRpdXM6MThweDtvdmVyZmxvdzpoaWRkZW47Ym94LXNoYWRvdzowIDRweCAxNnB4IHJnYmEoMjYsMTE1LDIzMiwuMTIpfQouY292ZXJ7aGVpZ2h0OjExMHB4O2JhY2tncm91bmQtc2l6ZTpjb3ZlcjtiYWNrZ3JvdW5kLXBvc2l0aW9uOmNlbnRlcjtwb3NpdGlvbjpyZWxhdGl2ZX0KLmJhZGdle3Bvc2l0aW9uOmFic29sdXRlO2xlZnQ6MTBweDt0b3A6MTBweDtjb2xvcjojZmZmO3BhZGRpbmc6NHB4IDhweDtib3JkZXItcmFkaXVzOjhweDtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo4MDB9Ci5pbmZve3BhZGRpbmc6MTJweH0udGl0bGV7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6OTAwO21hcmdpbi1ib3R0b206NHB4O2NvbG9yOiMwZDQ3YTF9LnN1Yntjb2xvcjojNjQ3NDhiO2ZvbnQtc2l6ZToxMHB4O21hcmdpbi1ib3R0b206MTBweDtsaW5lLWhlaWdodDoxLjR9Ci5wbGF5e2Rpc3BsYXk6YmxvY2s7dGV4dC1kZWNvcmF0aW9uOm5vbmU7dGV4dC1hbGlnbjpjZW50ZXI7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsIzFhNzNlOCwjMGQ0N2ExKTtjb2xvcjojZmZmO2ZvbnQtd2VpZ2h0OjgwMDtwYWRkaW5nOjEwcHg7Ym9yZGVyLXJhZGl1czoxMHB4O2ZvbnQtc2l6ZToxMnB4fQouc2lkZU1lbnV7cG9zaXRpb246Zml4ZWQ7dG9wOjA7bGVmdDotMjgwcHg7d2lkdGg6MjYwcHg7aGVpZ2h0OjEwMCU7YmFja2dyb3VuZDojZmZmO2JvcmRlci1yaWdodDoycHggc29saWQgI2JmZGJmZTt0cmFuc2l0aW9uOi4zczt6LWluZGV4Ojk5OTk7cGFkZGluZy10b3A6NzBweDt9Ci5zaWRlTWVudS5zaG93e2xlZnQ6MDt9LnNpZGVNZW51IGF7ZGlzcGxheTpibG9jaztwYWRkaW5nOjE0cHggMjBweDtjb2xvcjojMGYxNzJhO3RleHQtZGVjb3JhdGlvbjpub25lO2JvcmRlci1ib3R0b206MXB4IHNvbGlkICNmMWY1Zjk7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwfS5zaWRlTWVudSBhOmhvdmVye2JhY2tncm91bmQ6I2RiZWFmZTtjb2xvcjojMGQ0N2ExO30KLm1lbnVDbG9zZXtwb3NpdGlvbjphYnNvbHV0ZTt0b3A6MTVweDtyaWdodDoxNXB4O2ZvbnQtc2l6ZToyNHB4O2N1cnNvcjpwb2ludGVyO2NvbG9yOiMwZDQ3YTE7fQoub3ZlcmxheXtwb3NpdGlvbjpmaXhlZDtpbnNldDowO2JhY2tncm91bmQ6cmdiYSgxNSwyMyw0MiwuNCk7ZGlzcGxheTpub25lO3otaW5kZXg6OTk5ODt9Lm92ZXJsYXkuc2hvd3tkaXNwbGF5OmJsb2NrO30KLmhpc3RvcnlXcmFwe21hcmdpbjoxMnB4IDEycHggMCAxMnB4O3BhZGRpbmc6MDtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyOjJweCBzb2xpZCAjYmZkYmZlO2JvcmRlci1yYWRpdXM6MTZweDtvdmVyZmxvdzpoaWRkZW47fQouaGlzdG9yeUhlYWR7cGFkZGluZzoxMnB4IDE0cHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtYmV0d2Vlbjtib3JkZXItYm90dG9tOjFweCBzb2xpZCAjZTJlOGYwO2JhY2tncm91bmQ6I2VmZjZmZn0KPC9zdHlsZT48L2hlYWQ+PGJvZHk+CjxoZWFkZXI+CjxkaXYgY2xhc3M9Im1lbnUiIG9uY2xpY2s9Im9wZW5NZW51KCkiPuKYsDwvZGl2Pgo8ZGl2IGNsYXNzPSJsb2dvIj5SVUFORyBTQURBUjxicj48c21hbGw+UnVhbmcgQmVsYWphciBTYWRhciBCYWhheWEgSnVkb2w8L3NtYWxsPjxzbWFsbCBpZD0icGxheWVyRW1haWwiPjwvc21hbGw+PC9kaXY+CjxhIGhyZWY9Imh0dHBzOi8vdC5tZS9SdWFuZ1NhZGFyIiB0YXJnZXQ9Il9ibGFuayIgY2xhc3M9ImxpdmVDaGF0QnRuIj7wn5KsPC9hPgo8L2hlYWRlcj4KPGRpdiBpZD0ib3ZlcmxheSIgY2xhc3M9Im92ZXJsYXkiIG9uY2xpY2s9ImNsb3NlTWVudSgpIj48L2Rpdj4KPGRpdiBpZD0ic2lkZU1lbnUiIGNsYXNzPSJzaWRlTWVudSI+CjxkaXYgY2xhc3M9Im1lbnVDbG9zZSIgb25jbGljaz0iY2xvc2VNZW51KCkiPuKclTwvZGl2Pgo8YSBocmVmPSJwb3J0YWwuaHRtbCI+8J+PoCBCZXJhbmRhIEVkdWthc2k8L2E+CjxhIGhyZWY9Im1pbnRhLWNvaW4uaHRtbCI+8J+OkyBNaW50YSBDb2luIEVkdWthc2k8L2E+CjxhIGhyZWY9InRyYW5zYWtzaS5odG1sIj7wn5OcIFJpd2F5YXQgRWR1a2FzaTwvYT4KPGEgaHJlZj0iaHR0cHM6Ly90Lm1lL1J1YW5nU2FkYXIiIHRhcmdldD0iX2JsYW5rIj7wn5KsIExpdmUgQ2hhdCBFZHVrYXNpPC9hPgo8YSBocmVmPSJhYm91dC5odG1sIj7ihLnvuI8gVGVudGFuZyBSVUFORyBTQURBUjwvYT4KPGEgaHJlZj0iIyIgb25jbGljaz0ibG9nb3V0KCkiPvCfmqogTG9nb3V0PC9hPgo8L2Rpdj4KCjxkaXYgaWQ9IndhbGxldCIgc3R5bGU9Im1hcmdpbjoxMnB4IDEycHggMCAxMnB4O3BhZGRpbmc6MTRweDtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyOjJweCBzb2xpZCAjYmZkYmZlO2JvcmRlci1yYWRpdXM6MTZweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyOyI+CjxkaXYgc3R5bGU9ImZsZXg6MSI+PGRpdiBpZD0icGxheWVyTmFtZSIgc3R5bGU9ImZvbnQtc2l6ZToxNHB4O2ZvbnQtd2VpZ2h0OjgwMDtjb2xvcjojMGQ0N2ExOyI+UExBWUVSPC9kaXY+PGRpdiBzdHlsZT0iZm9udC1zaXplOjExcHg7Y29sb3I6IzY0NzQ4YjttYXJnaW4tdG9wOjJweCI+Q29pbiBFZHVrYXNpIEthbXU8L2Rpdj48ZGl2IHN0eWxlPSJkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2ZvbnQtc2l6ZToyMHB4O2ZvbnQtd2VpZ2h0OjkwMDttYXJnaW4tdG9wOjRweCI+PHNwYW4gaWQ9ImNvaW4iPjA8L3NwYW4+IDxzcGFuIHN0eWxlPSJtYXJnaW4tbGVmdDo4cHg7d2lkdGg6OHB4O2hlaWdodDo4cHg7YmFja2dyb3VuZDojMjJjNTVlO2JvcmRlci1yYWRpdXM6NTAlO2Rpc3BsYXk6aW5saW5lLWJsb2NrIj48L3NwYW4+PC9kaXY+PC9kaXY+CjxidXR0b24gb25jbGljaz0ibG9jYXRpb24uaHJlZj0nbWludGEtY29pbi5odG1sJyIgc3R5bGU9IndpZHRoOjkwcHg7aGVpZ2h0OjM4cHg7Ym9yZGVyOm5vbmU7Ym9yZGVyLXJhZGl1czoxMHB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCMxYTczZTgsIzBkNDdhMSk7Y29sb3I6I2ZmZjtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo4MDA7Y3Vyc29yOnBvaW50ZXI7Ij7wn46TIE1JTlRBIENPSU48L2J1dHRvbj4KPC9kaXY+Cgo8ZGl2IHN0eWxlPSJtYXJnaW46MTJweDtiYWNrZ3JvdW5kOiNmZmZiZWI7Ym9yZGVyOjJweCBzb2xpZCAjZjU5ZTBiO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHg7Ij4KPGIgc3R5bGU9ImZvbnQtc2l6ZToxMXB4O2NvbG9yOiM5MjQwMGUiPuKaoO+4jyA1IFNJTVVMQVNJIElOSSBNRU1CT05HS0FSIFNFVFRJTkcgQkFOREFSIEpVRE9MPC9iPgo8cCBzdHlsZT0iZm9udC1zaXplOjEwcHg7Y29sb3I6Izc4MzUwZjttYXJnaW4tdG9wOjRweDtsaW5lLWhlaWdodDoxLjQiPkluaSBidWthbiBqdWRpLiBJbmkgZWR1a2FzaSB1bnR1ayBzYWRhci4gTWFpbmthbiBzZW11YSBiaWFyIHBhaGFtIHBvbGFueWEuIE1vZGUgNSBrYW11IGphZGkgYmFuZGFybnlhITwvcD4KPC9kaXY+Cgo8ZGl2IGNsYXNzPSJncmlkIj4KPCEtLSBHQU1FIDEgLSBNRU5BTkcgQVdBTCAtLT4KPGRpdiBjbGFzcz0nY2FyZCc+PGRpdiBjbGFzcz0nY292ZXInIHN0eWxlPSJiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2RjZmNlNywjMjJjNTVlKTtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQwcHgiPvCfjZI8ZGl2IGNsYXNzPSdiYWRnZScgc3R5bGU9ImJhY2tncm91bmQ6IzE1ODAzZCI+U0lNVUxBU0kgMSAtIFVNUEFOPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0naW5mbyc+PGRpdiBjbGFzcz0ndGl0bGUnPklMVVNJIE1FTkFORyBBV0FMPC9kaXY+PGRpdiBjbGFzcz0nc3ViJz48Yj5TZXR0aW5nOiBQbGF5ZXIgYmFydSBzZW5nYWphIGRpYnVhdCBtZW5hbmcuPC9iPiBUcmlrIHBzaWtvbG9naSBiaWFyIGthbXUgbWVyYXNhIGhva2kgJiBrZXRhZ2loYW4gbWFpbiBsYWdpLiBQYWRhaGFsIGluaSB1bXBhbiBhd2FsIGJhbmRhci48L2Rpdj48YSBjbGFzcz0ncGxheScgaHJlZj0nZnJ1aXQuaHRtbCc+TUFJTiBTSU1VTEFTSSAxPC9hPjwvZGl2PjwvZGl2PgoKPCEtLSBHQU1FIDIgLSBEUkFXIC0tPgo8ZGl2IGNsYXNzPSdjYXJkJz48ZGl2IGNsYXNzPSdjb3Zlcicgc3R5bGU9ImJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEzNWRlZywjZGJlYWZlLCMxYTczZTgpO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmNlbnRlcjtmb250LXNpemU6NDBweCI+4pqW77iPPGRpdiBjbGFzcz0nYmFkZ2UnIHN0eWxlPSJiYWNrZ3JvdW5kOiMwZDQ3YTEiPlNJTVVMQVNJIDIgLSBESVRBSEFOPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0naW5mbyc+PGRpdiBjbGFzcz0ndGl0bGUnPlBPTEEgRFJBVyBNRU5BSEFOPC9kaXY+PGRpdiBjbGFzcz0nc3ViJz48Yj5TZXR0aW5nOiBUaWRhayBrYWxhaCB0aWRhayBtZW5hbmcuPC9iPiBTYWxkbyBuYWlrLXR1cnVuIGJpYXIgYmV0YWggbGFtYSBkaSBtZXNpbi4gS2FtdSBrZWhhYmlzYW4gd2FrdHUgJiBwZW5hc2FyYW4gdGVydXMuPC9kaXY+PGEgY2xhc3M9J3BsYXknIGhyZWY9J2ZydWl0Mi5odG1sJz5NQUlOIFNJTVVMQVNJIDI8L2E+PC9kaXY+PC9kaXY+Cgo8IS0tIEdBTUUgMyAtIEpBQ0tQT1QgR0xPQkFMIFBPT0wgLS0+CjxkaXYgY2xhc3M9J2NhcmQnPjxkaXYgY2xhc3M9J2NvdmVyJyBzdHlsZT0iYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmZmVkZDUsI2Y5NzMxNik7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2ZvbnQtc2l6ZTo0MHB4Ij7wn5KjPGRpdiBjbGFzcz0nYmFkZ2UnIHN0eWxlPSJiYWNrZ3JvdW5kOiNjMjQxMGMiPlNJTVVMQVNJIDMgLSBKQUNLUE9UPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0naW5mbyc+PGRpdiBjbGFzcz0ndGl0bGUnPkpFQkFLQU4gSkFDS1BPVCBHTE9CQUw8L2Rpdj48ZGl2IGNsYXNzPSdzdWInPjxiPlNldHRpbmc6IE1lbmFuZyBiZXNhciBoaW5nZ2EgaGFiaXNrYW4gc2FsZG8gR2xvYmFsIFBvb2wuPC9iPiBLYW11IGxpaGF0IG9yYW5nIGxhaW4gSlAgYmVzYXIsIHBhZGFoYWwgaXR1IGt1bXB1bGFuIHNhbGRvIGtvcmJhbiBsYWluIHlhbmcgZGlzZWRvdCBiYWxpay48L2Rpdj48YSBjbGFzcz0ncGxheScgaHJlZj0nZnJ1aXQzLmh0bWwnPk1BSU4gU0lNVUxBU0kgMzwvYT48L2Rpdj48L2Rpdj4KCjwhLS0gR0FNRSA0IC0gU0VET1QgMSBNRU5JVCAtLT4KPGRpdiBjbGFzcz0nY2FyZCc+PGRpdiBjbGFzcz0nY292ZXInIHN0eWxlPSJiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2ZlZTJlMiwjMGYxNzJhKTtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQwcHgiPvCflbPvuI88ZGl2IGNsYXNzPSdiYWRnZScgc3R5bGU9ImJhY2tncm91bmQ6IzAwMCI+U0lNVUxBU0kgNCAtIFNFRE9UPC9kaXY+PC9kaXY+PGRpdiBjbGFzcz0naW5mbyc+PGRpdiBjbGFzcz0ndGl0bGUnPk1PREUgU0VET1QgMSBNRU5JVDwvZGl2PjxkaXYgY2xhc3M9J3N1Yic+PGI+U2V0dGluZzogS2FsYWggdG90YWwsIGRpc2Vkb3QgaGFiaXMgZGFsYW0gMSBtZW5pdC48L2I+IFNldHRpbmcgYXNsaSBzYWF0IGJhbmRhciBidXR1aCB1YW5nLiBJbmlsYWggdWp1bmcgbnlhdGEgc2VtdWEgcGVtYWluIGp1ZG9sLjwvZGl2PjxhIGNsYXNzPSdwbGF5JyBocmVmPSdmcnVpdDQuaHRtbCcgc3R5bGU9ImJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCMzMzQxNTUsIzAwMCkiPk1BSU4gU0lNVUxBU0kgNDwvYT48L2Rpdj48L2Rpdj4KCjwhLS0gR0FNRSA1IC0gTUFOVUFMIC8gR09EIE1PREUgLSBCQVJVIC0tPgo8ZGl2IGNsYXNzPSdjYXJkJyBzdHlsZT0iYm9yZGVyLWNvbG9yOiNkOGI0ZmU7Ym94LXNoYWRvdzowIDRweCAyMHB4IHJnYmEoMTY4LDg1LDI0NywuMjUpOyI+PGRpdiBjbGFzcz0nY292ZXInIHN0eWxlPSJiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2YzZThmZiwjYTg1NWY3KTtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQwcHg7cG9zaXRpb246cmVsYXRpdmU7Ij7wn46b77iPPGRpdiBjbGFzcz0nYmFkZ2UnIHN0eWxlPSJiYWNrZ3JvdW5kOiM3ZTIyY2U7YW5pbWF0aW9uOiBwdWxzZSAxLjVzIGluZmluaXRlOyI+U0lNVUxBU0kgNSAtIE1BTlVBTCDigKIgQkFSVTwvZGl2PjxkaXYgc3R5bGU9InBvc2l0aW9uOmFic29sdXRlO3JpZ2h0OjhweDt0b3A6OHB4O2JhY2tncm91bmQ6I2ZmY2MwMDtjb2xvcjojMDAwO2ZvbnQtc2l6ZTo4cHg7Zm9udC13ZWlnaHQ6OTAwO3BhZGRpbmc6M3B4IDZweDtib3JkZXItcmFkaXVzOjIwcHg7Ij5HT0QgTU9ERTwvZGl2PjwvZGl2PjxkaXYgY2xhc3M9J2luZm8nPjxkaXYgY2xhc3M9J3RpdGxlJz5TRVRUSU5HIFNFTUFVTVUgLSBTRU9MQUgtT0xBSCBLQU1VIEJBTkRBUk5ZQTwvZGl2PjxkaXYgY2xhc3M9J3N1Yic+PGI+U2V0dGluZzogS2FtdSBhdHVyIHNlbmRpcmkga2FwYW4gc2NhdHRlciwga2FwYW4gem9uaywga2FwYW4gamFja3BvdCAxMGp0IC8gMTAwanQuPC9iPjxicj48YnI+8J+OriA2IHBpbGloYW4gY2VrbGlzLCBoYW55YSBib2xlaCAxIGFrdGlmLCBhdXRvIHJlc2V0IHRpYXAgcGluZGFoIGNla2xpcy48YnI+8J+Rge+4jyA8Yj5TaW1hayBuYWlrIHR1cnVuIHNhbGRvIG55YSBzZXN1YWkgeWFuZyBrYW11IGNla2xpczwvYj4gLSBsaWhhdCBncmFmaWsgYmlhciBzYWRhciBwb2xhbnlhLjxicj48YnI+4oCiIEMxOiBTcGluIDEtMTAgc2NhdHRlciBnZXNlcjxicj7igKIgQzI6IDN4IHNwaW4gMTBqdDxicj7igKIgQzM6IDEweCB6b25rPGJyPuKAoiBDNDogU2NhdHRlciB6b25rPGJyPuKAoiBDNTogU3BpbiAxIHNjYXR0ZXI8YnI+4oCiIEM2OiBTcGluIDEgc2NhdHRlciAxMDBqdDwvZGl2PjxhIGNsYXNzPSdwbGF5JyBocmVmPSdtYW51YWwuaHRtbCcgc3R5bGU9ImJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCNhODU1ZjcsIzdlMjJjZSk7Zm9udC1zaXplOjEzcHg7cGFkZGluZzoxMnB4OyI+8J+Om++4jyBNQUlOIFNJTVVMQVNJIDUgLSBNQU5VQUwgKEpBREkgQkFOREFSKTwvYT48L2Rpdj48L2Rpdj4KCjwvZGl2PgoKPHN0eWxlPkBrZXlmcmFtZXMgcHVsc2V7MCV7dHJhbnNmb3JtOnNjYWxlKDEpfTUwJXt0cmFuc2Zvcm06c2NhbGUoMS4wNSl9MTAwJXt0cmFuc2Zvcm06c2NhbGUoMSl9fTwvc3R5bGU+Cgo8c2NyaXB0IHNyYz0iaHR0cHM6Ly93d3cuZ3N0YXRpYy5jb20vZmlyZWJhc2Vqcy8xMC4xMy4yL2ZpcmViYXNlLWFwcC1jb21wYXQuanMiPjwvc2NyaXB0Pgo8c2NyaXB0IHNyYz0iaHR0cHM6Ly93d3cuZ3N0YXRpYy5jb20vZmlyZWJhc2Vqcy8xMC4xMy4yL2ZpcmViYXNlLWF1dGgtY29tcGF0LmpzIj48L3NjcmlwdD4KPHNjcmlwdCBzcmM9Imh0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ZpcmViYXNlanMvMTAuMTMuMi9maXJlYmFzZS1maXJlc3RvcmUtY29tcGF0LmpzIj48L3NjcmlwdD4KPHNjcmlwdD4KY29uc3QgZmlyZWJhc2VDb25maWc9e2FwaUtleToiQUl6YVN5QmVUQUxzRjQzaWozYUFsWmpGMVhlQmpCMWdOdGFUYjJJIixhdXRoRG9tYWluOiJnYW1lLWRlbW8tNGRiN2YuZmlyZWJhc2VhcHAuY29tIixwcm9qZWN0SWQ6ImdhbWUtZGVtby00ZGI3ZiIsc3RvcmFnZUJ1Y2tldDoiZ2FtZS1kZW1vLTRkYjdmLmZpcmViYXNlc3RvcmFnZS5hcHAiLG1lc3NhZ2luZ1NlbmRlcklkOiI0MDUzODE1MDYxNDMiLGFwcElkOiIxOjQwNTM4MTUwNjE0Mzp3ZWI6ZGE2M2YzNGEyNGYwMWU0ZjAzNjdlYSJ9OwpmaXJlYmFzZS5pbml0aWFsaXplQXBwKGZpcmViYXNlQ29uZmlnKTsKY29uc3QgYXV0aD1maXJlYmFzZS5hdXRoKCk7IGNvbnN0IGRiPWZpcmViYXNlLmZpcmVzdG9yZSgpOwpsZXQgcGxheWVyPW51bGw7IGxldCB1bnN1YnNjcmliZT1udWxsOwphdXRoLm9uQXV0aFN0YXRlQ2hhbmdlZChhc3luYyh1c2VyKT0+ewogICAgaWYoIXVzZXIpeyBsb2NhdGlvbi5yZXBsYWNlKCJpbmRleC5odG1sIik7IHJldHVybjsgfQogICAgaWYodW5zdWJzY3JpYmUpIHVuc3Vic2NyaWJlKCk7CiAgICB1bnN1YnNjcmliZSA9IGRiLmNvbGxlY3Rpb24oInBsYXllcnMiKS5kb2ModXNlci51aWQpLm9uU25hcHNob3QoZG9jPT57CiAgICAgICAgaWYoIWRvYy5leGlzdHMpeyByZXR1cm47IH0KICAgICAgICBwbGF5ZXI9ZG9jLmRhdGEoKTsKICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgicGxheWVyTmFtZSIpLnRleHRDb250ZW50ID0gcGxheWVyLnByb2ZpbGU/LnVzZXJuYW1lIHx8IHBsYXllci5wcm9maWxlPy5lbWFpbD8uc3BsaXQoIkAiKVswXSB8fCAiUExBWUVSIjsKICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgicGxheWVyRW1haWwiKS50ZXh0Q29udGVudCA9IHBsYXllci5wcm9maWxlPy5lbWFpbCB8fCB1c2VyLmVtYWlsOwogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJjb2luIikudGV4dENvbnRlbnQgPSBOdW1iZXIocGxheWVyLndhbGxldD8uY29pbnx8MCkudG9Mb2NhbGVTdHJpbmcoImlkLUlEIik7CiAgICB9KTsKfSk7CmZ1bmN0aW9uIGxvZ291dCgpeyBpZih1bnN1YnNjcmliZSkgdW5zdWJzY3JpYmUoKTsgYXV0aC5zaWduT3V0KCkudGhlbigoKT0+bG9jYXRpb24ucmVwbGFjZSgiaW5kZXguaHRtbCIpKTsgfQpmdW5jdGlvbiBvcGVuTWVudSgpeyBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgic2lkZU1lbnUiKS5jbGFzc0xpc3QuYWRkKCJzaG93Iik7IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJvdmVybGF5IikuY2xhc3NMaXN0LmFkZCgic2hvdyIpOyB9CmZ1bmN0aW9uIGNsb3NlTWVudSgpeyBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgic2lkZU1lbnUiKS5jbGFzc0xpc3QucmVtb3ZlKCJzaG93Iik7IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJvdmVybGF5IikuY2xhc3NMaXN0LnJlbW92ZSgic2hvdyIpOyB9Cjwvc2NyaXB0PjwvYm9keT48L2h0bWw+Cg==';
+    };
+  }
+});
+
+let shareShown = false;
+function maybeShowShareAfterPlay(){
+  // tidak auto muncul lagi - hanya muncul setelah semua ceklis dipakai
+  // dipanggil tetap untuk update progress
+  markChecklistUsed();
+}
+
+// Hook ke spin selesai
+let _origSpinEnd = null;
+
+document.addEventListener('DOMContentLoaded', ()=>{ let infoOk=document.getElementById('infoPopupOk'); if(infoOk){ infoOk.onclick=()=>{ hideInfoPopup(); }; } });
+
+auth.onAuthStateChanged(async u=>{ if(!u){ try{ await auth.signInAnonymously(); }catch(e){} } score=1000000; await initPool(); createBoard(); updateUI(); bind(); });
+</script>
+</body>
+</html>

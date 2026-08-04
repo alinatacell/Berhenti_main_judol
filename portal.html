@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id"><head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>RUANG SADAR - Portal Edukasi</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{font-family:Arial;background:#f0f7ff;color:#0f172a;overflow-x:hidden}
+header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;padding:14px 18px;display:flex;align-items:center;gap:18px;z-index:100;position:relative;}
+.liveChatBtn{position:absolute;top:14px;right:16px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(#1a73e8,#0d47a1);color:#fff;text-decoration:none;font-size:20px;}
+.menu{font-size:32px;cursor:pointer;color:#0d47a1}.logo{font-size:20px;font-weight:900;line-height:1.1;color:#0d47a1;flex:1;}.logo small{display:block;font-size:11px;margin-top:4px;color:#64748b;font-weight:600;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px}
+.card{background:#fff;border:2px solid #bfdbfe;border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(26,115,232,.12)}
+.cover{height:110px;background-size:cover;background-position:center;position:relative}
+.badge{position:absolute;left:10px;top:10px;color:#fff;padding:4px 8px;border-radius:8px;font-size:10px;font-weight:800}
+.info{padding:12px}.title{font-size:13px;font-weight:900;margin-bottom:4px;color:#0d47a1}.sub{color:#64748b;font-size:10px;margin-bottom:10px;line-height:1.4}
+.play{display:block;text-decoration:none;text-align:center;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-weight:800;padding:10px;border-radius:10px;font-size:12px}
+.sideMenu{position:fixed;top:0;left:-280px;width:260px;height:100%;background:#fff;border-right:2px solid #bfdbfe;transition:.3s;z-index:9999;padding-top:70px;}
+.sideMenu.show{left:0;}.sideMenu a{display:block;padding:14px 20px;color:#0f172a;text-decoration:none;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700}.sideMenu a:hover{background:#dbeafe;color:#0d47a1;}
+.menuClose{position:absolute;top:15px;right:15px;font-size:24px;cursor:pointer;color:#0d47a1;}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.4);display:none;z-index:9998;}.overlay.show{display:block;}
+.historyWrap{margin:12px 12px 0 12px;padding:0;background:#fff;border:2px solid #bfdbfe;border-radius:16px;overflow:hidden;}
+.historyHead{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;background:#eff6ff}
+</style></head><body>
+<header>
+<div class="menu" onclick="openMenu()">☰</div>
+<div class="logo">RUANG SADAR<br><small>Ruang Belajar Sadar Bahaya Judol</small><small id="playerEmail"></small></div>
+<a href="https://t.me/RuangSadar" target="_blank" class="liveChatBtn">💬</a>
+</header>
+<div id="overlay" class="overlay" onclick="closeMenu()"></div>
+<div id="sideMenu" class="sideMenu">
+<div class="menuClose" onclick="closeMenu()">✕</div>
+<a href="portal.html">🏠 Beranda Edukasi</a>
+<a href="minta-coin.html">🎓 Minta Coin Edukasi</a>
+<a href="transaksi.html">📜 Riwayat Edukasi</a>
+<a href="https://t.me/RuangSadar" target="_blank">💬 Live Chat Edukasi</a>
+<a href="about.html">ℹ️ Tentang RUANG SADAR</a>
+<a href="#" onclick="logout()">🚪 Logout</a>
+</div>
+
+<div id="wallet" style="margin:12px 12px 0 12px;padding:14px;background:#fff;border:2px solid #bfdbfe;border-radius:16px;display:flex;align-items:center;">
+<div style="flex:1"><div id="playerName" style="font-size:14px;font-weight:800;color:#0d47a1;">PLAYER</div><div style="font-size:11px;color:#64748b;margin-top:2px">Coin Edukasi Kamu</div><div style="display:flex;align-items:center;font-size:20px;font-weight:900;margin-top:4px"><span id="coin">0</span> <span style="margin-left:8px;width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block"></span></div></div>
+<button onclick="location.href='minta-coin.html'" style="width:90px;height:38px;border:none;border-radius:10px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🎓 MINTA COIN</button>
+</div>
+
+<div style="margin:12px;background:#fffbeb;border:2px solid #f59e0b;border-radius:12px;padding:12px;">
+<b style="font-size:11px;color:#92400e">⚠️ 5 SIMULASI INI MEMBONGKAR SETTING BANDAR JUDOL</b>
+<p style="font-size:10px;color:#78350f;margin-top:4px;line-height:1.4">Ini bukan judi. Ini edukasi untuk sadar. Mainkan semua biar paham polanya. Mode 5 kamu jadi bandarnya!</p>
+</div>
+
+<div class="grid">
+<!-- GAME 1 - MENANG AWAL -->
+<div class='card'><div class='cover' style="background:linear-gradient(135deg,#dcfce7,#22c55e);display:flex;align-items:center;justify-content:center;font-size:40px">🍒<div class='badge' style="background:#15803d">SIMULASI 1 - UMPAN</div></div><div class='info'><div class='title'>ILUSI MENANG AWAL</div><div class='sub'><b>Setting: Player baru sengaja dibuat menang.</b> Trik psikologi biar kamu merasa hoki & ketagihan main lagi. Padahal ini umpan awal bandar.</div><a class='play' href='fruit.html'>MAIN SIMULASI 1</a></div></div>
+
+<!-- GAME 2 - DRAW -->
+<div class='card'><div class='cover' style="background:linear-gradient(135deg,#dbeafe,#1a73e8);display:flex;align-items:center;justify-content:center;font-size:40px">⚖️<div class='badge' style="background:#0d47a1">SIMULASI 2 - DITAHAN</div></div><div class='info'><div class='title'>POLA DRAW MENAHAN</div><div class='sub'><b>Setting: Tidak kalah tidak menang.</b> Saldo naik-turun biar betah lama di mesin. Kamu kehabisan waktu & penasaran terus.</div><a class='play' href='fruit2.html'>MAIN SIMULASI 2</a></div></div>
+
+<!-- GAME 3 - JACKPOT GLOBAL POOL -->
+<div class='card'><div class='cover' style="background:linear-gradient(135deg,#ffedd5,#f97316);display:flex;align-items:center;justify-content:center;font-size:40px">💣<div class='badge' style="background:#c2410c">SIMULASI 3 - JACKPOT</div></div><div class='info'><div class='title'>JEBAKAN JACKPOT GLOBAL</div><div class='sub'><b>Setting: Menang besar hingga habiskan saldo Global Pool.</b> Kamu lihat orang lain JP besar, padahal itu kumpulan saldo korban lain yang disedot balik.</div><a class='play' href='fruit3.html'>MAIN SIMULASI 3</a></div></div>
+
+<!-- GAME 4 - SEDOT 1 MENIT -->
+<div class='card'><div class='cover' style="background:linear-gradient(135deg,#fee2e2,#0f172a);display:flex;align-items:center;justify-content:center;font-size:40px">🕳️<div class='badge' style="background:#000">SIMULASI 4 - SEDOT</div></div><div class='info'><div class='title'>MODE SEDOT 1 MENIT</div><div class='sub'><b>Setting: Kalah total, disedot habis dalam 1 menit.</b> Setting asli saat bandar butuh uang. Inilah ujung nyata semua pemain judol.</div><a class='play' href='fruit4.html' style="background:linear-gradient(90deg,#334155,#000)">MAIN SIMULASI 4</a></div></div>
+
+<!-- GAME 5 - MANUAL / GOD MODE - BARU -->
+<div class='card' style="border-color:#d8b4fe;box-shadow:0 4px 20px rgba(168,85,247,.25);"><div class='cover' style="background:linear-gradient(135deg,#f3e8ff,#a855f7);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;">🎛️<div class='badge' style="background:#7e22ce;animation: pulse 1.5s infinite;">SIMULASI 5 - MANUAL • BARU</div><div style="position:absolute;right:8px;top:8px;background:#ffcc00;color:#000;font-size:8px;font-weight:900;padding:3px 6px;border-radius:20px;">GOD MODE</div></div><div class='info'><div class='title'>SETTING SEMAUMU - SEOLAH-OLAH KAMU BANDARNYA</div><div class='sub'><b>Setting: Kamu atur sendiri kapan scatter, kapan zonk, kapan jackpot 10jt / 100jt.</b><br><br>🎮 6 pilihan ceklis, hanya boleh 1 aktif, auto reset tiap pindah ceklis.<br>👁️ <b>Simak naik turun saldo nya sesuai yang kamu ceklis</b> - lihat grafik biar sadar polanya.<br><br>• C1: Spin 1-10 scatter geser<br>• C2: 3x spin 10jt<br>• C3: 10x zonk<br>• C4: Scatter zonk<br>• C5: Spin 1 scatter<br>• C6: Spin 1 scatter 100jt</div><a class='play' href='manual.html' style="background:linear-gradient(90deg,#a855f7,#7e22ce);font-size:13px;padding:12px;">🎛️ MAIN SIMULASI 5 - MANUAL (JADI BANDAR)</a></div></div>
+
+</div>
+
+<style>@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(); const db=firebase.firestore();
+let player=null; let unsubscribe=null;
+auth.onAuthStateChanged(async(user)=>{
+    if(!user){ location.replace("index.html"); return; }
+    if(unsubscribe) unsubscribe();
+    unsubscribe = db.collection("players").doc(user.uid).onSnapshot(doc=>{
+        if(!doc.exists){ return; }
+        player=doc.data();
+        document.getElementById("playerName").textContent = player.profile?.username || player.profile?.email?.split("@")[0] || "PLAYER";
+        document.getElementById("playerEmail").textContent = player.profile?.email || user.email;
+        document.getElementById("coin").textContent = Number(player.wallet?.coin||0).toLocaleString("id-ID");
+    });
+});
+function logout(){ if(unsubscribe) unsubscribe(); auth.signOut().then(()=>location.replace("index.html")); }
+function openMenu(){ document.getElementById("sideMenu").classList.add("show"); document.getElementById("overlay").classList.add("show"); }
+function closeMenu(){ document.getElementById("sideMenu").classList.remove("show"); document.getElementById("overlay").classList.remove("show"); }
+</script></body></html>

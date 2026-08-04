@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) options = { passive: true };
+      else if (typeof options === 'boolean') options = { capture: options, passive: true };
+      else options = Object.assign({}, options, { passive: true });
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>FRUIT BOBANZA - SIMULASI 3 JACKPOT 50JT</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+:root{--safe-top: env(safe-area-inset-top, 0px);--safe-bottom: env(safe-area-inset-bottom, 0px);}
+html{font-size:16px;height:100%;overflow-x:hidden;}
+body{width:100%;min-height:100dvh;font-family:Arial,Helvetica,sans-serif;background:#000 url("portal.png") no-repeat center top/cover;display:flex;justify-content:center;align-items:flex-start;overflow-x:hidden;}
+.mainShell{width:100%;max-width:540px;min-height:100dvh;margin:0 auto;display:flex;flex-direction:column;gap:8px;padding:calc(var(--safe-top) + 6px) 10px calc(var(--safe-bottom) + 12px);}
+.panel-sadow{background:linear-gradient(180deg, rgba(38,38,42,0.96) 0%, rgba(18,18,20,0.98) 100%);border:1px solid rgba(255,255,255,0.13);border-radius:16px;box-shadow:0 0 0 1px rgba(0,0,0,0.9),0 12px 32px rgba(0,0,0,0.8);backdrop-filter:blur(14px);position:relative;width:100%;}
+.panel-sadow::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 40%);pointer-events:none;}
+.panel-inner{position:relative;z-index:2;}
+.topPanel{padding:12px 14px 10px;text-align:center;color:#fff;}
+#topWinDisplay{font-size:clamp(14px,4.2vw,18px);font-weight:900;text-shadow:0 2px 0 #000,0 0 12px rgba(255,215,0,0.6);}
+#poolDisplay{font-size:10px;color:#00ff88;margin-top:4px;font-weight:700;}
+#tierDisplay{font-size:9px;color:#ffe600;margin-top:3px;font-weight:800;background:rgba(0,0,0,0.4);padding:3px 8px;border-radius:20px;border:1px solid rgba(255,230,0,0.2);display:inline-block;}
+#cycleDisplay{font-size:9px;color:#00e5ff;margin-top:4px;font-weight:800;letter-spacing:0.6px;background:rgba(0,229,255,0.12);padding:5px 10px;border-radius:20px;border:1px solid rgba(0,229,255,0.3);display:inline-block;max-width:100%;line-height:1.4;}
+#eduPanel{font-size:8.5px;color:#ffd700;margin-top:6px;background:rgba(255,215,0,0.08);border:1px dashed rgba(255,215,0,0.4);padding:7px 9px;border-radius:10px;line-height:1.45;text-align:left;}
+#chartWrap{margin-top:8px;background:rgba(0,0,0,0.5);border-radius:10px;padding:6px;border:1px solid rgba(255,255,255,0.08);}
+#saldoChart{width:100%;height:70px;display:block;}
+.board{flex:1 1 auto;padding:10px 8px 10px 12px;display:flex;justify-content:center;align-items:center;border-radius:18px;background:radial-gradient(ellipse at center, rgba(20,20,25,0.9) 0%, rgba(5,5,8,0.98) 100%);border:1px solid rgba(255,255,255,0.10);overflow:hidden;}
+#grid{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:100%;max-width:100%;aspect-ratio:1/1;max-height:min(92vw, 62vh, 480px);}
+.cell{position:relative;aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:clamp(20px,7vw,38px);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);border-radius:8px;overflow:visible;box-shadow:inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 4px rgba(0,0,0,0.3);}
+.cell::after{content:"";position:absolute;left:50%;bottom:6px;width:38%;height:10%;transform:translateX(-50%);background:rgba(0,0,0,.35);border-radius:50%;filter:blur(4px);pointer-events:none;}
+.cell.scatter{background:radial-gradient(circle at 50% 50%, rgba(255,215,0,0.45), rgba(255,215,0,0.10) 45%, transparent 78%);}
+.cell .scatter-img{width:84%;height:84%;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6)) drop-shadow(0 0 16px rgba(255,215,0,1));animation:scatterFloat 2.5s ease-in-out infinite alternate;}
+@keyframes scatterFloat{from{transform:scale(1) rotate(-2deg);}to{transform:scale(1.12) rotate(2deg);}}
+@keyframes shatterAnim{0%{transform:scale(1);opacity:1;}25%{transform:scale(1.2);}100%{transform:scale(0.15) translateY(35px);filter:blur(8px);opacity:0;}}
+.cell.shattering{animation:shatterAnim 0.5s cubic-bezier(.7,0,.85,.6) forwards;z-index:20;}
+.particle-piece{position:absolute;left:50%;top:50%;pointer-events:none;font-size:20px;z-index:50;}
+@keyframes pieceFly{0%{transform:translate(-50%,-50%) scale(1);opacity:1;}100%{transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(0);opacity:0;}}
+.cell.scatter-last{animation:scatterLastGlow 0.9s ease-in-out infinite alternate;z-index:30;}
+@keyframes scatterLastGlow{from{filter:drop-shadow(0 0 14px gold) brightness(1.2);}to{filter:drop-shadow(0 0 32px gold) brightness(1.8);transform:scale(1.22);}}
+.controlArea{padding:10px;display:flex;flex-direction:column;gap:8px;}
+.featureRow{width:100%;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:linear-gradient(180deg, rgba(30,30,34,0.9), rgba(14,14,16,0.95));border-radius:12px;border:1px solid rgba(255,255,255,0.08);}
+.sadow-btn{background:linear-gradient(180deg, rgba(55,55,60,0.95) 0%, rgba(22,22,26,0.98) 100%);border:1px solid rgba(255,255,255,0.14);border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.6);color:#fff;font-weight:900;text-shadow:0 1px 0 #000;cursor:pointer;transition:0.12s;position:relative;overflow:hidden;}
+.sadow-btn:active{transform:scale(0.93);}
+.sadow-btn.disabled{opacity:0.25;pointer-events:none;filter:grayscale(1);}
+.autoWrap,.buyWrap{display:flex;flex-direction:column;align-items:center;min-width:60px;}
+.autoBox,.buyBox{padding:6px 8px;min-width:60px;text-align:center;font-size:9px;line-height:1.1;}
+.autoBox i,.buyBox i{font-style:normal;font-size:18px;display:block;}
+.autoBox b,.buyBox b{display:block;font-size:8px;margin-top:2px;color:#ffd700;}
+.autoBox.active{color:#ff4a4a;animation:pulse 0.7s infinite;border-color:rgba(255,74,74,0.4) !important;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+#message{font-size:9px;font-weight:800;color:#fff;text-shadow:1px 1px 2px #000;min-height:18px;text-align:center;flex:1;padding:5px 8px;background:rgba(0,0,0,0.35);border-radius:8px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;margin:0 6px;line-height:1.2;}
+.spinRow{width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:linear-gradient(180deg, rgba(30,30,34,0.9), rgba(14,14,16,0.95));border-radius:12px;border:1px solid rgba(255,255,255,0.08);gap:6px;}
+.betBtn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0;}
+#speedBtn{width:62px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;flex-shrink:0;}
+#speedBtn i{font-style:normal;font-size:11px;} #speedBtn b{font-size:6px;margin-top:2px;}
+#spinBtn{width:68px;height:68px;border-radius:50%;border:3px solid #fff;background:linear-gradient(180deg,#ffd700 0%,#ff8c00 30%,#ff4500 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 2px #000,0 0 20px rgba(255,215,0,0.6),0 8px 18px rgba(0,0,0,.7), inset 0 2px 4px rgba(255,255,255,0.4);transition:.15s;flex-shrink:0;}
+#spinBtn span{font-size:30px;color:#fff;font-weight:bold;text-shadow:0 2px 0 #8B2500;} #spinBtn:active{transform:scale(.92);} #spinBtn.hidden{opacity:0;pointer-events:none;transform:scale(.5);}
+#soundToggle{width:60px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;flex-shrink:0;}
+#soundToggle i{font-style:normal;font-size:14px;} #soundToggle b{font-size:6px;margin-top:2px;}
+.bottomStats{display:flex;justify-content:space-between;gap:8px;}
+.saldoDisplay,.betDisplay{flex:1;text-align:center;padding:8px 6px;background:linear-gradient(180deg, rgba(40,40,45,0.95), rgba(15,15,18,0.98));border:1px solid rgba(255,215,0,0.18);border-radius:10px;cursor:pointer;}
+.saldoDisplay span,.betDisplay span{display:block;font-size:7px;font-weight:900;color:#aaa;letter-spacing:1px;}
+.saldoDisplay b,.betDisplay b{font-size:13px;color:#fff;font-weight:900;display:block;margin-top:3px;}
+.comboPopup{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);font-size:30px;font-weight:bold;color:#fff;text-shadow:0 0 16px #000,0 0 28px #ff9800;pointer-events:none;animation:comboPopup 1.1s forwards;z-index:9999;text-align:center;max-width:90vw;}
+@keyframes comboPopup{0%{opacity:0;transform:translate(-50%,-50%) scale(.2);}25%{opacity:1;transform:translate(-50%,-50%) scale(1.25);}100%{opacity:0;transform:translate(-50%,-160%) scale(1);}}
+.bigFlash{animation:bigFlash .6s;}@keyframes bigFlash{0%{filter:brightness(1);}50%{filter:brightness(3);}100%{filter:brightness(1);}}
+#freeSpinPopup,#autoPopup,#buyPopup,#betPopup{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;justify-content:center;align-items:center;z-index:99999;backdrop-filter:blur(8px);padding:10px 12px;}
+.popupBox{width:min(92vw,400px);max-height:90dvh;overflow-y:auto;background:linear-gradient(180deg,#2a2a2e,#111113);border:1px solid rgba(255,255,255,0.15);border-radius:20px;text-align:center;padding:18px;animation:popupScale .3s;}
+@keyframes popupScale{from{transform:scale(.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.autoGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0;max-height:40vh;overflow-y:auto;}
+.autoOpt{padding:8px 2px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:#2a2a2e;font-weight:900;color:#ccc;cursor:pointer;font-size:13px;}
+.autoOpt.selected{background:linear-gradient(180deg,#ffdc5c,#ff9f00);color:#5a3a00;border-color:#fff;}
+.buyGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0;}
+.buyCard{padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:#2a2a2e;cursor:pointer;text-align:left;}
+.buyCard.selected{background:linear-gradient(180deg,#4a3a00,#ff9f00);border-color:#ffcc00;}
+.buyCardTitle{font-size:12px;font-weight:900;color:#ffcc00;}
+.buyCardDesc{font-size:8px;color:#aaa;margin-top:2px;}
+.buyCardPrice{font-size:12px;font-weight:900;color:#00ff88;margin-top:4px;}
+.betHeaderTabs{display:flex;gap:6px;margin:10px 0;overflow-x:auto;padding-bottom:6px;}
+.betTab{padding:5px 9px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);font-size:8px;font-weight:900;color:#aaa;cursor:pointer;white-space:nowrap;}
+.betTab.active{background:#ffcc00;color:#000;border-color:#fff;}
+.betGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0;max-height:38vh;overflow-y:auto;}
+.betOpt{padding:7px 4px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#222;cursor:pointer;}
+.betOpt.selected{background:linear-gradient(180deg,#ffdc5c,#ff9f00);color:#000;}
+.betOpt b{display:block;font-size:11px;font-weight:900;}
+.betOpt span{display:block;font-size:6px;margin-top:2px;color:#888;}
+#popupDiamond{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;min-height:48px;}
+#popupDiamond img{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 0 6px gold);}
+</style>
+</head>
+<body>
+<div class="mainShell">
+  <div class="panel-sadow topPanel"><div class="panel-inner">
+    <div id="topWinDisplay">💰 MENANG : Rp 0</div>
+    <div id="poolDisplay">GLOBAL POOL: - | JACKPOT MODE</div>
+    <div id="tierDisplay">TIER: -</div>
+    <div id="cycleDisplay">SIMULASI 3 - JACKPOT 50JT | Spin: 1/29 - KEMENANGAN KECIL</div>
+    <div id="eduPanel">🎓 <b>JEBAKAN JACKPOT:</b> Awal dikasih menang kecil biar betah. Spin 30 → 4 Scatter → 10 Free Spin JP 50JT dari Global Pool! Saldo naik drastis → euforia. Setelah itu peluang turun, saldo pelan-pelan habis lagi → pemain ngejar jackpot berikutnya.</div>
+    <div id="chartWrap"><canvas id="saldoChart" width="500" height="70"></canvas><div style="display:flex;justify-content:space-between;font-size:7px;color:#888;margin-top:2px;"><span>Spin awal</span><span style="color:#ffcc00;">● Jackpot 50JT</span><span>Setelah JP → turun →</span></div></div>
+  </div></div>
+  <div class="panel-sadow board"><div class="panel-inner" style="width:100%;display:flex;justify-content:center;"><div id="grid"></div></div></div>
+  <div class="panel-sadow controlArea"><div class="panel-inner" style="width:100%;display:flex;flex-direction:column;gap:8px;">
+      <div class="featureRow">
+        <div class="autoWrap"><div class="sadow-btn autoBox" id="autoSpinBtn"><i>🎡</i>AUTO<b id="autoText">10</b></div></div>
+        <div id="message">JACKPOT MODE AKTIF</div>
+        <div class="buyWrap"><div class="sadow-btn buyBox" id="buySpinBtn"><i>💰</i>BUY<b id="buyPriceText">20.000</b></div></div>
+      </div>
+      <div class="spinRow">
+        <div class="sadow-btn betBtn" id="betMinus">−</div>
+        <div id="speedBtn" class="sadow-btn"><i id="speedIcon">🐢</i><b id="speedText">LAMBAT</b></div>
+        <button id="spinBtn"><span>⟳</span></button>
+        <div id="soundToggle" class="sadow-btn sound-on"><i id="soundIcon">🔊</i><b id="soundText">SOUND</b></div>
+        <div class="sadow-btn betBtn" id="betPlus">+</div>
+      </div>
+      <div class="bottomStats">
+        <div class="saldoDisplay"><span>SALDO</span><b id="score">0</b></div>
+        <div class="betDisplay" id="betDisplayBtn"><span>BET - TAP PILIH</span><b id="betText">200</b></div>
+      </div>
+  </div></div>
+</div>
+
+<div id="freeSpinEndPopup" style="position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;justify-content:center;align-items:center;z-index:100000;backdrop-filter:blur(8px);padding:10px;"><div class="popupBox" style="border:2px solid gold;"><div style="font-size:20px;font-weight:900;color:#ffcc00;">💥 JACKPOT SELESAI 💥</div><div style="font-size:50px;margin:10px 0;">👑</div><div id="freeSpinEndTotal" style="font-size:16px;font-weight:900;color:#fff;margin:8px 0;"></div><div id="freeSpinEndDetail" style="font-size:10px;color:#ffcc88;margin-bottom:12px;line-height:1.4;"></div><button id="freeSpinEndOk" style="width:100%;padding:14px;background:linear-gradient(180deg,#ffcc00,#ff8c00);color:#000;border:2px solid #fff;border-radius:12px;font-weight:900;font-size:14px;">KLAIM 50JT!</button></div></div>
+<div id="freeSpinPopup"><div class="popupBox" style="border:2px solid gold;"><div id="popupTitle" style="font-size:20px;font-weight:bold;color:#ffcc00;text-shadow:0 2px 0 #000;">💥 JACKPOT 50JT! 💥</div><div style="font-size:48px;margin:8px 0;" id="popupDiamond"></div><div id="scatterInfo" style="font-size:11px;margin:8px 0;color:#fff;line-height:1.4;"></div><button id="popupOk" style="width:100%;padding:14px;background:linear-gradient(180deg,#ffd700,#ff8c00);color:#000;border:2px solid #fff;border-radius:12px;font-weight:900;">GASS JACKPOT 50JT!</button></div></div>
+<div id="autoPopup"><div class="popupBox" style="width:380px;"><div style="font-size:18px;font-weight:900;color:#ffcc00;">🎡 AUTO SPIN</div><div class="autoGrid" id="autoGrid"></div><div style="display:flex;gap:8px;"><button id="autoCancel" style="flex:1;padding:10px;background:#2a2a2e;border:1px solid #444;border-radius:10px;color:#fff;">BATAL</button><button id="autoStart" style="flex:1;padding:10px;background:linear-gradient(180deg,#ffd700,#ff8c00);color:#000;border:1px solid #fff;border-radius:10px;font-weight:900;">MULAI</button></div></div></div>
+<div id="buyPopup"><div class="popupBox" style="width:420px;"><div style="font-size:18px;font-weight:900;color:#ffcc00;">💰 BUY JACKPOT</div><div style="font-size:9px;color:#aaa;margin-top:4px;">BET: <span id="buyCurrentBet" style="color:#ffcc00;font-weight:900;">200</span> | SALDO: <span id="buyCurrentSaldo" style="color:#00ff88;">0</span></div><div class="buyGrid" id="buyGrid"></div><div id="buyDetail" style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px;font-size:9px;color:#ddd;text-align:left;margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><button id="buyCancel" style="flex:1;padding:11px;background:#2a2a2e;border:1px solid #444;border-radius:10px;color:#fff;">BATAL</button><button id="buyConfirm" style="flex:2;padding:11px;background:linear-gradient(180deg,#ffd700,#ff8c00);color:#000;border:1px solid #fff;border-radius:10px;font-weight:900;">BELI - <span id="buyConfirmPrice">20.000</span></button></div></div></div>
+<div id="betPopup"><div class="popupBox" style="width:420px;"><div style="font-size:18px;font-weight:900;color:#ffcc00;">🎲 PILIH BET</div><div style="font-size:9px;color:#aaa;margin-top:4px;">Saldo: <span id="betPopupSaldo" style="color:#00ff88;">0</span></div><div class="betHeaderTabs" id="betTabs"></div><div class="betGrid" id="betGrid"></div><div style="display:flex;gap:8px;"><button id="betCancel" style="flex:1;padding:10px;background:#2a2a2e;border:1px solid #444;border-radius:10px;color:#fff;">BATAL</button><button id="betConfirm" style="flex:1;padding:10px;background:linear-gradient(180deg,#ffcc00,#ff9f00);color:#000;border:1px solid #fff;border-radius:10px;font-weight:900;">PAKAI</button></div></div></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
+firebase.initializeApp(firebaseConfig); const auth=firebase.auth(); const db=firebase.firestore();
+let soundEnabled=true;
+const AUDIO_SRC={sorak:'sorak.mp3',scatter:'scatter.mp3',pecah:'pecah.mp3',spin:'spin.mp3',win:'win.mp3'};
+let audioCache={};
+function initAudio(){for(let k in AUDIO_SRC){if(!audioCache[k]){try{let a=new Audio();a.src=AUDIO_SRC[k];a.preload='auto';audioCache[k]=a;}catch(e){}}}}
+function ensureAudio(){if(soundEnabled)initAudio();}
+function playSound(name,vol=1,allowOverlap=false){if(!soundEnabled)return;try{let base=audioCache[name];if(!base){base=new Audio(AUDIO_SRC[name]);base.preload='auto';audioCache[name]=base;}if(allowOverlap||name==='pecah'||name==='spin'){let c=base.cloneNode();c.volume=vol;c.play().catch(()=>{});}else{base.pause();base.currentTime=0;base.volume=vol;base.play().catch(()=>{});}}catch(e){}}
+function playFruitFall(){playSound('spin',0.75,true);}function playShatter(){playSound('pecah',0.85,true);}function playVictoryCheer(){playSound('sorak',0.95,false);}function playWinScatter(){playSound('win',0.95,false);}function playScatterPop(isLast=false){if(isLast)playSound('scatter',0.95,false);else playSound('spin',0.55,true);}
+
+function generateBetLevels(){let l=[];for(let v=200;v<=10000;v+=200)l.push(v);for(let v=12000;v<=100000;v+=2000)l.push(v);for(let v=120000;v<=1000000;v+=20000)l.push(v);return l;}
+let BET_LEVELS=generateBetLevels();let betIndex=0,currentBet=200;
+let AUTO_LEVELS=[];for(let i=10;i<=500;i+=10)AUTO_LEVELS.push(i);
+let autoIndex=0,autoCount=10,isAutoSpin=false,autoRemaining=0,isStoppingAuto=false,tempAutoIndex=0;
+let SPEED_CONFIG=[{label:'LAMBAT',icon:'🐢',speed:0.30},{label:'SEDANG',icon:'⚡',speed:1},{label:'CEPAT',icon:'⚡⚡',speed:2.5}];
+let speedIndex=0,currentSpeed=0.55,tumbleWin=0,isSuperFree=false;
+
+// === SIMULASI 3 JACKPOT 50JT ===
+let spinJackpotCount=1; // 1-29 kecil, 30 trigger JP
+let isAfterJackpot=false;
+let initialSaldoJackpot=0;
+let saldoHistory=[];
+let faseJackpot="AWAL - KEMENANGAN KECIL";
+let jackpotCap=50000000; // 50JT FIX
+let jackpotAccumulated=0;
+let jackpotStartSaldo=0;
+
+function getTier(bet){if(bet<=1000)return{pct:0.20,label:"KECIL 20%",tab:"KECIL"};if(bet<=10000)return{pct:0.15,label:"MENENGAH 15%",tab:"MENENGAH"};if(bet<=100000)return{pct:0.10,label:"BESAR 10%",tab:"BESAR"};return{pct:0.05,label:"SULTAN 5% VIP",tab:"SULTAN"};}
+let globalPool=0,houseProfit=0,totalBetGlobal=0,globalPoolFirebase=0;
+const POOL_KEY="fruitBobanza_jp50_pool";const SAVE_KEY="fruitBobanza_jp50_state";
+let poolDocRef=db.collection("global").doc("pool");
+async function initGlobalPool(){try{let doc=await poolDocRef.get();if(!doc.exists){await poolDocRef.set({pool:0,profit:0,totalBet:0,lastUpdate:Date.now()});}else{let d=doc.data();globalPool=d.pool||0;houseProfit=d.profit||0;totalBetGlobal=d.totalBet||0;globalPoolFirebase=d.pool||0;}poolDocRef.onSnapshot(snap=>{if(snap.exists){let d=snap.data();globalPoolFirebase=d.pool||0;globalPool=globalPoolFirebase;houseProfit=d.profit||0;totalBetGlobal=d.totalBet||0;updatePoolUI();}});}catch(e){loadLocalPool();}}
+function loadLocalPool(){try{let d=JSON.parse(localStorage.getItem(POOL_KEY));if(d){globalPool=d.pool||0;houseProfit=d.profit||0;totalBetGlobal=d.totalBet||0;}}catch(e){}}
+function saveLocalPool(){localStorage.setItem(POOL_KEY,JSON.stringify({pool:globalPool,profit:houseProfit,totalBet:totalBetGlobal}));}
+async function addToGlobalPool(poolAdd,houseCut,bet){try{await db.runTransaction(async (tx)=>{let doc=await tx.get(poolDocRef);if(!doc.exists){tx.set(poolDocRef,{pool:poolAdd,profit:houseCut,totalBet:bet,lastUpdate:Date.now()});}else{let data=doc.data();tx.update(poolDocRef,{pool:(data.pool||0)+poolAdd,profit:(data.profit||0)+houseCut,totalBet:(data.totalBet||0)+bet,lastUpdate:Date.now()});}});}catch(e){globalPool+=poolAdd;houseProfit+=houseCut;totalBetGlobal+=bet;saveLocalPool();}}
+async function takeFromGlobalPool(winAmount){try{let taken=0;await db.runTransaction(async (tx)=>{let doc=await tx.get(poolDocRef);if(!doc.exists){taken=0;return;}let pool=doc.data().pool||0;if(pool>=winAmount){tx.update(poolDocRef,{pool:pool-winAmount,lastUpdate:Date.now()});taken=winAmount;}else{let give=Math.floor(pool*0.7);tx.update(poolDocRef,{pool:pool-give,lastUpdate:Date.now()});taken=give;}});return taken;}catch(e){if(globalPool>=winAmount){globalPool-=winAmount;saveLocalPool();return winAmount;}else{let give=Math.floor(globalPool*0.7);globalPool-=give;saveLocalPool();return give;}}}
+
+function saveState(){try{const data={board,score,betIndex,autoIndex,speedIndex,freeSpins,inFreeSpin,isAutoSpin,autoRemaining,tumbleWin,combo,spinJackpotCount,isAfterJackpot,initialSaldoJackpot,saldoHistory,faseJackpot,jackpotAccumulated,jackpotStartSaldo,ts:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(data));}catch(e){}}
+function loadState(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;const d=JSON.parse(raw);if(Date.now()-d.ts>60*60*1000){localStorage.removeItem(SAVE_KEY);return null;}return d;}catch(e){return null;}}
+
+function updateJackpotDisplay(){
+  let el=document.getElementById('cycleDisplay');
+  if(!el) return;
+  if(inFreeSpin){
+    let sisa = Math.max(0, jackpotCap - jackpotAccumulated);
+    el.innerHTML=`🎁 JACKPOT FREE ${freeSpins} | AKUMULASI: ${jackpotAccumulated.toLocaleString('id-ID')} / 50.000.000 | SISA: ${sisa.toLocaleString('id-ID')} 💥`;
+    el.style.color="#ffd700";
+  } else if(isAfterJackpot){
+    let diff = score - (jackpotStartSaldo + jackpotCap);
+    el.innerHTML=`📉 SETELAH JACKPOT - Saldo turun pelan | Spin: ${spinJackpotCount} | Dari JP 50JT → sekarang ${score.toLocaleString('id-ID')} | Fase: ${faseJackpot}`;
+    el.style.color="#ff5555";
+  } else {
+    if(spinJackpotCount<=29){
+      el.innerHTML=`SIMULASI 3 - Spin ${spinJackpotCount}/29 | AWAL - Kemenangan kecil dominan | ${faseJackpot}`;
+      el.style.color="#88ff88";
+    } else {
+      el.innerHTML=`SIMULASI 3 - Spin 30 | TRIGGER JACKPOT 50JT! 💎💥`;
+      el.style.color="#ffd700";
+    }
+  }
+}
+
+function drawSaldoChart(){
+  const canvas=document.getElementById('saldoChart');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
+  for(let i=0;i<4;i++){ ctx.beginPath(); ctx.moveTo(0, i*h/4); ctx.lineTo(w, i*h/4); ctx.stroke(); }
+  if(saldoHistory.length<2) return;
+  let min=Math.min(...saldoHistory, initialSaldoJackpot*0.5);
+  let max=Math.max(...saldoHistory, initialSaldoJackpot + jackpotCap + 5000000);
+  let range=Math.max(1, max-min);
+  // garis saldo awal
+  let y0 = h - ((initialSaldoJackpot - min)/range)*h;
+  ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(w,y0); ctx.stroke(); ctx.setLineDash([]);
+  // garis jackpot 50jt
+  let yJP = h - ((initialSaldoJackpot + jackpotCap - min)/range)*h;
+  ctx.strokeStyle='rgba(255,215,0,0.6)'; ctx.setLineDash([6,3]); ctx.beginPath(); ctx.moveTo(0,yJP); ctx.lineTo(w,yJP); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,215,0,0.8)'; ctx.font='8px Arial'; ctx.fillText('50JT JP', 4, yJP-2);
+  // line saldo
+  ctx.strokeStyle='#ffd700'; ctx.lineWidth=2.5; ctx.beginPath();
+  saldoHistory.forEach((val,i)=>{
+    let x = (i/(saldoHistory.length-1))*w;
+    let y = h - ((val - min)/range)*h;
+    if(i==0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // fill
+  ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); ctx.fillStyle='rgba(255,215,0,0.12)'; ctx.fill();
+}
+
+function pushSaldoHistory(){ saldoHistory.push(score); if(saldoHistory.length>50) saldoHistory.shift(); drawSaldoChart(); updateJackpotDisplay(); }
+
+function updatePoolUI(){let tier=getTier(currentBet);let poolToShow=globalPoolFirebase>0?globalPoolFirebase:globalPool;document.getElementById('poolDisplay').innerHTML=`🌐 GLOBAL POOL: ${Math.floor(poolToShow).toLocaleString('id-ID')} | JP 50JT MODE`;document.getElementById('tierDisplay').textContent=`${tier.label} | ${faseJackpot}`;updateJackpotDisplay();saveLocalPool();saveState();}
+function updateSpeedUI(){let cfg=SPEED_CONFIG[speedIndex];currentSpeed=cfg.speed;document.getElementById('speedText').textContent=cfg.label;document.getElementById('speedIcon').textContent=cfg.icon;saveState();}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms/currentSpeed));}function sleepReal(ms){return new Promise(r=>setTimeout(r,ms));}
+function setControlsLock(locked){const a=document.getElementById('autoSpinBtn');const b=document.getElementById('buySpinBtn');const m=document.getElementById('betMinus');const p=document.getElementById('betPlus');const bd=document.getElementById('betDisplayBtn');if(locked){a.classList.add('disabled');b.classList.add('disabled');m.classList.add('disabled');p.classList.add('disabled');bd.classList.add('disabled');}else{a.classList.remove('disabled');b.classList.remove('disabled');m.classList.remove('disabled');p.classList.remove('disabled');bd.classList.remove('disabled');}if(inFreeSpin){b.classList.add('disabled');}}
+function updateBetUI(){currentBet=BET_LEVELS[betIndex];document.getElementById('betText').textContent=currentBet.toLocaleString('id-ID');document.getElementById('betMinus').style.opacity=betIndex===0?'0.3':'1';document.getElementById('betPlus').style.opacity=betIndex===BET_LEVELS.length-1?'0.3':'1';updateBuyUI();checkSaldoForSpin();updatePoolUI();}
+function updateAutoUI(){autoCount=AUTO_LEVELS[autoIndex];document.getElementById('autoText').textContent=isAutoSpin?autoRemaining:autoCount;saveState();}
+function updateBuyUI(){document.getElementById('buyPriceText').textContent=(currentBet*100).toLocaleString('id-ID');}
+function updateTopWin(){document.getElementById('topWinDisplay').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`;saveState();}
+function buildAutoGrid(){const g=document.getElementById('autoGrid');g.innerHTML="";AUTO_LEVELS.forEach((v,i)=>{const d=document.createElement('div');d.className='autoOpt'+(i===tempAutoIndex?' selected':'');d.textContent=v;d.onclick=()=>{tempAutoIndex=i;document.querySelectorAll('.autoOpt').forEach(e=>e.classList.remove('selected'));d.classList.add('selected');};g.appendChild(d);});}
+function openAutoPopup(){if(isAutoSpin||inFreeSpin)return;tempAutoIndex=autoIndex;buildAutoGrid();document.getElementById('autoPopup').style.display='flex';}
+function closeAutoPopup(){document.getElementById('autoPopup').style.display='none';}
+const BUY_OPTIONS=[
+  {spins:10,mult:100,name:"JACKPOT 50JT",desc:"10 Free - Total 50JT fix dari Pool",icon:"👑",badge:"50JT"},
+  {spins:15,mult:150,name:"MEGA JP 50JT",desc:"15 Free - Tetap total 50JT, dibagi",icon:"💎",badge:"JP"},
+  {spins:20,mult:200,name:"SUPER JP 50JT",desc:"20 Free - 50JT dibagi 20 spin",icon:"🔥",badge:"SUPER"},
+  {spins:10,mult:250,name:"INSTANT 50JT",desc:"10 Free Super - Rate JP tinggi",icon:"💥",badge:"INSTANT",super:true}
+];
+let tempBuyIndex=0;
+function openBuyPopup(){if(spinning||inFreeSpin||isAutoSpin){showMessage("⏳ Tunggu selesai");return;}ensureAudio();tempBuyIndex=0;document.getElementById('buyCurrentBet').textContent=currentBet.toLocaleString('id-ID');document.getElementById('buyCurrentSaldo').textContent=score.toLocaleString('id-ID');buildBuyGrid();document.getElementById('buyPopup').style.display='flex';}
+function closeBuyPopup(){document.getElementById('buyPopup').style.display='none';}
+function buildBuyGrid(){const g=document.getElementById('buyGrid');g.innerHTML="";BUY_OPTIONS.forEach((opt,i)=>{const price=currentBet*opt.mult;const canAfford=score>=price;const card=document.createElement('div');card.className='buyCard'+(i===tempBuyIndex?' selected':'');if(!canAfford)card.style.opacity='0.5';card.innerHTML=`<div class="buyCardTitle">${opt.icon} ${opt.name}</div><div class="buyCardDesc">${opt.desc}</div><div class="buyCardPrice">💰 ${price.toLocaleString('id-ID')}</div><div style="font-size:8px;color:#ffd700;">TOTAL 50JT FIX DARI GLOBAL POOL</div>`;card.onclick=()=>{tempBuyIndex=i;document.querySelectorAll('.buyCard').forEach(el=>el.classList.remove('selected'));card.classList.add('selected');updateBuyDetail();};g.appendChild(card);});updateBuyDetail();}
+function updateBuyDetail(){const opt=BUY_OPTIONS[tempBuyIndex];const price=currentBet*opt.mult;document.getElementById('buyConfirmPrice').textContent=price.toLocaleString('id-ID');document.getElementById('buyDetail').innerHTML=`<b style="color:#ffd700;">${opt.icon} ${opt.name} - ${opt.spins} FREE - TOTAL 50JT</b><br>Harga: ${price.toLocaleString('id-ID')}<br><span style="color:#ffaa88;">Edukasi: Buy langsung JP 50JT, tapi setelah itu saldo akan disedot balik → jebakan</span><br><span style="color:#88ff88;">Diambil dari Global Pool</span>`;const btn=document.getElementById('buyConfirm');btn.disabled=score<price;btn.style.opacity=score<price?'0.5':'1';}
+let tempBetIndex=0;let betFilter='ALL';
+function openBetPopup(){if(inFreeSpin)return;ensureAudio();tempBetIndex=betIndex;document.getElementById('betPopupSaldo').textContent=score.toLocaleString('id-ID');buildBetTabs();buildBetGrid();document.getElementById('betPopup').style.display='flex';}
+function closeBetPopup(){document.getElementById('betPopup').style.display='none';}
+function buildBetTabs(){const tabs=document.getElementById('betTabs');tabs.innerHTML="";const allTabs=['ALL','KECIL','MENENGAH','BESAR','SULTAN'];allTabs.forEach(t=>{const el=document.createElement('div');el.className='betTab'+(betFilter===t?' active':'');el.textContent=t;el.onclick=()=>{betFilter=t;buildBetTabs();buildBetGrid();};tabs.appendChild(el);});}
+function buildBetGrid(){const g=document.getElementById('betGrid');g.innerHTML="";let filtered=BET_LEVELS.map((v,i)=>({v,i,tier:getTier(v).tab})).filter(o=>{if(betFilter==='ALL')return true;return o.tier===betFilter;});filtered.forEach(obj=>{const div=document.createElement('div');div.className='betOpt'+(obj.i===tempBetIndex?' selected':'');const tier=getTier(obj.v);div.innerHTML=`<b>${obj.v.toLocaleString('id-ID')}</b><span>${tier.tab}</span>`;div.onclick=()=>{tempBetIndex=obj.i;document.querySelectorAll('.betOpt').forEach(e=>e.classList.remove('selected'));div.classList.add('selected');};g.appendChild(div);});}
+let player=null;
+auth.onAuthStateChanged(async u=>{
+  if(!u){location.replace("index.html");return;}
+  const doc=await db.collection("players").doc(u.uid).get();if(!doc.exists)return;
+  player=doc.data();
+  await initGlobalPool();
+  const saved=loadState();
+  if(saved&&saved.score>0){score=saved.score;}else{score=player.wallet?.coin||0;}
+  if(saved){
+    if(saved.betIndex!=null&&saved.betIndex<BET_LEVELS.length)betIndex=saved.betIndex;
+    if(saved.autoIndex!=null)autoIndex=saved.autoIndex;
+    if(saved.speedIndex!=null)speedIndex=saved.speedIndex;
+    if(saved.board&&saved.board.length===ROWS){board=saved.board;drawBoard();}
+    freeSpins=saved.freeSpins||0;inFreeSpin=saved.inFreeSpin||false;isAutoSpin=saved.isAutoSpin||false;autoRemaining=saved.autoRemaining||0;tumbleWin=saved.tumbleWin||0;combo=saved.combo||0;
+    if(saved.spinJackpotCount) spinJackpotCount=saved.spinJackpotCount;
+    if(saved.isAfterJackpot!=null) isAfterJackpot=saved.isAfterJackpot;
+    if(saved.initialSaldoJackpot) initialSaldoJackpot=saved.initialSaldoJackpot; else initialSaldoJackpot=score;
+    if(saved.saldoHistory) saldoHistory=saved.saldoHistory; else saldoHistory=[score];
+    if(saved.faseJackpot) faseJackpot=saved.faseJackpot;
+    if(saved.jackpotAccumulated) jackpotAccumulated=saved.jackpotAccumulated;
+    if(saved.jackpotStartSaldo) jackpotStartSaldo=saved.jackpotStartSaldo;
+    updateBetUI();updateAutoUI();updateSpeedUI();updateTopWin();updatePoolUI();drawSaldoChart();
+    if(inFreeSpin||isAutoSpin){showMessage(`♻️ Lanjut ${inFreeSpin?`JP FREE ${freeSpins} 50JT`:`AUTO ${autoRemaining}`}`);setTimeout(()=>{if(inFreeSpin)startFreeSpins();else if(isAutoSpin)spin();},800);}
+  }else{
+    initialSaldoJackpot=score; saldoHistory=[score]; jackpotStartSaldo=score;
+    updateBetUI();updateAutoUI();updateSpeedUI();updateTopWin();updatePoolUI();drawSaldoChart();
+  }
+  updatePanel();
+});
+const SCATTER="SCATTER";const SCATTER_IMG="scatter.png";let TRANSPARENT_SCATTER_URL=null;
+let freeSpins=0,inFreeSpin=false,ROWS=5,COLS=5;const symbols=["🍎","🍓","🍍","🥝","🍇","🥭","🍒","🍉","🥥"];let board=[],score=0,combo=0,spinning=false;const grid=document.getElementById("grid");let cells=[];const scoreText=document.getElementById("score"),message=document.getElementById("message"),spinBtn=document.getElementById("spinBtn");
+let _spinLock = false;let _lastSpinTime = 0;
+function isDoubleClickBlocked(){const now=Date.now();if(_spinLock) return true;if(spinning) return true;if(now-_lastSpinTime<500) return true;return false;}
+async function buildTransparentScatter(){try{const img=new Image();img.crossOrigin="anonymous";img.src=SCATTER_IMG+"?t="+Date.now();await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;});const canvas=document.createElement('canvas');canvas.width=img.naturalWidth||200;canvas.height=img.naturalHeight||200;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);const d=imageData.data;for(let i=0;i<d.length;i+=4){let r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];let lum=(r+g+b)/3;if(lum<22&&a>10){d[i+3]=0;}else if(lum<45){d[i+3]=Math.floor(a*(lum/45)*0.35);}}ctx.putImageData(imageData,0,0);TRANSPARENT_SCATTER_URL=canvas.toDataURL('image/png');}catch(e){TRANSPARENT_SCATTER_URL=SCATTER_IMG;}}
+function checkSaldoForSpin(){if(score<currentBet&&!inFreeSpin){spinBtn.classList.add('hidden');showMessage("💰 Saldo habis setelah jackpot - Reset siklus...");setTimeout(()=>{spinJackpotCount=1;isAfterJackpot=false;faseJackpot="RESET SETELAH HABIS";initialSaldoJackpot=score+500000;score=initialSaldoJackpot;saldoHistory=[score];updatePanel();drawSaldoChart();spinBtn.classList.remove('hidden');showMessage("🔄 Siklus reset - kembali ke kemenangan kecil");},1200);}else{spinBtn.classList.remove('hidden');}}
+function randomFruit(){return symbols[Math.floor(Math.random()*symbols.length)];}
+function randomFruitNoScatter(){return symbols[Math.floor(Math.random()*symbols.length)];}
+function updatePanel(){scoreText.textContent=score.toLocaleString("id-ID");checkSaldoForSpin();saveState();}
+function showMessage(t){message.textContent=t;}
+function createBoard(){const saved=loadState();if(saved&&saved.board&&saved.board.length===ROWS){board=saved.board;}else{board=[];for(let r=0;r<ROWS;r++){let row=[];for(let c=0;c<COLS;c++)row.push(randomFruitNoScatter());board.push(row);}limitScatter(2);}drawBoard();updatePanel();setTimeout(buildTransparentScatter,300);}
+function isScatter(v){return v===SCATTER;}
+function renderCellContent(cellEl,value){cellEl.innerHTML="";cellEl.classList.remove("scatter","shattering","scatter-last");const oldP=cellEl.querySelectorAll('.particle-piece');oldP.forEach(p=>p.remove());if(isScatter(value)){cellEl.classList.add("scatter");let img=document.createElement("img");img.src=TRANSPARENT_SCATTER_URL||SCATTER_IMG;img.className="scatter-img";img.alt="SCATTER";img.onerror=()=>{cellEl.textContent="💎";};cellEl.appendChild(img);}else{cellEl.textContent=value??"";}}
+function drawBoard(){grid.innerHTML="";cells=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const cell=document.createElement("div");cell.className="cell";renderCellContent(cell,board[r][c]);grid.appendChild(cell);cells.push(cell);}}
+function countScatter(){let cnt=0;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(isScatter(board[r][c]))cnt++;return cnt;}
+function limitScatter(max){let positions=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(isScatter(board[r][c]))positions.push({r,c});if(positions.length<=max)return;for(let i=positions.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[positions[i],positions[j]]=[positions[j],positions[i]];}let toRemove=positions.slice(0,positions.length-max);toRemove.forEach(p=>{board[p.r][p.c]=randomFruitNoScatter();updateCell(p.r,p.c);});}
+function hasMatch(b){const cnt={};for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){let v=b[r][c];if(!v||isScatter(v))continue;cnt[v]=(cnt[v]||0)+1;}return Object.values(cnt).some(x=>x>=6);}
+
+// === LOGIKA JACKPOT 50JT ===
+function getJackpotCategory(isFree){
+  let pool=globalPoolFirebase>0?globalPoolFirebase:globalPool;
+  if(isFree){
+    if(jackpotAccumulated>=jackpotCap) return "ZONK";
+    let r=Math.random();
+    if(r<0.05) return "ZONK";
+    if(r<0.20) return "RENDAH_JP";
+    if(r<0.50) return "SEDANG_JP";
+    return "TINGGI_JP";
+  }
+  if(isAfterJackpot){
+    // Setelah JP - peluang menurun, cenderung kalah
+    faseJackpot="SETELAH JP - Peluang menurun, saldo disedot";
+    let r=Math.random();
+    if(r<0.65) return "ZONK";
+    if(r<0.85) return "RENDAH_KECIL";
+    if(r<0.95) return "SEDANG_KECIL";
+    return "TINGGI_KECIL";
+  }
+  if(spinJackpotCount>=1 && spinJackpotCount<=29){
+    // Awal - kemenangan kecil dominan
+    faseJackpot=`AWAL ${spinJackpotCount}/29 - Kemenangan kecil`;
+    let r=Math.random();
+    if(r<0.45) return "RENDAH_KECIL";
+    if(r<0.80) return "ZONK";
+    if(r<0.95) return "SEDANG_KECIL";
+    return "RENDAH_KECIL";
+  }
+  if(spinJackpotCount==30){
+    faseJackpot="TRIGGER JACKPOT 4 SCATTER!";
+    return "SCATTER";
+  }
+  return "ZONK";
+}
+
+function calculateJackpotWin(category,isFree){
+  let pool=globalPoolFirebase>0?globalPoolFirebase:globalPool;
+  let win=0;
+  if(isFree){
+    if(jackpotAccumulated>=jackpotCap) return 0;
+    let remaining = jackpotCap - jackpotAccumulated;
+    let remainingSpins = Math.max(1, freeSpins+1);
+    if(remainingSpins<=1){
+      win = remaining;
+    } else {
+      let avg = remaining / remainingSpins; // 5jt rata-rata
+      let variance = 0.7 + Math.random()*0.8;
+      let base = Math.floor(avg * variance);
+      if(category==="ZONK") win=0;
+      else if(category==="RENDAH_JP") win = Math.floor(Math.max(1000000, Math.min(base, 3500000)));
+      else if(category==="SEDANG_JP") win = Math.floor(Math.max(3000000, Math.min(base*1.1, 7000000)));
+      else if(category==="TINGGI_JP") win = Math.floor(Math.max(5000000, Math.min(base*1.3, 12000000)));
+      else win=0;
+    }
+    if(jackpotAccumulated + win > jackpotCap) win = Math.max(0, jackpotCap - jackpotAccumulated);
+    if(win>0){
+      let maxPool = Math.floor(pool*0.95);
+      if(win>maxPool) win=maxPool;
+    }
+    return win;
+  }
+
+  if(!isAfterJackpot && spinJackpotCount<=29){
+    if(category==="ZONK") win=0;
+    else if(category==="RENDAH_KECIL") win=Math.floor(currentBet*(0.3+Math.random()*0.5)); // 0.3-0.8x
+    else if(category==="SEDANG_KECIL") win=Math.floor(currentBet*(0.9+Math.random()*0.6)); // 0.9-1.5x
+    else if(category==="SCATTER") win=Math.floor(currentBet*0.5);
+    return win;
+  }
+
+  if(isAfterJackpot){
+    if(category==="ZONK") win=0;
+    else if(category==="RENDAH_KECIL") win=Math.floor(currentBet*(0.2+Math.random()*0.3)); // 0.2-0.5x kecil
+    else if(category==="SEDANG_KECIL") win=Math.floor(currentBet*(0.6+Math.random()*0.4)); // 0.6-1.0x
+    else if(category==="TINGGI_KECIL") win=Math.floor(currentBet*(1.0+Math.random()*0.8)); // jarang
+    else win=0;
+    return win;
+  }
+
+  return 0;
+}
+
+function generateJackpotBoard(category,isFree){
+  let newBoard=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  let scatterCount=0;
+  if(isFree){
+    if(category==="SCATTER") scatterCount=3;
+    else {
+      if(Math.random()<0.08) scatterCount=2;
+      else if(Math.random()<0.15) scatterCount=1;
+      else scatterCount=0;
+    }
+  } else {
+    if(!isAfterJackpot && spinJackpotCount>=1 && spinJackpotCount<=29){
+      scatterCount = Math.random()<0.08 ? 1 : 0; // hampir no scatter
+    } else if(!isAfterJackpot && spinJackpotCount==30){
+      scatterCount=4; // wajib 4 scatter trigger JP
+    } else if(isAfterJackpot){
+      scatterCount = Math.random()<0.03 ? 1 : 0; // setelah JP jarang scatter
+    } else {
+      scatterCount=0;
+    }
+  }
+  let allPos=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) allPos.push({r,c});
+  for(let i=allPos.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [allPos[i],allPos[j]]=[allPos[j],allPos[i]];}
+  let scatterPositions=allPos.slice(0,scatterCount);
+  scatterPositions.forEach(p=>newBoard[p.r][p.c]=SCATTER);
+
+  if(category==="ZONK"){
+    let tries=0;
+    while(true){
+      let cnt={};
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(newBoard[r][c]!==SCATTER){
+        let fruit, at=0; do{ fruit=randomFruitNoScatter(); at++; }while((cnt[fruit]||0)>=5 && at<20);
+        newBoard[r][c]=fruit; cnt[fruit]=(cnt[fruit]||0)+1;
+      }
+      if(Math.max(...Object.values(cnt),0)<6) break;
+      tries++; if(tries>30) break;
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(newBoard[r][c]!==SCATTER) newBoard[r][c]=null;
+    }
+  } else if(category==="SCATTER"){
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(newBoard[r][c]!==SCATTER) newBoard[r][c]=randomFruitNoScatter();
+  } else {
+    let winSym=symbols[Math.floor(Math.random()*symbols.length)];
+    let winCount;
+    if(isFree){
+      if(category==="RENDAH_JP") winCount=8+Math.floor(Math.random()*2); // 8-9
+      else if(category==="SEDANG_JP") winCount=9+Math.floor(Math.random()*3); // 9-11
+      else if(category==="TINGGI_JP") winCount=11+Math.floor(Math.random()*3); // 11-13 - JP besar cascade
+      else winCount=6;
+    } else {
+      if(category==="RENDAH_KECIL") winCount=6;
+      else if(category==="SEDANG_KECIL") winCount=7;
+      else if(category==="TINGGI_KECIL") winCount=7+Math.floor(Math.random()*2);
+      else winCount=6;
+    }
+    winCount=Math.min(winCount, 25-scatterCount);
+    let available=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(newBoard[r][c]!==SCATTER) available.push({r,c});
+    for(let i=available.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [available[i],available[j]]=[available[j],available[i]];}
+    for(let i=0;i<winCount;i++){ newBoard[available[i].r][available[i].c]=winSym; }
+    let cnt={[winSym]:winCount};
+    for(let i=winCount;i<available.length;i++){
+      let p=available[i]; let fruit, at=0;
+      do{ fruit=randomFruitNoScatter(); at++; }while((cnt[fruit]||0)>=5 && at<20 && fruit!==winSym);
+      if((cnt[fruit]||0)>=5){ let other=symbols.filter(s=>s!==winSym && (cnt[s]||0)<5); if(other.length>0) fruit=other[Math.floor(Math.random()*other.length)]; }
+      newBoard[p.r][p.c]=fruit; cnt[fruit]=(cnt[fruit]||0)+1;
+    }
+  }
+  return {board:newBoard, scatterPositions};
+}
+
+async function animateReelDrop(targetData,isFree){
+  const existingOverlay=document.getElementById('trainOverlay'); if(existingOverlay) existingOverlay.remove();
+  cells.forEach(c=>{try{c.getAnimations().forEach(a=>a.cancel());}catch(e){}});
+  const targetBoard=targetData.board; const scatterPositions=targetData.scatterPositions;
+  let suspensePos=null;
+  if(!isFree && scatterPositions.length>=4){
+    let sorted=[...scatterPositions].sort((a,b)=>(a.c-b.c)||(a.r-b.r));
+    suspensePos=sorted[sorted.length-1];
+  }
+  const firstCell=cells[0]; const cellH=firstCell?firstCell.offsetHeight:68; const gap=3; const trainH=5*(cellH+gap); const initialY=-trainH;
+  grid.style.opacity='0';
+  const boardInner=document.querySelector('.board .panel-inner'); boardInner.style.position='relative';
+  let overlay=document.createElement('div'); overlay.id='trainOverlay'; overlay.style.position='absolute'; overlay.style.inset='0'; overlay.style.display='grid'; overlay.style.gridTemplateColumns='repeat(5,1fr)'; overlay.style.gap=gap+'px'; overlay.style.pointerEvents='none'; overlay.style.overflow='hidden'; overlay.style.zIndex='5'; boardInner.appendChild(overlay);
+  let columns=[];
+  for(let c=0;c<COLS;c++){
+    let colDiv=document.createElement('div'); colDiv.style.display='flex'; colDiv.style.flexDirection='column'; colDiv.style.gap=gap+'px'; colDiv.style.transform=`translateY(${initialY}px)`;
+    for(let r=0;r<ROWS;r++){let val=targetBoard[r][c];let el=document.createElement('div');el.className='cell'+(isScatter(val)?' scatter':'');if(isScatter(val)){let img=document.createElement('img');img.src=TRANSPARENT_SCATTER_URL||SCATTER_IMG;img.className='scatter-img';el.appendChild(img);}else{el.textContent=val??'';}colDiv.appendChild(el);}
+    for(let r=0;r<ROWS;r++){let val=board[r][c];let el=document.createElement('div');el.className='cell'+(isScatter(val)?' scatter':'');if(isScatter(val)){let img=document.createElement('img');img.src=TRANSPARENT_SCATTER_URL||SCATTER_IMG;img.className='scatter-img';el.appendChild(img);}else{el.textContent=val??'';}colDiv.appendChild(el);}
+    overlay.appendChild(colDiv); columns.push(colDiv);
+  }
+  playFruitFall();
+  let suspenseCol=suspensePos?suspensePos.c:-1; let anims=[];
+  for(let c=0;c<COLS;c++){
+    if(c===suspenseCol) continue;
+    let colDiv=columns[c]; let delay=c*85;
+    try{let anim=colDiv.animate([{transform:`translateY(${initialY}px)`},{transform:`translateY(0px)`}],{duration:600/currentSpeed,delay:delay,easing:'cubic-bezier(.2,.9,.25,1)',fill:'forwards'});anims.push(anim.finished.catch(()=>{})); if(scatterPositions.some(p=>p.c===c)) setTimeout(()=>playScatterPop(false), delay+200);}catch(e){}
+  }
+  await Promise.all(anims);
+  if(suspensePos){
+    showMessage("💎💥 4 SCATTER! JACKPOT 50JT DARI GLOBAL POOL! 💓");
+    await sleepReal(800);
+    let colDiv=columns[suspenseCol]; let scatterEl=colDiv.children[suspensePos.r]; if(scatterEl) scatterEl.classList.add('scatter-last');
+    try{await colDiv.animate([{transform:`translateY(${initialY}px)`},{transform:`translateY(0px)`}],{duration:750, easing:'cubic-bezier(.1,.8,.2,1)', fill:'forwards'}).finished;}catch(e){await sleepReal(750);}
+    playScatterPop(true);
+    showMessage("👑 JACKPOT 50JT! 10 FREE SPIN!");
+    await sleepReal(800);
+  }
+  overlay.remove(); grid.style.opacity='1'; board=targetBoard; drawBoard(); saveState();
+}
+async function performTumbleGravity(){
+  let newBoard=Array.from({length:ROWS},()=>Array(COLS).fill(null)); let moves=[];
+  for(let c=0;c<COLS;c++){let write=ROWS-1; for(let r=ROWS-1;r>=0;r--){if(board[r][c]!==null){newBoard[write][c]=board[r][c]; if(write!==r) moves.push({from:r,to:write,col:c,isNew:false,value:board[r][c]}); write--;}} for(let r=write;r>=0;r--){let v=randomFruitNoScatter(); newBoard[r][c]=v; moves.push({from:-100-r,to:r,col:c,isNew:true,value:v});}}
+  board=newBoard; let anims=[];
+  for(let c=0;c<COLS;c++){let colMoves=moves.filter(m=>m.col===c); let colDelay=c*40; for(let m of colMoves){let idx=m.to*COLS+m.col; let cell=cells[idx]; if(!cell) continue; renderCellContent(cell,m.value); let distance=m.isNew?(m.to+4):(m.to-m.from); let h=cell.offsetHeight||68; let fromY= -distance*(h+6) - (m.isNew?80:0); cell.style.transform=`translateY(${fromY}px)`; if(m.isNew) cell.style.opacity='0'; try{let anim=cell.animate([{transform:`translateY(${fromY}px)`,opacity:m.isNew?0:1},{transform:'translateY(0)',opacity:1}],{duration:380/currentSpeed,delay:colDelay,easing:'cubic-bezier(.2,.78,.3,1)',fill:'forwards'}); anims.push(anim.finished.catch(()=>{}));}catch(e){cell.style.transform=''; cell.style.opacity='';}}}
+  await Promise.all(anims); cells.forEach(c=>{c.style.transform=''; c.style.opacity='';}); playFruitFall(); limitScatter(isAfterJackpot?1:3); drawBoard(); await sleep(100);
+}
+function findMatches(){const counts={},pos={};for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const f=board[r][c];if(isScatter(f)||!f)continue;if(!counts[f]){counts[f]=0;pos[f]=[];}counts[f]++;pos[f].push({r,c});}const m=[];for(const f in counts)if(counts[f]>=6)m.push(pos[f]);return m;}
+async function destroyMatchesWithShatter(groups){
+  let allPos=[];groups.forEach(g=>allPos.push(...g));if(allPos.length===0)return;
+  playShatter();
+  for(let p of allPos){let idx=p.r*COLS+p.c;let cell=cells[idx];if(!cell)continue;cell.classList.add('shattering');let val=board[p.r][p.c];for(let k=0;k<5;k++){let piece=document.createElement('div');piece.className='particle-piece';let dx=(Math.random()*120-60)+'px';let dy=(Math.random()*120-60)+'px';let rot=(Math.random()*600-300)+'deg';piece.style.setProperty('--dx',dx);piece.style.setProperty('--dy',dy);piece.style.setProperty('--rot',rot);piece.style.animation=`pieceFly 0.55s forwards`;piece.textContent=val;cell.appendChild(piece);}}
+  await sleep(480);for(let p of allPos){board[p.r][p.c]=null;let idx=p.r*COLS+p.c;let cell=cells[idx];if(cell){cell.innerHTML='';cell.classList.remove('shattering','scatter');cell.style.opacity='0';}}await sleep(80);await performTumbleGravity();saveState();let again=findMatches();if(again.length>0){if(isAfterJackpot && Math.random()<0.7){ /* setelah JP jarang cascade */ } else {combo++;showWin(`COMBO x${combo+1} 💥`);await sleep(160);await destroyMatchesWithShatter(again);}}
+}
+async function animateSpin(category,winAmount,isFree){
+  if(isFree) showMessage(`💥 JP FREE ${freeSpins} [${category}] SISA ${(jackpotCap-jackpotAccumulated).toLocaleString('id-ID')} | Pool ${Math.floor(globalPoolFirebase||globalPool).toLocaleString('id-ID')}`);
+  else {
+    if(isAfterJackpot) showMessage(`📉 SETELAH JP ${spinJackpotCount} [${category}] ${faseJackpot} | Pool ${Math.floor(globalPoolFirebase||globalPool).toLocaleString('id-ID')}`);
+    else if(spinJackpotCount==30) showMessage(`💎 SPIN 30 TRIGGER 4 SCATTER JACKPOT 50JT!`);
+    else showMessage(`🎣 AWAL ${spinJackpotCount}/29 [${category}] Kemenangan kecil | Pool ${Math.floor(globalPoolFirebase||globalPool).toLocaleString('id-ID')}`);
+  }
+  let targetData=generateJackpotBoard(category,isFree);
+  await animateReelDrop(targetData,isFree);
+  saveState();
+}
+function updateCell(r,c){const i=r*COLS+c;if(!cells[i])return;renderCellContent(cells[i],board[r][c]);}
+function showWin(t){const d=document.createElement("div");d.className="comboPopup";d.innerHTML=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1200);grid.classList.add("bigFlash");setTimeout(()=>grid.classList.remove("bigFlash"),600);}
+function renderScatterPopup(count){let cont=document.getElementById('popupDiamond');cont.innerHTML="";for(let i=0;i<count;i++){let img=document.createElement("img");img.src=TRANSPARENT_SCATTER_URL||SCATTER_IMG;img.alt="scatter";img.onerror=()=>{img.replaceWith(document.createTextNode('💎'));};cont.appendChild(img);}}
+async function spin(){
+  if(isDoubleClickBlocked()){ return; }
+  if(score<currentBet){
+    showMessage("💸 Saldo habis - siklus jackpot reset");
+    spinJackpotCount=1; isAfterJackpot=false; faseJackpot="RESET"; initialSaldoJackpot=score+1000000; score=initialSaldoJackpot; saldoHistory=[score]; updatePanel(); drawSaldoChart();
+    return;
+  }
+  _spinLock = true; spinning = true; _lastSpinTime = Date.now(); spinBtn.disabled = true; setControlsLock(true);
+  try{
+    ensureAudio();
+    if(!isAutoSpin){combo=0;tumbleWin=0;updateTopWin();}
+    if(initialSaldoJackpot==0){initialSaldoJackpot=score; jackpotStartSaldo=score; saldoHistory=[score];}
+    let tier=getTier(currentBet);let houseCut=Math.floor(currentBet*tier.pct);let poolAdd=currentBet-houseCut;
+    await addToGlobalPool(poolAdd,houseCut,currentBet);
+    let category=getJackpotCategory(false);
+    let winAmount=calculateJackpotWin(category,false);
+    await animateSpin(category,winAmount,false);
+    let scatterCount=countScatter();
+    if(scatterCount>=4 || (spinJackpotCount==30 && category=="SCATTER")){
+      jackpotStartSaldo=score;
+      jackpotCap=50000000;
+      jackpotAccumulated=0;
+      freeSpins+=10;inFreeSpin=true;isSuperFree=false;playVictoryCheer();
+      document.getElementById('popupTitle').textContent=`💥 JACKPOT 50JT! ${scatterCount} SCATTER!`;
+      renderScatterPopup(scatterCount);
+      document.getElementById('scatterInfo').innerHTML=`${scatterCount} SCATTER = 10 FREE SPINS JACKPOT!<br>Saldo Awal JP: ${jackpotStartSaldo.toLocaleString('id-ID')}<br><b style="color:#ffd700;font-size:14px;">TOTAL 50.000.000 DARI GLOBAL POOL!</b><br>Global Pool: ${Math.floor(globalPoolFirebase||globalPool).toLocaleString('id-ID')}<br>Rata-rata 5JT per spin`;
+      document.getElementById('popupOk').textContent="GASS JACKPOT 50JT!";await showFreeSpinPopup();await startFreeSpins();return;
+    }
+    if(winAmount===0){
+      score=Math.max(0,score-currentBet);if(player){player.wallet.coin=score;const u=auth.currentUser;if(u)await db.collection("players").doc(u.uid).update({"wallet.coin":score});}
+      updatePanel(); pushSaldoHistory();
+      if(!isAfterJackpot && spinJackpotCount<30) spinJackpotCount++;
+      return;
+    }
+    let actualWin=await takeFromGlobalPool(winAmount);
+    tumbleWin=actualWin;let groups=findMatches();if(groups.length>0)await destroyMatchesWithShatter(groups);
+    score=Math.max(0,score-currentBet+actualWin);if(player){player.wallet.coin=score;const u=auth.currentUser;if(u)await db.collection("players").doc(u.uid).update({"wallet.coin":score});}
+    updateTopWin();updatePanel();pushSaldoHistory();
+    if(!isAfterJackpot){
+      if(spinJackpotCount<30) spinJackpotCount++;
+    }
+    showWin(actualWin>=currentBet*2?`💥 ${actualWin.toLocaleString('id-ID')}!`:`💰 ${actualWin.toLocaleString('id-ID')}`);
+  }catch(e){console.error(e);showMessage(e.message);}finally{
+    spinning=false;_spinLock=false;spinBtn.disabled=false;setControlsLock(false);saveState();handleAutoNext();
+  }
+}
+function handleAutoNext(){if(isAutoSpin){if(isStoppingAuto){stopAuto();return;}autoRemaining--;updateAutoUI();if(autoRemaining<=0){stopAuto();showMessage(`✅ Auto selesai - Spin ${spinJackpotCount} ${isAfterJackpot?'setelah JP - turun':''}`);return;}if(score<currentBet){stopAuto();showMessage(`💸 Saldo habis setelah JP`);return;}saveState();setTimeout(()=>{if(isAutoSpin)spin();},600/currentSpeed);}else{saveState();}}
+function startAutoSpin(){if(isDoubleClickBlocked()) return; if(isAutoSpin)return;if(score<currentBet){showMessage("❌ Saldo tidak cukup");return;}ensureAudio();isAutoSpin=true;isStoppingAuto=false;autoRemaining=AUTO_LEVELS[autoIndex];document.getElementById('autoSpinBtn').classList.add('active');document.getElementById('autoText').textContent=autoRemaining;showMessage(`▶ AUTO ${autoRemaining} | ${faseJackpot}`);saveState();spin();}
+function stopAuto(){isAutoSpin=false;autoRemaining=0;isStoppingAuto=false;document.getElementById('autoSpinBtn').classList.remove('active');updateAutoUI();if(!inFreeSpin)setControlsLock(false);saveState();}
+async function executeBuy(){
+  if(isDoubleClickBlocked()) return;
+  const opt=BUY_OPTIONS[tempBuyIndex];
+  let price=currentBet*opt.mult;
+  if(score<price){showMessage(`❌ Saldo tidak cukup BUY`);return;}
+  closeBuyPopup();ensureAudio();
+  let tier=getTier(currentBet);let houseCut=Math.floor(price*tier.pct);let poolAdd=price-houseCut;
+  score-=price;await addToGlobalPool(poolAdd,houseCut,price);if(player){player.wallet.coin=score;const u=auth.currentUser;if(u)await db.collection("players").doc(u.uid).update({"wallet.coin":score});}updatePanel();pushSaldoHistory();setControlsLock(true);saveState();
+  showMessage(`💸 BUY ${opt.name} -${price.toLocaleString('id-ID')} → JP 50JT!`);
+  await sleep(400);
+  jackpotStartSaldo=score; jackpotCap=50000000; jackpotAccumulated=0;
+  freeSpins+=opt.spins;inFreeSpin=true;isSuperFree=opt.super||false;
+  document.getElementById('popupTitle').textContent=`${opt.icon} BUY ${opt.name} JP 50JT!`;
+  renderScatterPopup(4);
+  document.getElementById('scatterInfo').innerHTML=`${opt.name} - ${opt.spins} FREE<br>BET ${currentBet.toLocaleString('id-ID')}<br><b style="color:#ffd700;">TOTAL 50JT FIX DARI GLOBAL POOL</b><br>Saldo awal: ${jackpotStartSaldo.toLocaleString('id-ID')}`;
+  document.getElementById('popupOk').textContent=`GASS ${opt.spins} FREE JP 50JT!`;
+  playVictoryCheer();await showFreeSpinPopup();await startFreeSpins();
+}
+document.getElementById('betMinus').onclick=()=>{if(inFreeSpin||spinning||_spinLock)return;ensureAudio();if(betIndex>0){betIndex--;updateBetUI();playSound('spin',0.4,true);}};
+document.getElementById('betPlus').onclick=()=>{if(inFreeSpin||spinning||_spinLock)return;ensureAudio();if(betIndex<BET_LEVELS.length-1){betIndex++;updateBetUI();playSound('spin',0.4,true);}};
+document.getElementById('autoSpinBtn').onclick=()=>{if(inFreeSpin||spinning||_spinLock)return;ensureAudio();if(isAutoSpin){isStoppingAuto=true;showMessage("⏹ Stop Auto...");if(!spinning)stopAuto();}else{openAutoPopup();}};
+document.getElementById('buySpinBtn').onclick=()=>{if(spinning||_spinLock||inFreeSpin) return; openBuyPopup();};
+document.getElementById('betDisplayBtn').onclick=()=>{if(spinning||_spinLock||inFreeSpin) return; openBetPopup();};
+document.getElementById('autoCancel').onclick=closeAutoPopup;
+document.getElementById('autoStart').onclick=()=>{autoIndex=tempAutoIndex;updateAutoUI();closeAutoPopup();startAutoSpin();};
+document.getElementById('buyCancel').onclick=closeBuyPopup;
+document.getElementById('buyConfirm').onclick=executeBuy;
+document.getElementById('betCancel').onclick=closeBetPopup;
+document.getElementById('betConfirm').onclick=()=>{if(spinning||_spinLock) return; betIndex=tempBetIndex;updateBetUI();closeBetPopup();showMessage(`✅ BET ${currentBet.toLocaleString('id-ID')} | ${faseJackpot}`);playSound('spin',0.5,true);};
+document.getElementById('speedBtn').onclick=()=>{ensureAudio();speedIndex=(speedIndex+1)%SPEED_CONFIG.length;updateSpeedUI();showMessage(`⚡ ${SPEED_CONFIG[speedIndex].label}`);playSound('spin',0.5,true);};
+spinBtn.addEventListener("click", (e)=>{e.preventDefault();if(isDoubleClickBlocked()) return;ensureAudio();if(inFreeSpin)return;if(isAutoSpin){isStoppingAuto=true;showMessage("⏹ Auto Dihentikan");if(!spinning)stopAuto();return;}spin();});
+function updateSoundUI(){const btn=document.getElementById('soundToggle');const icon=document.getElementById('soundIcon');const txt=document.getElementById('soundText');if(soundEnabled){btn.classList.remove('sound-off');btn.classList.add('sound-on');icon.textContent='🔊';txt.textContent='SOUND';}else{btn.classList.remove('sound-on');btn.classList.add('sound-off');icon.textContent='🔇';txt.textContent='OFF';}}
+document.getElementById('soundToggle').onclick=()=>{soundEnabled=!soundEnabled;updateSoundUI();if(soundEnabled){initAudio();playSound('spin',0.5,true);}else{for(let k in audioCache){try{audioCache[k].pause();}catch(e){}}}};
+function showFreeSpinEndPopup(totalWin, spinsDone){
+  return new Promise(res=>{
+    const p=document.getElementById("freeSpinEndPopup");
+    document.getElementById("freeSpinEndTotal").innerHTML=`JACKPOT TOTAL 10 FREE SPIN<br><span style="font-size:30px;color:#ffd700;text-shadow:0 2px 0 #000;">Rp ${totalWin.toLocaleString('id-ID')}</span><br><span style="font-size:12px;color:#fff;">DARI GLOBAL POOL</span>`;
+    document.getElementById("freeSpinEndDetail").innerHTML=`Dari ${spinsDone} spin | Saldo awal JP ${jackpotStartSaldo.toLocaleString('id-ID')} → Sekarang ${score.toLocaleString('id-ID')} | <b style="color:#ff5555;">Edukasi: Setelah JP besar, peluang turun & saldo disedot balik!</b><br>Pemain merasa beruntung → terus main → habis`;
+    p.style.display="flex";
+    document.getElementById("freeSpinEndOk").onclick=()=>{p.style.display="none"; res();};
+  });
+}
+async function startFreeSpins(){
+  setControlsLock(true);saveState();
+  let totalFreeWin=0; let spinsDone=0; updateJackpotDisplay();
+  while(freeSpins>0){
+    freeSpins--; spinsDone++;
+    let poolNow=globalPoolFirebase>0?globalPoolFirebase:globalPool;
+    let remaining = Math.max(0, jackpotCap - jackpotAccumulated);
+    showMessage(`💥 JP FREE ${freeSpins} | AKUMULASI ${jackpotAccumulated.toLocaleString('id-ID')} / 50JT | SISA ${remaining.toLocaleString('id-ID')} | Pool ${Math.floor(poolNow).toLocaleString('id-ID')}`);
+    updateJackpotDisplay();
+    await sleep(450);
+    let category=getJackpotCategory(true);
+    let winAmount=calculateJackpotWin(category,true);
+    if(jackpotAccumulated>=jackpotCap){ category="ZONK"; winAmount=0; }
+    await animateSpin(category,winAmount,true);
+    let matches=findMatches();
+    if(matches.length>0){
+      let actualWin=await takeFromGlobalPool(winAmount);
+      if(jackpotAccumulated + actualWin > jackpotCap) actualWin = Math.max(0, jackpotCap - jackpotAccumulated);
+      if(actualWin>0){
+        totalFreeWin+=actualWin; jackpotAccumulated+=actualWin; tumbleWin+=actualWin; score+=actualWin;
+        if(player){player.wallet.coin=score; const u=auth.currentUser; if(u) await db.collection("players").doc(u.uid).update({"wallet.coin":score});}
+        updateTopWin(); updatePanel(); pushSaldoHistory();
+        showWin(`💥 JP ${actualWin.toLocaleString('id-ID')}!`);
+      }
+      await destroyMatchesWithShatter(matches);
+    }
+    saveState();
+  }
+  playVictoryCheer();
+  await showFreeSpinEndPopup(totalFreeWin, spinsDone);
+  inFreeSpin=false; isSuperFree=false; isAfterJackpot=true; spinJackpotCount=31; faseJackpot="SETELAH JACKPOT - Mulai sedot";
+  spinBtn.disabled=false; spinning=false; _spinLock=false; setControlsLock(false); saveState(); updateJackpotDisplay();
+  showMessage(`JP 50JT SELESAI! Saldo ${score.toLocaleString('id-ID')} | Sekarang masuk fase sedot 📉 | Ngejar JP lagi?`);
+  updatePanel(); if(isAutoSpin) handleAutoNext();
+}
+function showFreeSpinPopup(){return new Promise(res=>{const p=document.getElementById("freeSpinPopup");p.style.display="flex";document.getElementById("popupOk").onclick=()=>{p.style.display="none";res();};});}
+window.addEventListener('beforeunload',(e)=>{if(inFreeSpin||isAutoSpin||spinning){saveState();e.preventDefault();e.returnValue='Yakin?';}});
+setInterval(()=>{if(inFreeSpin||isAutoSpin||spinning)saveState();},1000);
+updateBetUI();updateAutoUI();updateSpeedUI();updateTopWin();updateSoundUI();createBoard();showMessage("💥 SIMULASI 3 JACKPOT 50JT AKTIF - Awal kecil, spin 30 JP 50JT, setelah itu sedot");
+</script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Ruang Sadar - 4 Simulasi All In One</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+body{min-height:100dvh;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#000 url("portal.png") no-repeat center top/cover fixed;color:#fff;display:flex;justify-content:center;}
+.main{width:100%;max-width:560px;margin:0 auto;padding:6px 8px 16px;display:flex;flex-direction:column;gap:8px;}
+.panel{background:linear-gradient(180deg, rgba(38,38,42,0.96), rgba(18,18,20,0.98));border:1px solid rgba(255,255,255,0.13);border-radius:16px;box-shadow:0 0 0 1px rgba(0,0,0,0.9),0 12px 32px rgba(0,0,0,0.8);backdrop-filter:blur(14px);position:relative;overflow:hidden;}
+.panel::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg, rgba(255,255,255,0.06), transparent 40%);pointer-events:none;}
+.inner{position:relative;z-index:2;padding:10px;}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:0 0 auto;padding:8px 10px;border-radius:100px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);font-size:8px;font-weight:900;letter-spacing:0.5px;cursor:pointer;white-space:nowrap;transition:.15s;}
+.tab.active{background:#ffcc00;color:#000;border-color:#fff;box-shadow:0 4px 12px rgba(255,204,0,0.4);}
+.badge{font-size:8px;font-weight:900;padding:4px 8px;border-radius:100px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,215,0,0.2);color:#ffcc00;display:inline-block;}
+.topWin{font-size:16px;font-weight:900;text-align:center;text-shadow:0 2px 0 #000;}
+.pool{font-size:9px;color:#00ff88;text-align:center;margin-top:3px;font-weight:700;}
+.tier{font-size:8px;color:#ffe600;text-align:center;margin-top:3px;background:rgba(0,0,0,0.4);padding:3px 8px;border-radius:20px;border:1px solid rgba(255,230,0,0.2);display:inline-block;margin-left:50%;transform:translateX(-50%);}
+.cycle{font-size:8px;color:#00e5ff;text-align:center;margin-top:4px;background:rgba(0,229,255,0.12);padding:5px 8px;border-radius:20px;border:1px solid rgba(0,229,255,0.3);line-height:1.4;}
+.edu{font-size:8px;color:#ffcc88;margin-top:6px;background:rgba(255,215,0,0.08);border:1px dashed rgba(255,215,0,0.4);padding:7px 9px;border-radius:10px;line-height:1.45;text-align:left;}
+#chartWrap{margin-top:6px;background:rgba(0,0,0,0.5);border-radius:10px;padding:5px;border:1px solid rgba(255,255,255,0.08);}
+#saldoChart{width:100%;height:60px;display:block;}
+.board{padding:8px;display:flex;justify-content:center;align-items:center;border-radius:18px;background:radial-gradient(ellipse at center, rgba(20,20,25,0.9), rgba(5,5,8,0.98));border:1px solid rgba(255,255,255,0.10);min-height:300px;}
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:100%;aspect-ratio:1/1;max-height:60vh;}
+.cell{aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:26px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);border-radius:8px;position:relative;}
+.cell.scatter{background:radial-gradient(circle, rgba(255,215,0,0.35), transparent 70%);}
+.cell .scatter-img{width:82%;height:82%;object-fit:contain;}
+@keyframes shatter{0%{transform:scale(1);opacity:1;}100%{transform:scale(0.1) translateY(20px);opacity:0;}}
+.cell.shattering{animation:shatter 0.35s forwards;}
+.featureRow{display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:linear-gradient(180deg, rgba(30,30,34,0.9), rgba(14,14,16,0.95));border-radius:12px;border:1px solid rgba(255,255,255,0.08);}
+.sadow-btn{background:linear-gradient(180deg, rgba(55,55,60,0.95), rgba(22,22,26,0.98));border:1px solid rgba(255,255,255,0.14);border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.6);color:#fff;font-weight:900;cursor:pointer;padding:6px 8px;font-size:9px;text-align:center;}
+.sadow-btn:active{transform:scale(0.93);} .sadow-btn.disabled{opacity:0.25;pointer-events:none;}
+#message{flex:1;margin:0 6px;font-size:8px;font-weight:800;text-align:center;background:rgba(0,0,0,0.35);border-radius:8px;border:1px solid rgba(255,255,255,0.06);padding:5px;min-height:28px;display:flex;align-items:center;justify-content:center;}
+.spinRow{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;background:linear-gradient(180deg, rgba(30,30,34,0.9), rgba(14,14,16,0.95));border-radius:12px;border:1px solid rgba(255,255,255,0.08);gap:6px;}
+.betBtn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;}
+#spinBtn{width:62px;height:62px;border-radius:50%;border:3px solid #fff;background:linear-gradient(180deg,#ffd700,#ff4500);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #000,0 0 16px rgba(255,215,0,0.6);flex-shrink:0;}
+#spinBtn span{font-size:26px;color:#fff;font-weight:bold;}
+.bottomStats{display:flex;gap:6px;}
+.saldoDisplay,.betDisplay{flex:1;text-align:center;padding:6px;background:linear-gradient(180deg, rgba(40,40,45,0.95), rgba(15,15,18,0.98));border:1px solid rgba(255,215,0,0.18);border-radius:10px;cursor:pointer;}
+.saldoDisplay span,.betDisplay span{font-size:6px;color:#aaa;font-weight:900;display:block;}
+.saldoDisplay b,.betDisplay b{font-size:12px;color:#fff;font-weight:900;}
+.hubGrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;aspect-ratio:1;max-width:300px;margin:8px auto;}
+.cell3{background:rgba(255,255,255,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:12px;display:grid;place-items:center;font-size:28px;}
+.simGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;}
+.simCard{background:linear-gradient(180deg, rgba(45,45,50,0.9), rgba(20,20,22,0.95));border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:8px;cursor:pointer;}
+.simCard.active{border-color:#ffcc00;box-shadow:0 0 12px rgba(255,204,0,0.4);background:linear-gradient(180deg, rgba(60,50,10,0.9), rgba(30,20,0,0.95));}
+.simNum{font-size:7px;font-weight:900;color:#ffcc00;background:rgba(255,204,0,0.15);padding:2px 5px;border-radius:20px;display:inline-block;}
+.simTitle{font-size:11px;font-weight:900;margin-top:4px;line-height:1.1;}
+.simDesc{font-size:7px;color:#aaa;margin-top:3px;line-height:1.3;min-height:28px;}
+.popup{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:none;justify-content:center;align-items:center;z-index:99999;padding:10px;}
+.popupBox{width:90%;max-width:360px;background:linear-gradient(180deg,#2a2a2e,#111113);border:1px solid rgba(255,255,255,0.15);border-radius:18px;padding:14px;text-align:center;}
+.autoGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:10px 0;max-height:30vh;overflow:auto;}
+.autoOpt{padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:#2a2a2e;font-size:11px;font-weight:900;cursor:pointer;}
+.autoOpt.selected{background:#ffcc00;color:#000;}
+.comboPopup{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;color:#fff;text-shadow:0 0 12px #000;pointer-events:none;animation:combo 1s forwards;z-index:9999;text-align:center;}
+@keyframes combo{0%{opacity:0;transform:translate(-50%,-50%) scale(.2);}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-140%) scale(1);}}
+</style>
+</head>
+<body>
+<div class="main">
+  <div class="panel"><div class="inner">
+    <div class="tabs" id="modeTabs">
+      <div class="tab active" data-mode="0">🏠 HUB EDUKASI</div>
+      <div class="tab" data-mode="1">♻️ SIM1 5JT</div>
+      <div class="tab" data-mode="2">🎣 SIM2 DITAHAN</div>
+      <div class="tab" data-mode="3">💥 SIM3 50JT</div>
+      <div class="tab" data-mode="4">📉 SIM4 SEDOT</div>
+    </div>
+  </div></div>
+
+  <!-- HUB VIEW -->
+  <div id="hubView">
+    <div class="panel"><div class="inner">
+      <div style="text-align:center;"><span class="badge">🧠 RUANG SADAR • 4 SIMULASI ALL IN ONE • TANPA UANG ASLI</span></div>
+      <div style="font-size:22px;font-weight:900;margin-top:8px;line-height:0.9;">BUAH KOIN<br><span style="background:linear-gradient(90deg,#ffcc00,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">DIBONGKAR</span></div>
+      <div style="font-size:10px;color:#ccc;margin-top:6px;line-height:1.4;">Kenapa situs ilegal bisa atur hasil? Ini 4 pola jebakan yang dipakai bandar. Semua pakai board & pool yang sama.</div>
+      <div class="hubGrid3" id="hubGrid"></div>
+      <div style="display:flex;gap:6px;max-width:300px;margin:0 auto;"><button class="sadow-btn" style="flex:1;" id="hubSpin">▶ PUTAR EDUKASI</button><button class="sadow-btn" style="width:44px;" id="hubReset">↺</button></div>
+      <div id="hubChartWrap" style="margin-top:8px;background:rgba(0,0,0,0.4);border-radius:8px;padding:5px;"><canvas id="hubChart" width="400" height="50" style="width:100%;height:50px;"></canvas></div>
+      <div style="margin-top:8px;font-size:8px;color:#ffcc00;background:rgba(255,204,0,0.1);border:1px dashed rgba(255,204,0,0.4);padding:6px 8px;border-radius:8px;">💡 <b>Pilih mode di tab atas</b> untuk lihat cara kerja bandar. Semua simulasi pakai tema portal.png yang sama — ini yang bikin nyambung.</div>
+    </div></div>
+    <div class="panel"><div class="inner">
+      <div style="font-size:12px;font-weight:900;">🎮 4 MODE JEBAKAN - TAP UNTUK SWITCH</div>
+      <div class="simGrid">
+        <div class="simCard" data-goto="1"><div class="simNum">SIM1</div><div class="simTitle">♻️ RTP CYCLE 5JT</div><div class="simDesc">1-29 pancing menang besar, 30 scatter → 10 free total 5JT dari Global Pool, lalu sedot</div></div>
+        <div class="simCard" data-goto="2"><div class="simNum">SIM2</div><div class="simTitle">🎣 DITAHAN DRAW</div><div class="simDesc">Saldo naik turun dibuat stagnan, tease scatter 2 & near win 5 simbol terus</div></div>
+        <div class="simCard" data-goto="3"><div class="simNum">SIM3</div><div class="simTitle">💥 JACKPOT 50JT</div><div class="simDesc">Awal kecil, spin 30 JP 50JT meledak → euforia → setelah itu disedot balik</div></div>
+        <div class="simCard" data-goto="4"><div class="simNum">SIM4</div><div class="simTitle">📉 MODE SEDOT</div><div class="simDesc">70% ZONK, cascade jarang, menang pun 0.1x-0.8x. Saldo turun pelan sampai habis reset</div></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- SIM VIEW -->
+  <div id="simView" style="display:none;">
+    <div class="panel"><div class="inner">
+      <div class="topWin" id="topWinDisplay">💰 MENANG : Rp 0</div>
+      <div class="pool" id="poolDisplay">GLOBAL POOL: -</div>
+      <div class="tier" id="tierDisplay">TIER: -</div>
+      <div class="cycle" id="cycleDisplay">MODE: -</div>
+      <div class="edu" id="eduPanel">Edukasi</div>
+      <div id="chartWrap"><canvas id="saldoChart" width="500" height="60"></canvas></div>
+    </div></div>
+    <div class="panel board"><div class="inner" style="width:100%;display:flex;justify-content:center;"><div id="grid"></div></div></div>
+    <div class="panel"><div class="inner" style="display:flex;flex-direction:column;gap:6px;">
+      <div class="featureRow">
+        <div class="sadow-btn" id="autoSpinBtn">🎡 AUTO<br><b id="autoText">10</b></div>
+        <div id="message">PILIH MODE</div>
+        <div class="sadow-btn" id="buySpinBtn">💰 BUY<br><b id="buyPriceText">20.000</b></div>
+      </div>
+      <div class="spinRow">
+        <div class="sadow-btn betBtn" id="betMinus">−</div>
+        <div class="sadow-btn" id="speedBtn" style="width:56px;">🐢<br><b id="speedText" style="font-size:7px;">LAMBAT</b></div>
+        <button id="spinBtn"><span>⟳</span></button>
+        <div class="sadow-btn" id="soundToggle" style="width:56px;">🔊<br><b style="font-size:7px;">SOUND</b></div>
+        <div class="sadow-btn betBtn" id="betPlus">+</div>
+      </div>
+      <div class="bottomStats">
+        <div class="saldoDisplay"><span id="saldoLabel">SALDO</span><b id="score">0</b></div>
+        <div class="betDisplay" id="betDisplayBtn"><span>BET</span><b id="betText">200</b></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<div id="freePopup" class="popup"><div class="popupBox"><div id="freeTitle" style="font-size:18px;font-weight:900;color:#ffcc00;"></div><div id="freeDiamond" style="font-size:40px;margin:8px 0;">💎💎💎💎</div><div id="freeInfo" style="font-size:10px;color:#fff;line-height:1.4;"></div><button id="freeOk" style="width:100%;margin-top:10px;padding:12px;background:linear-gradient(180deg,#ffcc00,#ff8c00);border:1px solid #fff;border-radius:12px;font-weight:900;">GASS!</button></div></div>
+<div id="resetPopup" class="popup"><div class="popupBox"><div style="font-size:16px;font-weight:900;color:#ff5555;">💸 SALDO HABIS - RESET</div><div id="resetInfo" style="font-size:11px;margin:10px 0;color:#ffaaaa;"></div><button id="resetOk" style="width:100%;padding:12px;background:#ff5555;color:#fff;border-radius:12px;font-weight:900;">RESET KE AWAL</button></div></div>
+<div id="autoPopup" class="popup"><div class="popupBox"><div style="font-weight:900;">🎡 AUTO</div><div class="autoGrid" id="autoGrid"></div><div style="display:flex;gap:6px;"><button id="autoCancel" class="sadow-btn" style="flex:1;">BATAL</button><button id="autoStart" class="sadow-btn" style="flex:1;background:#ffcc00;color:#000;">MULAI</button></div></div></div>
+<div id="betPopup" class="popup"><div class="popupBox"><div style="font-weight:900;">🎲 BET</div><div id="betGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:10px 0;max-height:30vh;overflow:auto;"></div><button id="betCancel" class="sadow-btn" style="width:100%;">TUTUP</button></div></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
+firebase.initializeApp(firebaseConfig); const auth=firebase.auth(); const db=firebase.firestore();
+
+// CORE
+let currentMode=0, score=0, currentBet=200, betIndex=0, autoIndex=0, isAuto=false, autoRem=0, spinning=false, freeSpins=0, inFree=false, tumbleWin=0, combo=0;
+let globalPool=0, globalPoolFirebase=0, houseProfit=0;
+let saldoHistory=[], hubHistory=[1000], hubCoins=1000, hubSpins=0;
+let BET_LEVELS=[]; for(let v=200;v<=10000;v+=200) BET_LEVELS.push(v); for(let v=12000;v<=100000;v+=2000) BET_LEVELS.push(v);
+let AUTO_LEVELS=[]; for(let i=10;i<=200;i+=10) AUTO_LEVELS.push(i);
+let SPEED=[{l:'LAMBAT',s:0.4},{l:'SEDANG',s:1},{l:'CEPAT',s:2.5}], speedIdx=0;
+let ROWS=5,COLS=5, symbols=["🍎","🍓","🍍","🥝","🍇","🥭","🍒","🍉","🥥"], board=[], cells=[], SCATTER="SCATTER";
+let modeState={1:{cycle:1,isSedot:false,freeCap:5000000,freeAcc:0,freeStart:0},2:{draw:0,saldoAwal:0,freeCap:0,freeAcc:0},3:{cycle:1,isAfter:false,jpCap:50000000,jpAcc:0,jpStart:0},4:{cycle:0,totalLoss:0,totalWin:0,init:0}};
+let poolRef=db.collection("global").doc("pool");
+async function initPool(){try{let d=await poolRef.get(); if(!d.exists) await poolRef.set({pool:0,profit:0}); else {globalPool=d.data().pool||0; globalPoolFirebase=globalPool;} poolRef.onSnapshot(s=>{if(s.exists){globalPoolFirebase=s.data().pool||0; globalPool=globalPoolFirebase; updateUI();}});}catch(e){}}
+async function addPool(p,h,b){try{await db.runTransaction(async tx=>{let d=await tx.get(poolRef); if(!d.exists) tx.set(poolRef,{pool:p,profit:h}); else tx.update(poolRef,{pool:(d.data().pool||0)+p,profit:(d.data().profit||0)+h});});}catch(e){globalPool+=p;}}
+async function takePool(amt){try{let taken=0; await db.runTransaction(async tx=>{let d=await tx.get(poolRef); let pool=d.data().pool||0; if(pool>=amt){tx.update(poolRef,{pool:pool-amt}); taken=amt;} else {let g=Math.floor(pool*0.7); tx.update(poolRef,{pool:pool-g}); taken=g;}}); return taken;}catch(e){let g=Math.min(amt, Math.floor(globalPool*0.7)); globalPool-=g; return g;}}
+
+function switchMode(m){
+  currentMode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', parseInt(t.dataset.mode)==m));
+  document.querySelectorAll('.simCard').forEach(c=>c.classList.toggle('active', parseInt(c.dataset.goto)==m));
+  if(m==0){ document.getElementById('hubView').style.display='block'; document.getElementById('simView').style.display='none'; }
+  else { document.getElementById('hubView').style.display='none'; document.getElementById('simView').style.display='block'; createBoard(); updateUI(); drawChart(); }
+  saveState();
+}
+document.getElementById('modeTabs').onclick=e=>{let t=e.target.closest('.tab'); if(t) switchMode(parseInt(t.dataset.mode));};
+document.querySelectorAll('.simCard').forEach(c=>c.onclick=()=>switchMode(parseInt(c.dataset.goto)));
+
+// HUB MINI GAME
+function hubRender(){let g=document.getElementById('hubGrid'); g.innerHTML=''; for(let i=0;i<9;i++){let d=document.createElement('div'); d.className='cell3'; d.textContent=["🍎","🍌","🍇","🍒","🍋"][Math.floor(Math.random()*5)]; g.appendChild(d);} }
+function hubWin(){let c=[...document.getElementById('hubGrid').children].map(x=>x.textContent); return (c[0]==c[1]&&c[1]==c[2])||(c[3]==c[4]&&c[4]==c[5])||(c[6]==c[7]&&c[7]==c[8]);}
+function hubDraw(){let c=document.getElementById('hubChart'), ctx=c.getContext('2d'), w=c.width, h=c.height; ctx.clearRect(0,0,w,h); if(hubHistory.length<2) return; let min=Math.min(...hubHistory,800), max=Math.max(...hubHistory,1100), range=Math.max(1,max-min); ctx.strokeStyle='#ff4444'; ctx.lineWidth=2; ctx.beginPath(); hubHistory.forEach((v,i)=>{let x=i/(hubHistory.length-1)*w, y=h-((v-min)/range)*h; i==0?ctx.moveTo(x,y):ctx.lineTo(x,y);}); ctx.stroke();}
+document.getElementById('hubSpin').onclick=()=>{let g=document.getElementById('hubGrid'); let it=setInterval(()=>{[...g.children].forEach(c=>c.textContent=["🍎","🍌","🍇","🍒","🍋"][Math.floor(Math.random()*5)]);},80); setTimeout(()=>{clearInterval(it); let win=hubWin(); hubCoins=Math.max(0, hubCoins+(win?50:-10)); hubSpins++; hubHistory.push(hubCoins); if(hubHistory.length>20) hubHistory.shift(); hubDraw(); document.getElementById('hubGrid').parentElement.nextElementSibling.nextElementSibling;},400);};
+document.getElementById('hubReset').onclick=()=>{hubCoins=1000; hubHistory=[1000]; hubSpins=0; hubDraw(); hubRender();};
+hubRender(); hubDraw();
+
+// SIM BOARD COMMON
+function randFruit(){return symbols[Math.floor(Math.random()*symbols.length)];}
+function isScat(v){return v==SCATTER;}
+function createBoard(){board=[]; for(let r=0;r<ROWS;r++){let row=[]; for(let c=0;c<COLS;c++) row.push(randFruit()); board.push(row);} drawBoard();}
+function drawBoard(){let g=document.getElementById('grid'); if(!g) return; g.innerHTML=''; cells=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){let el=document.createElement('div'); el.className='cell'+(isScat(board[r][c])?' scatter':''); el.textContent=isScat(board[r][c])?'💎':board[r][c]; g.appendChild(el); cells.push(el);} }
+function countScat(){let cnt=0; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(isScat(board[r][c])) cnt++; return cnt;}
+
+function getCategory(isFree){
+  if(currentMode==1){
+    let st=modeState[1];
+    if(isFree){ let r=Math.random(); if(r<0.1) return "ZONK"; if(r<0.4) return "RENDAH"; if(r<0.8) return "SEDANG"; return "TINGGI"; }
+    if(st.isSedot){ let r=Math.random(); if(r<0.7) return "ZONK"; if(r<0.9) return "RENDAH"; return "SEDANG"; }
+    if(st.cycle>=1 && st.cycle<=29){ let r=Math.random(); if(r<0.15) return "ZONK"; if(r<0.5) return "RENDAH"; if(r<0.8) return "SEDANG"; return "TINGGI"; }
+    return "SCATTER";
+  }
+  if(currentMode==2){
+    let st=modeState[2]; let p=st.draw%12;
+    if(isFree){ if(p<3) return "RENDAH"; if(p<6) return "SEDANG"; return "ZONK"; }
+    if(p<=1) return "RENDAH"; if(p<=3) return "ZONK"; if(p==4) return "SEDANG"; if(p==5) return "ZONK_TEASE_NEAR"; if(p==6) return "ZONK_TEASE_SCATTER"; if(p==8) return "RENDAH"; if(p==10) return "SEDANG_TEASE"; return "ZONK";
+  }
+  if(currentMode==3){
+    let st=modeState[3];
+    if(isFree){ let r=Math.random(); if(r<0.05) return "ZONK"; if(r<0.2) return "RENDAH_JP"; if(r<0.5) return "SEDANG_JP"; return "TINGGI_JP"; }
+    if(st.isAfter){ let r=Math.random(); if(r<0.65) return "ZONK"; if(r<0.85) return "RENDAH_KECIL"; if(r<0.95) return "SEDANG_KECIL"; return "TINGGI_KECIL"; }
+    if(st.cycle<=29){ let r=Math.random(); if(r<0.45) return "RENDAH_KECIL"; if(r<0.8) return "ZONK"; return "SEDANG_KECIL"; }
+    return "SCATTER";
+  }
+  if(currentMode==4){
+    let r=Math.random(); if(r<0.7) return "ZONK"; if(r<0.88) return "RENDAH_SEDIT"; if(r<0.97) return "SEDANG_KECIL"; return "TINGGI_KECIL";
+  }
+  return "ZONK";
+}
+
+function calcWin(cat,isFree){
+  let pool=globalPoolFirebase||globalPool;
+  if(currentMode==1){
+    let st=modeState[1];
+    if(isFree){
+      if(st.freeAcc>=st.freeCap) return 0;
+      let rem=st.freeCap-st.freeAcc, remSp=Math.max(1, freeSpins+1);
+      if(remSp<=1) return rem;
+      let avg=rem/remSp, vari=0.6+Math.random()*0.9, base=Math.floor(avg*vari);
+      let win=0;
+      if(cat=="ZONK") win=0; else if(cat=="RENDAH") win=Math.max(100000, Math.min(base,450000));
+      else if(cat=="SEDANG") win=Math.max(300000, Math.min(base,750000));
+      else if(cat=="TINGGI") win=Math.max(500000, Math.min(base*1.2,1300000));
+      if(st.freeAcc+win>st.freeCap) win=st.freeCap-st.freeAcc;
+      return Math.min(win, Math.floor(pool*0.9));
+    } else {
+      if(cat=="ZONK") return 0;
+      if(cat=="RENDAH") return Math.floor(currentBet*(st.isSedot?0.15+Math.random()*0.35:0.5+Math.random()*0.8));
+      if(cat=="SEDANG") return Math.floor(currentBet*(st.isSedot?0.6+Math.random()*0.6:1.2+Math.random()*1.3));
+      if(cat=="TINGGI") return Math.floor(currentBet*(st.isSedot?1.2+Math.random()*1:2.2+Math.random()*2.8));
+      return Math.floor(currentBet*0.5);
+    }
+  }
+  if(currentMode==2){
+    if(isFree){
+      let st=modeState[2]; if(st.freeAcc>=st.freeCap) return 0;
+      let win=0; if(cat=="RENDAH") win=Math.floor(currentBet*(0.4+Math.random()*0.6));
+      else if(cat=="SEDANG") win=Math.floor(currentBet*(1+Math.random()*0.8));
+      if(st.freeAcc+win>st.freeCap) win=st.freeCap-st.freeAcc;
+      return win;
+    } else {
+      if(cat=="ZONK"||cat.includes("TEASE")) return 0;
+      if(cat=="RENDAH") return Math.floor(currentBet*(0.4+Math.random()*0.6));
+      if(cat=="SEDANG"||cat=="SEDANG_TEASE") return Math.floor(currentBet*(1+Math.random()*0.8));
+      return 0;
+    }
+  }
+  if(currentMode==3){
+    let st=modeState[3];
+    if(isFree){
+      if(st.jpAcc>=st.jpCap) return 0;
+      let rem=st.jpCap-st.jpAcc, remSp=Math.max(1, freeSpins+1);
+      if(remSp<=1) return rem;
+      let avg=rem/remSp, base=Math.floor(avg*(0.7+Math.random()*0.8));
+      let win=0; if(cat=="RENDAH_JP") win=Math.max(1000000, Math.min(base,3500000));
+      else if(cat=="SEDANG_JP") win=Math.max(3000000, Math.min(base*1.1,7000000));
+      else if(cat=="TINGGI_JP") win=Math.max(5000000, Math.min(base*1.3,12000000));
+      if(st.jpAcc+win>st.jpCap) win=st.jpCap-st.jpAcc;
+      return Math.min(win, Math.floor(pool*0.95));
+    } else {
+      if(cat=="ZONK") return 0;
+      if(cat=="RENDAH_KECIL"||cat=="RENDAH_SEDIT") return Math.floor(currentBet*(0.3+Math.random()*0.5));
+      if(cat=="SEDANG_KECIL") return Math.floor(currentBet*(0.9+Math.random()*0.6));
+      if(cat=="TINGGI_KECIL") return Math.floor(currentBet*(1+Math.random()*0.8));
+      return Math.floor(currentBet*0.5);
+    }
+  }
+  if(currentMode==4){
+    if(cat=="ZONK") return 0;
+    if(cat=="RENDAH_SEDIT") return Math.floor(currentBet*(0.08+Math.random()*0.27));
+    if(cat=="SEDANG_KECIL") return Math.floor(currentBet*(0.35+Math.random()*0.45));
+    if(cat=="TINGGI_KECIL") return Math.floor(currentBet*(0.85+Math.random()*0.3));
+    return 0;
+  }
+  return 0;
+}
+
+function genBoard(cat,isFree){
+  let nb=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  let scat=0;
+  if(currentMode==1){ scat=isFree? (Math.random()<0.15?1:0) : (cat=="SCATTER"?4: (Math.random()<0.08?1:0)); }
+  else if(currentMode==2){ scat=isFree? (cat=="RENDAH"?1:0) : (cat=="ZONK_TEASE_SCATTER"?2: (cat=="SCATTER"?4:0)); }
+  else if(currentMode==3){ scat=isFree?0: (cat=="SCATTER"?4: (Math.random()<0.05?1:0)); }
+  else if(currentMode==4){ scat=Math.random()<0.02?1:0; }
+
+  let all=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) all.push({r,c});
+  for(let i=all.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]];}
+  all.slice(0,scat).forEach(p=>nb[p.r][p.c]=SCATTER);
+
+  if(cat=="ZONK"||cat.includes("TEASE")){
+    let cnt={}; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(nb[r][c]!=SCATTER){
+      let f; let at=0; do{f=randFruit(); at++;}while((cnt[f]||0)>=5 && at<20);
+      nb[r][c]=f; cnt[f]=(cnt[f]||0)+1;
+    }
+  } else {
+    let winSym=symbols[Math.floor(Math.random()*symbols.length)];
+    let winCnt=6;
+    if(currentMode==1) winCnt=isFree? (cat=="RENDAH"?8:cat=="SEDANG"?9:11) : (cat=="RENDAH"?6:cat=="SEDANG"?7:8);
+    if(currentMode==2) winCnt=cat=="RENDAH"?7:cat=="SEDANG"?8:6;
+    if(currentMode==3) winCnt=isFree? (cat=="RENDAH_JP"?8:cat=="SEDANG_JP"?10:12) : 6;
+    if(currentMode==4) winCnt=6;
+    let avail=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(nb[r][c]!=SCATTER) avail.push({r,c});
+    for(let i=avail.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [avail[i],avail[j]]=[avail[j],avail[i]];}
+    for(let i=0;i<Math.min(winCnt,avail.length);i++) nb[avail[i].r][avail[i].c]=winSym;
+    let cnt={[winSym]:winCnt};
+    for(let i=winCnt;i<avail.length;i++){let p=avail[i]; let f; let at=0; do{f=randFruit(); at++;}while((cnt[f]||0)>=5 && at<20 && f!=winSym); nb[p.r][p.c]=f; cnt[f]=(cnt[f]||0)+1;}
+  }
+  return {board:nb, scat};
+}
+
+function findMatches(){let counts={},pos={}; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){let f=board[r][c]; if(isScat(f)||!f) continue; if(!counts[f]){counts[f]=0; pos[f]=[];} counts[f]++; pos[f].push({r,c});} let m=[]; for(let f in counts) if(counts[f]>=6) m.push(pos[f]); return m;}
+async function tumble(){
+  let nb=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  for(let c=0;c<COLS;c++){let w=ROWS-1; for(let r=ROWS-1;r>=0;r--) if(board[r][c]!=null){nb[w][c]=board[r][c]; w--;} for(let r=w;r>=0;r--) nb[r][c]=randFruit();}
+  board=nb; drawBoard(); await new Promise(r=>setTimeout(r,200));
+}
+async function destroy(groups){
+  let all=[]; groups.forEach(g=>all.push(...g));
+  for(let p of all){let idx=p.r*COLS+p.c; if(cells[idx]) cells[idx].classList.add('shattering');}
+  await new Promise(r=>setTimeout(r,300));
+  for(let p of all) board[p.r][p.c]=null;
+  await tumble();
+  let again=findMatches();
+  if(again.length>0 && (currentMode!=4 || Math.random()<0.1)){ combo++; await destroy(again); }
+}
+
+function updateUI(){
+  if(currentMode==0) return;
+  document.getElementById('score').textContent=score.toLocaleString('id-ID');
+  document.getElementById('betText').textContent=currentBet.toLocaleString('id-ID');
+  document.getElementById('topWinDisplay').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`;
+  document.getElementById('poolDisplay').textContent=`🌐 POOL: ${Math.floor(globalPoolFirebase||globalPool).toLocaleString('id-ID')} | MODE ${currentMode}`;
+  let tier = currentBet<=1000?"KECIL":currentBet<=10000?"MENENGAH":currentBet<=100000?"BESAR":"SULTAN";
+  document.getElementById('tierDisplay').textContent=tier;
+  let st=modeState[currentMode];
+  let cycleTxt="";
+  if(currentMode==1) cycleTxt= inFree? `FREE ${freeSpins} SISA TARGET ${(st.freeCap-st.freeAcc).toLocaleString('id-ID')} / 5JT` : st.isSedot? `SEDOT Spin ${st.cycle}` : `PANCING ${st.cycle}/29 - ${st.cycle==30?'TRIGGER SCATTER 5JT!':''}`;
+  if(currentMode==2) cycleTxt= inFree? `FREE DITAHAN ${freeSpins}` : `DRAW ${st.draw%12} - Saldo ${score.toLocaleString('id-ID')}`;
+  if(currentMode==3) cycleTxt= inFree? `JP FREE ${freeSpins} AKUMULASI ${(st.jpAcc).toLocaleString('id-ID')} / 50JT` : st.isAfter? `SETELAH JP Spin ${st.cycle} - Turun` : `AWAL ${st.cycle}/29`;
+  if(currentMode==4) cycleTxt=`SEDOT Spin ${st.cycle} - 70% ZONK - Loss ${st.totalLoss.toLocaleString('id-ID')}`;
+  document.getElementById('cycleDisplay').textContent=`MODE ${currentMode} - ${cycleTxt}`;
+  let edu="";
+  if(currentMode==1) edu="🎓 SIM1 RTP: 1-29 pancing menang besar, 30 scatter 10 free total 5JT dari pool, lalu fase sedot";
+  if(currentMode==2) edu="🎓 SIM2 DITAHAN: Naik turun dibuat stagnan, tease scatter 2 & near win, tujuan biar betah tapi tidak naik";
+  if(currentMode==3) edu="🎓 SIM3 JACKPOT 50JT: Awal kecil, tengah JP 50JT euforia, setelah itu peluang turun & saldo disedot";
+  if(currentMode==4) edu="🎓 SIM4 SEDOT: 70% ZONK, cascade jarang, menang pun 0.1x-0.8x, saldo turun pelan sampai habis reset";
+  document.getElementById('eduPanel').innerHTML=edu;
+  document.getElementById('buyPriceText').textContent=(currentBet*100).toLocaleString('id-ID');
+  document.getElementById('saldoLabel').textContent=currentMode==4?'SALDO TURUN':'SALDO';
+}
+function drawChart(){
+  let c=document.getElementById('saldoChart'); if(!c) return; let ctx=c.getContext('2d'), w=c.width, h=c.height; ctx.clearRect(0,0,w,h);
+  if(saldoHistory.length<2) return;
+  let min=Math.min(...saldoHistory), max=Math.max(...saldoHistory), range=Math.max(1,max-min);
+  ctx.strokeStyle=currentMode==4?'#ff4444':currentMode==3?'#ffd700':'#00ff88'; ctx.lineWidth=2; ctx.beginPath();
+  saldoHistory.forEach((v,i)=>{let x=i/(saldoHistory.length-1)*w, y=h-((v-min)/range)*h; i==0?ctx.moveTo(x,y):ctx.lineTo(x,y);}); ctx.stroke();
+}
+function pushHistory(){saldoHistory.push(score); if(saldoHistory.length>50) saldoHistory.shift(); drawChart();}
+
+async function spin(){
+  if(spinning||score<currentBet){ if(score<currentBet) showReset(); return; }
+  spinning=true;
+  let st=modeState[currentMode];
+  let isFree=inFree;
+  let cat=getCategory(isFree);
+  let win=calcWin(cat,isFree);
+  document.getElementById('message').textContent=`SPIN ${currentMode==1?st.cycle:currentMode==3?st.cycle:currentMode==2?st.draw:st.cycle} [${cat}]`;
+  let data=genBoard(cat,isFree);
+  board=data.board; drawBoard();
+  await new Promise(r=>setTimeout(r,400));
+  if(!isFree && data.scat>=4){
+    if(currentMode==1){ st.freeCap=5000000; st.freeAcc=0; st.freeStart=score; freeSpins=10; inFree=true; showFree(`💥 SCATTER 4! FREE 10 - TOTAL 5JT FIX!`, `Saldo awal ${score.toLocaleString('id-ID')}<br>Target 5.000.000 dari Global Pool`); await waitFree(); await startFree(); spinning=false; return; }
+    if(currentMode==3){ st.jpCap=50000000; st.jpAcc=0; st.jpStart=score; freeSpins=10; inFree=true; showFree(`💥 JACKPOT 50JT! 4 SCATTER!`, `Saldo awal ${score.toLocaleString('id-ID')}<br>Total 50.000.000 dari Pool`); await waitFree(); await startFree(); spinning=false; return; }
+    if(currentMode==2){ st.freeCap=Math.floor(st.saldoAwal*0.4); st.freeAcc=0; freeSpins=10; inFree=true; showFree(`🎣 FREE DITAHAN`, `Cap 40% saldo`); await waitFree(); await startFree(); spinning=false; return; }
+  }
+  if(win==0){ score=Math.max(0,score-currentBet); if(currentMode==1 && !isFree && !st.isSedot){ if(st.cycle<30) st.cycle++; else {st.isSedot=true; st.cycle=1;} } if(currentMode==2) st.draw++; if(currentMode==3 && !st.isAfter && st.cycle<30) st.cycle++; if(currentMode==4){st.cycle++; st.totalLoss+=currentBet;} updateUI(); pushHistory(); showCombo(`ZONK -${currentBet}`); }
+  else {
+    let actual=await takePool(win);
+    if(currentMode==1 && isFree){ if(st.freeAcc+actual>st.freeCap) actual=st.freeCap-st.freeAcc; st.freeAcc+=actual; }
+    if(currentMode==3 && isFree){ if(st.jpAcc+actual>st.jpCap) actual=st.jpCap-st.jpAcc; st.jpAcc+=actual; }
+    if(currentMode==2 && isFree) st.freeAcc+=actual;
+    tumbleWin+=actual; score=score-currentBet+actual; if(currentMode==4) st.totalWin+=actual;
+    updateUI(); pushHistory();
+    let groups=findMatches(); if(groups.length>0) await destroy(groups);
+    showCombo(`💰 ${actual.toLocaleString('id-ID')}`);
+    if(currentMode==1 && !isFree && !st.isSedot) st.cycle++;
+    if(currentMode==2 && !isFree) st.draw++;
+    if(currentMode==3 && !isFree && !st.isAfter) st.cycle++;
+    if(currentMode==4) st.cycle++;
+  }
+  spinning=false;
+  if(isAuto){ autoRem--; document.getElementById('autoText').textContent=autoRem; if(autoRem<=0){ isAuto=false; } else setTimeout(spin,500); }
+  saveState();
+}
+
+function showCombo(t){let d=document.createElement('div'); d.className='comboPopup'; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),1000);}
+function showFree(title,info){document.getElementById('freeTitle').textContent=title; document.getElementById('freeInfo').innerHTML=info; document.getElementById('freePopup').style.display='flex';}
+function waitFree(){return new Promise(res=>{document.getElementById('freeOk').onclick=()=>{document.getElementById('freePopup').style.display='none'; res();};});}
+async function startFree(){
+  let st=modeState[currentMode];
+  let total=0;
+  while(freeSpins>0){
+    freeSpins--;
+    let cat=getCategory(true);
+    let win=calcWin(cat,true);
+    let data=genBoard(cat,true); board=data.board; drawBoard(); await new Promise(r=>setTimeout(r,400));
+    let actual=await takePool(win);
+    if(currentMode==1){ if(st.freeAcc+actual>st.freeCap) actual=st.freeCap-st.freeAcc; st.freeAcc+=actual; }
+    if(currentMode==3){ if(st.jpAcc+actual>st.jpCap) actual=st.jpCap-st.jpAcc; st.jpAcc+=actual; }
+    total+=actual; tumbleWin+=actual; score+=actual; updateUI(); pushHistory();
+    let groups=findMatches(); if(groups.length>0) await destroy(groups);
+  }
+  inFree=false; if(currentMode==1) st.isSedot=true; if(currentMode==3) st.isAfter=true;
+  alert(`FREE SELESAI! Total menang ${total.toLocaleString('id-ID')} dari ${currentMode==3?'50JT':currentMode==1?'5JT':'ditahan'}`);
+  updateUI(); spinning=false;
+}
+function showReset(){let p=document.getElementById('resetPopup'); document.getElementById('resetInfo').innerHTML=`Saldo habis di mode ${currentMode}. Reset ke awal mode ini.`; p.style.display='flex';}
+document.getElementById('resetOk').onclick=()=>{document.getElementById('resetPopup').style.display='none'; let st=modeState[currentMode]; score=st.init||1000000; saldoHistory=[score]; if(currentMode==1) st.cycle=1, st.isSedot=false; if(currentMode==3) st.cycle=1, st.isAfter=false; if(currentMode==2) st.draw=0; if(currentMode==4) st.cycle=0, st.totalLoss=0, st.totalWin=0; updateUI(); drawChart();};
+
+document.getElementById('spinBtn').onclick=spin;
+document.getElementById('betMinus').onclick=()=>{if(betIndex>0){betIndex--; currentBet=BET_LEVELS[betIndex]; updateUI();}};
+document.getElementById('betPlus').onclick=()=>{if(betIndex<BET_LEVELS.length-1){betIndex++; currentBet=BET_LEVELS[betIndex]; updateUI();}};
+document.getElementById('autoSpinBtn').onclick=()=>{
+  if(isAuto){isAuto=false; return;}
+  let p=document.getElementById('autoPopup'); p.style.display='flex';
+  let g=document.getElementById('autoGrid'); g.innerHTML=''; AUTO_LEVELS.forEach((v,i)=>{let d=document.createElement('div'); d.className='autoOpt'; d.textContent=v; d.onclick=()=>{document.querySelectorAll('.autoOpt').forEach(e=>e.classList.remove('selected')); d.classList.add('selected'); autoRem=v;}; g.appendChild(d);});
+};
+document.getElementById('autoCancel').onclick=()=>document.getElementById('autoPopup').style.display='none';
+document.getElementById('autoStart').onclick=()=>{document.getElementById('autoPopup').style.display='none'; isAuto=true; document.getElementById('autoText').textContent=autoRem||10; spin();};
+document.getElementById('betDisplayBtn').onclick=()=>{
+  let p=document.getElementById('betPopup'); p.style.display='flex';
+  let g=document.getElementById('betGrid'); g.innerHTML=''; BET_LEVELS.slice(0,60).forEach((v,i)=>{let d=document.createElement('div'); d.className='sadow-btn'; d.style.fontSize='10px'; d.textContent=v.toLocaleString('id-ID'); d.onclick=()=>{betIndex=i; currentBet=v; updateUI(); p.style.display='none';}; g.appendChild(d);});
+};
+document.getElementById('betCancel').onclick=()=>document.getElementById('betPopup').style.display='none';
+document.getElementById('buySpinBtn').onclick=()=>{if(currentMode==4){alert('Buy dimatikan di mode sedot - edukasi tanpa buy pun habis'); return;} let price=currentBet*100; if(score<price){alert('Saldo tidak cukup buy'); return;} score-=price; let st=modeState[currentMode]; if(currentMode==1){st.freeCap=5000000; st.freeAcc=0; freeSpins=10; inFree=true;} if(currentMode==3){st.jpCap=50000000; st.jpAcc=0; freeSpins=10; inFree=true;} if(currentMode==2){st.freeCap=Math.floor(score*0.4); st.freeAcc=0; freeSpins=10; inFree=true;} updateUI(); showFree('BUY FREE!', `Harga ${price.toLocaleString('id-ID')} - langsung free ${currentMode==3?'50JT':currentMode==1?'5JT':'ditahan'}`); waitFree().then(startFree);};
+
+function saveState(){}
+function loadState(){}
+
+auth.onAuthStateChanged(async u=>{
+  if(!u){ /* allow guest */ score=1000000; } else { let d=await db.collection("players").doc(u.uid).get(); if(d.exists) score=d.data().wallet?.coin||1000000; else score=1000000; }
+  for(let k in modeState) modeState[k].init=score;
+  saldoHistory=[score];
+  await initPool();
+  updateUI(); drawChart(); createBoard();
+});
+
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+</script>
+</body>
+</html>

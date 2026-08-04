@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QRIS Alinsta Cellular - Donasi Seikhlasnya</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#f0f7ff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:16px}
+.card{width:100%;max-width:360px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.15);border:2px solid #0d47a1}
+.header{background:#fff;padding:12px;text-align:center;border-bottom:2px solid #f0f0f0}
+.qrWrap{padding:16px;background:#fff;text-align:center}
+.qrWrap img{width:100%;max-width:300px;border-radius:12px}
+.footer{background:#eff6ff;padding:12px;text-align:center;font-size:11px;color:#334155}
+.btn{display:block;width:100%;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;padding:12px;border-radius:12px;text-decoration:none;font-weight:900;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="card">
+<div class="header">
+<div style="display:flex;justify-content:space-between;align-items:center"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/QRIS_logo.svg" style="height:24px"><img src="https://upload.wikimedia.org/wikipedia/commons/3/31/GPN_logo.png" style="height:28px" onerror="this.style.display='none'"></div>
+<div style="font-weight:900;font-size:18px;margin-top:10px">Alinsta cellular</div>
+<div style="font-size:13px;color:#555">NMID : ID1026561358320</div>
+<div style="font-size:12px;color:#888">A01</div>
+</div>
+<div class="qrWrap">
+<img src="qris.jpg" alt="QRIS Alinsta Cellular">
+<div style="margin-top:10px;font-weight:800;color:#0d47a1">SATU QRIS UNTUK SEMUA</div>
+<div style="font-size:10px;color:#666;margin-top:4px">Donasi Seikhlasnya Perawatan Web RUANG SADAR<br>Scan via DANA/OVO/Gopay/M-Banking</div>
+</div>
+<div class="footer">
+Dicetak oleh: 93600915<br>
+Cek aplikasi di www.aspi-qris.id
+<a href="https://t.me/Legends_Portal" class="btn">💬 KIRIM BUKTI DONASI KE ADMIN</a>
+<button onclick="window.close()" style="width:100%;margin-top:8px;background:#f1f5f9;border:none;padding:10px;border-radius:10px;color:#64748b;font-weight:700">TUTUP</button>
+</div>
+</div>
+</body>
+</html>
