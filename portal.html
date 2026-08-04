@@ -108,4 +108,18 @@ auth.onAuthStateChanged(async(user)=>{
 function logout(){ if(unsubscribe) unsubscribe(); auth.signOut().then(()=>location.replace("index.html")); }
 function openMenu(){ document.getElementById("sideMenu").classList.add("show"); document.getElementById("overlay").classList.add("show"); }
 function closeMenu(){ document.getElementById("sideMenu").classList.remove("show"); document.getElementById("overlay").classList.remove("show"); }
-</script></body></html>
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",projectId:"game-demo-4db7f"});
+firebase.firestore().collection("page_visits").add({
+ page: location.pathname,
+ url: location.href,
+ time: firebase.firestore.FieldValue.serverTimestamp(),
+ ua: navigator.userAgent,
+ ref: document.referrer,
+ dateStr: new Date().toISOString().slice(0,10)
+});
+</script>
+</body></html>
