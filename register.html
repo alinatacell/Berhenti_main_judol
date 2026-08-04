@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Register - RUANG SADAR</title>
@@ -26,6 +45,9 @@ input::placeholder{color:#94a3b8}
 .popup-box h2{color:#0d47a1;margin-bottom:10px;font-size:18px}
 .popup-box p{margin-bottom:18px;white-space:pre-line;font-size:12px;line-height:1.6;color:#334155}
 .popup-box button{width:140px;height:44px;border:none;border-radius:10px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-weight:bold;cursor:pointer}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:#bfdbfe}
+.divider span{font-size:11px;color:#64748b;font-weight:800}
 </style>
 </head>
 <body>
@@ -44,7 +66,6 @@ input::placeholder{color:#94a3b8}
 <input type="tel" id="wa" placeholder="No WhatsApp (angka saja)" inputmode="numeric">
 <div id="waError" class="error-text">WA harus angka saja min 10 digit</div>
 
-<!-- PENJELASAN KENAPA ISI EWALLET -->
 <div style="background:#fffbeb;border:1.5px dashed #f59e0b;border-radius:12px;padding:12px;margin-bottom:10px;">
 <p style="font-size:11.5px;color:#78350f;line-height:1.5;text-align:left">
 <b>💙 Kenapa harus isi E-Wallet / Rekening?</b><br>
@@ -70,9 +91,18 @@ Data rekening ini <b>BUKAN untuk potongan</b>, tapi untuk <b>berbagi rezeki</b> 
 <div id="checkingRek" class="checking">⏳ Mengecek no rekening...</div>
 
 <button id="registerBtn" type="button">DAFTAR AKUN RUANG SADAR</button>
-<a class="back" href="simulator.html">Sudah punya akun? Kembali ke LOGIN</a>
+<a class="back" href="index.html">Sudah punya akun? Kembali ke LOGIN</a>
 
-<!-- KOMITMEN LENGKAP -->
+<!-- 2 PILIHAN BARU -->
+<div class="divider"><span>ATAU</span></div>
+
+<div style="background:#f0f9ff;border:2px solid #1a73e8;border-radius:14px;padding:14px;text-align:center">
+<h4 style="font-size:13px;color:#0d47a1;font-weight:900">Mau langsung belajar tanpa daftar?</h4>
+<p style="font-size:11px;color:#64748b;margin-top:4px;line-height:1.5">Tidak perlu login. Kamu bisa langsung masuk ke Portal Edukasi dan coba simulasi cara kerja judol biar sadar.</p>
+<a href="portal.html" onclick="trackTanpaLogin()" style="display:block;margin-top:10px;width:100%;padding:14px;background:#fff;border:2px solid #1a73e8;color:#0d47a1;border-radius:12px;text-decoration:none;font-weight:900;font-size:14px;text-align:center">🚀 MASUK TANPA LOGIN - KE PORTAL</a>
+<div style="font-size:10px;color:#94a3b8;margin-top:6px">Gratis, tanpa data, langsung edukasi</div>
+</div>
+
 <div style="margin-top:14px;background:#f0fdf4;border:2px solid #22c55e;border-radius:14px;padding:14px;">
 <h4 style="font-size:12px;color:#15803d;text-align:center;margin-bottom:6px">🤝 KOMITMEN BERBAGI REZEKI</h4>
 <p style="font-size:11px;color:#334155;line-height:1.6;text-align:left">
@@ -92,6 +122,21 @@ Data rekening ini <b>BUKAN untuk potongan</b>, tapi untuk <b>berbagi rezeki</b> 
 const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();const db=firebase.firestore();
+
+function trackTanpaLogin(){
+  try{
+    db.collection("page_visits").add({
+      page:"register_to_portal_tanpa_login",
+      url:location.href,
+      time:firebase.firestore.FieldValue.serverTimestamp(),
+      ua:navigator.userAgent,
+      ref:"register_page",
+      dateStr:new Date().toISOString().slice(0,10)
+    });
+  }catch(e){}
+  fetch(`https://api.countapi.xyz/hit/ruang-sadar-final/tanpa_login`).catch(()=>{});
+}
+
 function showPopup(pesan,cb=null){document.getElementById("popupText").textContent=pesan;document.getElementById("successPopup").style.display="flex";window.popupCallback=cb}
 function closePopup(){document.getElementById("successPopup").style.display="none";if(window.popupCallback){window.popupCallback();window.popupCallback=null}}
 function isValidGmail(e){return /^[a-z0-9._%+-]+@gmail\.com$/.test(e.toLowerCase())}
