@@ -20,11 +20,31 @@
   };
 })();
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Admin Juragan + Minta Coin Group 1 Player</title>
+<title>Admin Juragan + Pengunjung + Ruang Sadar</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial;background:#0a0a0a;color:#fff;display:flex;justify-content:center;min-height:100vh}
-.container{width:100%;max-width:440px;padding:12px}
+.container{width:100%;max-width:460px;padding:12px}
 .card{background:#111;border:2px solid #d4a500;border-radius:14px;padding:14px;margin-bottom:10px}
 input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;border:1px solid #333;margin:6px 0}
 .btn{padding:12px 16px;border-radius:10px;border:none;font-weight:900;cursor:pointer}
@@ -34,7 +54,7 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 .gridPlayer{display:grid;gap:12px;max-height:75vh;overflow-y:auto;padding:4px}
 .playerCard{background:#161616;border:1px solid #222;border-radius:12px;padding:12px}
 .playerCard.hasMinta{border:2px solid #f59e0b;background:#1a1500;box-shadow:0 0 8px rgba(245,158,11,.3)}
-.tabs{display:flex;gap:6px}.tab{padding:8px 14px;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:#aaa;font-size:11px;font-weight:800;cursor:pointer}.tab.active{background:#ffe77d;color:#000}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}.tab{white-space:nowrap;padding:8px 14px;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:#aaa;font-size:11px;font-weight:800;cursor:pointer}.tab.active{background:#ffe77d;color:#000}
 .legendOverlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;justify-content:center;align-items:center;z-index:9999;padding:20px}.legendOverlay.show{display:flex}
 .legendBox{width:100%;max-width:400px;background:#111;border:2px solid #d4a500;border-radius:16px;padding:20px;text-align:center}
 .legendTitle{font-weight:900;color:#ffd84d;margin-bottom:8px}.legendMsg{text-align:left;background:#000;border:1px solid #222;border-radius:8px;padding:10px;font-size:12px;margin:10px 0;line-height:1.5}
@@ -44,40 +64,47 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 .btnHijau{flex:1;background:#00ff88;color:#000;padding:14px;border-radius:10px;font-weight:900;border:none;font-size:13px;cursor:pointer}
 .btnMerah{flex:1;background:#ff3b3b;color:#fff;padding:14px;border-radius:10px;font-weight:900;border:none;font-size:13px;cursor:pointer}
 .flex2{display:flex;gap:8px;margin-top:8px}
+.visitCard{background:#101010;border:1px solid #333;border-radius:10px;padding:10px;margin-bottom:8px;font-size:11px}
+.badge{display:inline-block;padding:2px 6px;border-radius:6px;font-size:9px;font-weight:900}
 </style>
 </head>
 <body>
 <div class="container">
 <div id="loginBox" class="card">
 <h2 style="color:#ffd84d;text-align:center">👑 ADMIN JURAGAN</h2>
-<p style="text-align:center;font-size:10px;color:#aaa">ID A / Pass A - Data Lama + Minta Coin Group</p>
+<p style="text-align:center;font-size:10px;color:#aaa">ID A / Pass A - + Tracker Pengunjung Tanpa Login</p>
 <input id="adminId" type="text" value="A" placeholder="ID A">
 <input id="adminPass" type="password" value="A" placeholder="Pass A">
 <button class="btn btnLogin" onclick="loginA()">LOGIN A</button>
 <div id="loginMsg" style="text-align:center;font-size:11px;color:#888;margin-top:8px"></div>
+<div id="autoTrackInfo" style="text-align:center;font-size:9px;color:#00ff88;margin-top:8px">🟢 Tracking pengunjung aktif...</div>
 </div>
 
 <div id="adminPanel" style="display:none">
 <div class="card" style="border-color:#00ff88;padding:10px">
-<div style="font-size:11px">Juragan: <b style="color:#00ff88">servicehpmaja@gmail.com</b> | ID A | <span id="countReq" style="background:#f59e0b;color:#000;padding:4px 8px;border-radius:8px;font-weight:900">0 Minta</span></div>
-<div style="font-size:10px;color:#888">Read: <span id="readCount">0</span> | 1 Player = 1 Card (Terbaru) | No Index Error</div>
+<div style="font-size:11px">Juragan: <b style="color:#00ff88">servicehpmaja@gmail.com</b> | <span id="countReq" style="background:#f59e0b;color:#000;padding:4px 8px;border-radius:8px;font-weight:900">0 Minta</span> | <span id="countVisit" style="background:#00ff88;color:#000;padding:4px 8px;border-radius:8px;font-weight:900">0 Visit</span></div>
+<div style="font-size:10px;color:#888">Read: <span id="readCount">0</span> | Tanpa Login = Tetap Ke-Track</div>
 </div>
 
 <div class="card">
-<div class="tabs"><div class="tab active" data-tab="saldo" onclick="switchTab('saldo')">💰 Tambah Saldo + Minta Coin</div><div class="tab" data-tab="pool" onclick="switchTab('pool')">🔥 Pool</div></div>
+<div class="tabs">
+<div class="tab active" data-tab="saldo" onclick="switchTab('saldo')">💰 Saldo</div>
+<div class="tab" data-tab="pool" onclick="switchTab('pool')">🔥 Pool</div>
+<div class="tab" data-tab="visit" onclick="switchTab('visit')">👁️ Pengunjung</div>
+<div class="tab" data-tab="tentang" onclick="switchTab('tentang')">ℹ️ Tentang</div>
+</div>
 
 <div id="tabSaldo">
 <div style="background:#1a1500;border:1px solid #f59e0b;border-radius:10px;padding:10px;margin-top:10px">
-<div style="font-size:11px;font-weight:900;color:#f59e0b">🔥 MINTA COIN DI ATAS 50RB - GROUP PER PLAYER (1 Player 1 Card Terbaru)</div>
+<div style="font-size:11px;font-weight:900;color:#f59e0b">🔥 MINTA COIN DI ATAS 50RB - GROUP PER PLAYER</div>
 <div id="pendingGrouped" style="margin-top:8px"><div style="text-align:center;color:#888;font-size:11px">Belum load</div></div>
-<button class="btn" style="width:100%;background:#f59e0b;color:#000;margin-top:8px;font-size:11px;font-weight:900" onclick="loadPendingGrouped()">🔄 REFRESH MINTA COIN (GROUP)</button>
-<button class="btn" style="width:100%;background:#333;color:#fff;border:1px solid #555;margin-top:6px;font-size:10px" onclick="bersihkanDuplikat()">🧹 BERSIHKAN DUPLIKAT - SISAKAN 1 TERBARU PER PLAYER</button>
+<button class="btn" style="width:100%;background:#f59e0b;color:#000;margin-top:8px;font-size:11px;font-weight:900" onclick="loadPendingGrouped()">🔄 REFRESH MINTA COIN</button>
+<button class="btn" style="width:100%;background:#333;color:#fff;border:1px solid #555;margin-top:6px;font-size:10px" onclick="bersihkanDuplikat()">🧹 BERSIHKAN DUPLIKAT</button>
 </div>
-
-<div style="display:flex;gap:6px;margin-top:12px"><input id="searchEmail" type="text" placeholder="Cari email... contoh: agus" value=""><button class="btnSearch" onclick="searchEmailOnly()">Cari</button></div>
+<div style="display:flex;gap:6px;margin-top:12px"><input id="searchEmail" type="text" placeholder="Cari email..."><button class="btnSearch" onclick="searchEmailOnly()">Cari</button></div>
 <div style="display:flex;gap:6px;margin-top:6px">
-<button class="btn" style="flex:1;background:#222;color:#fff;border:1px solid #555;font-size:11px" onclick="loadEmailOnly()">Load 20 Email Only</button>
-<button class="btn" style="flex:1;background:#222;color:#fff;border:1px solid #555;font-size:11px" onclick="loadJuraganOnly()">Cari Juragan Aja</button>
+<button class="btn" style="flex:1;background:#222;color:#fff;border:1px solid #555;font-size:11px" onclick="loadEmailOnly()">Load 20 Email</button>
+<button class="btn" style="flex:1;background:#222;color:#fff;border:1px solid #555;font-size:11px" onclick="loadJuraganOnly()">Juragan Aja</button>
 </div>
 <div id="playerList" class="gridPlayer"><div style="text-align:center;color:#666;padding:20px;font-size:11px">Klik Load 20 Email Only</div></div>
 </div>
@@ -89,9 +116,57 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 <button class="btn" style="width:100%;background:#ff4444;color:#fff;margin-top:8px" onclick="resetPool()">⚠️ RESET POOL 0</button>
 </div>
 
+<div id="tabVisit" style="display:none">
+<div style="background:#0a1a0a;border:1px solid #00ff88;border-radius:10px;padding:10px;margin-top:10px">
+<div style="font-size:11px;font-weight:900;color:#00ff88">👁️ TRACK PENGUNJUNG TANPA LOGIN</div>
+<div style="font-size:10px;color:#aaa;margin-top:4px">Setiap orang buka link portal.html / tentang-ruang-sadar.html langsung ke-log kesini walau tanpa login.</div>
+<div style="display:flex;gap:6px;margin-top:8px">
+<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#00ff88" id="statTotal">0</div><div style="font-size:9px;color:#888">Total Buka</div></div>
+<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#ffd84d" id="statHari">0</div><div style="font-size:9px;color:#888">Hari Ini</div></div>
+<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#25D366" id="statWa">0</div><div style="font-size:9px;color:#888">Share WA</div></div>
+</div>
+</div>
+<button class="btn" style="width:100%;background:#00ff88;color:#000;margin-top:8px;font-size:11px;font-weight:900" onclick="loadVisits()">🔄 REFRESH PENGUNJUNG</button>
+<button class="btn" style="width:100%;background:#222;color:#fff;border:1px solid #555;margin-top:6px;font-size:10px" onclick="hapusVisits()">🗑️ HAPUS LOG 7 HARI LALU</button>
+<div id="visitList" style="margin-top:10px;max-height:60vh;overflow-y:auto"><div style="text-align:center;color:#888;font-size:11px;padding:20px">Belum load</div></div>
+</div>
+
+<div id="tabTentang" style="display:none">
+<div style="background:linear-gradient(135deg,#1a4aff,#0f2da0);border-radius:14px;padding:14px;margin-top:10px">
+<div style="font-weight:900;font-size:14px">Tentang RUANG SADAR</div>
+<div style="font-size:11px;color:#d0d8ff;margin-top:6px;line-height:1.6">Portal edukasi interaktif untuk membongkar ilusi judi online. Tidak mengajarkan cara main, tapi cara SADAR kalau sedang ditipu sistem. 100% EDUKASI.</div>
+<div style="margin-top:8px;background:#fff;color:#1a4aff;font-size:10px;font-weight:900;padding:4px 10px;border-radius:20px;display:inline-block">BUKAN JUDI BENERAN</div>
+</div>
+
+<div style="background:#fff;border-radius:14px;padding:12px;margin-top:10px;color:#000">
+<div style="font-weight:900;font-size:12px">🤝 Dukung Gerakan Berhenti Judol</div>
+<div style="font-size:11px;color:#444;margin-top:6px;line-height:1.6">Jika kamu setuju dengan misi RUANG SADAR, <b>tolong bagikan link ini ke teman/keluarga.</b> Satu share bisa selamatkan satu keluarga.<br><br>Jika berkenan donasi untuk pengembangan aplikasi, silahkan tap QRIS di bawah ini.</div>
+<button onclick="document.getElementById('qrisModal').classList.remove('hidden')" style="width:100%;background:linear-gradient(90deg,#1a4aff,#3b66ff);color:#fff;padding:12px;border-radius:10px;font-weight:900;border:none;margin-top:10px;font-size:12px">📱 Tap untuk Donasi via QRIS</button>
+<div style="font-size:9px;color:#888;text-align:center;margin-top:4px">QRIS - DANA/OVO/Gopay/ShopeePay/MBanking</div>
+<div style="display:flex;gap:6px;margin-top:10px">
+<button onclick="shareToWA()" style="flex:1;background:#25D366;color:#fff;padding:12px;border-radius:10px;font-weight:900;border:none;font-size:11px">🔗 Bagikan ke WA</button>
+<button onclick="window.open('portal.html','_blank')" style="flex:1;background:#111;color:#fff;border:1px solid #333;padding:12px;border-radius:10px;font-weight:800;font-size:11px">Portal</button>
 </div>
 </div>
 
+<div style="background:#161616;border:1px solid #222;border-radius:10px;padding:10px;margin-top:10px">
+<div style="font-weight:900;font-size:11px;color:#ffd84d">4 FASE JEBAKAN JUDOL</div>
+<div style="font-size:10px;color:#aaa;margin-top:6px;line-height:1.6">1. DIKASIH MENANG - sengaja dikasih menang awal<br>2. DITAHAN - saldo naik-turun biar penasaran<br>3. DIKURAS - mulai kalah beruntun<br>4. DISEDOT HABIS - total kalah, sistem memang begitu</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="qrisModal" class="legendOverlay" onclick="this.classList.remove('show')">
+<div class="legendBox" onclick="event.stopPropagation()" style="background:#fff;border-color:#1a4aff">
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:900;color:#000;font-size:12px">Donasi RUANG SADAR</div><button onclick="document.getElementById('qrisModal').classList.remove('show')" style="width:28px;height:28px;background:#eee;border-radius:50%;border:none">✕</button></div>
+<div style="margin-top:10px;background:#f5f5f5;border:2px dashed #ccc;border-radius:12px;padding:8px">
+<img src="qris.jpg" style="width:100%;border-radius:10px" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='+encodeURIComponent(location.href)">
+</div>
+<div style="font-size:10px;color:#666;margin-top:8px">Terima kasih orang baik! 🙏 Donasi dipakai untuk hosting & edukasi baru.</div>
+</div>
 </div>
 
 <div id="legendOK" class="legendOverlay" onclick="this.classList.remove('show')"><div class="legendBox" onclick="event.stopPropagation()"><div class="legendTitle" id="okTitle">LEGENDS</div><div class="legendMsg" id="okMsg"></div><button class="btnOk" style="width:100%" onclick="document.getElementById('legendOK').classList.remove('show')">OK</button></div></div>
@@ -108,7 +183,36 @@ firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(); const db=firebase.firestore();
 let readCounter=0, playersCache={}, confirmCb=null, inputCb=null, resetCb=null, groupedMap={};
 const JURAGAN="servicehpmaja@gmail.com";
-function switchTab(n){document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));document.querySelector(`.tab[data-tab="${n}"]`)?.classList.add("active");document.getElementById("tabSaldo").style.display=n==="saldo"?"block":"none";document.getElementById("tabPool").style.display=n==="pool"?"block":"none"; if(n==="pool") refreshPool();}
+
+// === TRACKER TANPA LOGIN - AUTO JALAN BAHKAN SEBELUM LOGIN ===
+(function autoTrack(){
+  const data = {
+    page: location.pathname + location.search,
+    url: location.href,
+    ref: document.referrer || 'direct',
+    ua: navigator.userAgent,
+    lang: navigator.language,
+    screen: window.screen.width + 'x' + window.screen.height,
+    time: firebase.firestore.FieldValue.serverTimestamp(),
+    dateStr: new Date().toISOString().slice(0,10)
+  };
+  // simpan ke 2 tempat: page_visits (untuk portal) & admin_visits (untuk admin ini)
+  db.collection("page_visits").add(data).catch(()=>{});
+  db.collection("admin_visits").add(data).catch(()=>{});
+  // hit countapi juga biar ada total
+  fetch(`https://api.countapi.xyz/hit/ruangsadar-${firebaseConfig.projectId}/total`).catch(()=>{});
+})();
+
+function switchTab(n){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelector(`.tab[data-tab="${n}"]`)?.classList.add("active");
+  document.getElementById("tabSaldo").style.display=n==="saldo"?"block":"none";
+  document.getElementById("tabPool").style.display=n==="pool"?"block":"none";
+  document.getElementById("tabVisit").style.display=n==="visit"?"block":"none";
+  document.getElementById("tabTentang").style.display=n==="tentang"?"block":"none";
+  if(n==="pool") refreshPool();
+  if(n==="visit") loadVisits();
+}
 function incRead(n){readCounter+=n; document.getElementById("readCount").textContent=readCounter;}
 function showOK(t,m){document.getElementById("okTitle").textContent=t;document.getElementById("okMsg").innerHTML=m;document.getElementById("legendOK").classList.add("show");}
 function showConfirm(t,m,cb){document.getElementById("confirmTitle").textContent=t;document.getElementById("confirmMsg").innerHTML=m;confirmCb=cb;document.getElementById("legendConfirm").classList.add("show");}
@@ -134,15 +238,15 @@ function loginA(){
   document.getElementById("adminPanel").style.display="block";
   loadPendingGrouped();
   loadEmailOnly();
+  loadVisits();
  }).catch(e=>{
   document.getElementById("loginBox").style.display="none";
   document.getElementById("adminPanel").style.display="block";
   loadPendingGrouped();
   loadEmailOnly();
+  loadVisits();
  });
 }
-
-// === BARU: GROUPED MINTA COIN 1 PLAYER = 1 CARD TERBARU ===
 async function loadPendingGrouped(){
  try{
   document.getElementById("pendingGrouped").innerHTML="<div style='text-align:center;padding:10px;font-size:11px'>⏳ Load & Group per player...</div>";
@@ -163,7 +267,7 @@ async function loadPendingGrouped(){
   });
   groupedMap=grouped;
   let count=Object.keys(grouped).length;
-  document.getElementById("countReq").textContent=count+" Player Minta ("+snap.size+" request)";
+  document.getElementById("countReq").textContent=count+" Player Minta ("+snap.size+" req)";
   if(count===0){document.getElementById("pendingGrouped").innerHTML="<div style='text-align:center;color:#888;font-size:11px'>Tidak ada yang minta</div>";return;}
   let html="";
   for(let uid in grouped){
@@ -173,7 +277,7 @@ async function loadPendingGrouped(){
    let coin=0; if(pDoc && pDoc.exists) coin=pDoc.data().wallet?.coin||0;
    let t = g.timeObj && g.timeObj.toDate ? g.timeObj.toDate().toLocaleString() : '';
    let dup = g.allIds.length;
-   html+=`<div class="playerCard hasMinta"><div style="font-weight:900;font-size:12px">📧 ${g.email||uid.substring(0,10)} <span style="background:#f59e0b;color:#000;padding:2px 6px;border-radius:6px;font-size:9px">MINTA ${Number(g.amount).toLocaleString()}</span> ${dup>1?`<span style="background:#ff4444;color:#fff;padding:2px 6px;border-radius:6px;font-size:9px">${dup}x</span>`:''}</div><div style="font-size:10px;color:#888">UID:${uid.substring(0,12)}... | Saldo:${Number(coin).toLocaleString()} Coin</div><div class="reqBox"><div style="font-weight:900;color:#92400e">💰 Minta: ${Number(g.amount).toLocaleString()} Coin</div><div style="font-size:11px">Donasi: <b>Rp ${g.donasi}</b></div><div style="font-size:9px;color:#888">${t} ${dup>1?`• ${dup} request, hanya terbaru ditampilkan`:''}</div><div class="flex2"><button class="btnHijau" onclick="approveGrouped('${g.id}','${uid}',${g.amount})">✅ SETUJUI</button><button class="btnMerah" onclick="rejectGrouped('${g.id}')">❌ CANCEL</button></div></div></div>`;
+   html+=`<div class="playerCard hasMinta"><div style="font-weight:900;font-size:12px">📧 ${g.email||uid.substring(0,10)} <span style="background:#f59e0b;color:#000;padding:2px 6px;border-radius:6px;font-size:9px">MINTA ${Number(g.amount).toLocaleString()}</span> ${dup>1?`<span style="background:#ff4444;color:#fff;padding:2px 6px;border-radius:6px;font-size:9px">${dup}x</span>`:''}</div><div style="font-size:10px;color:#888">UID:${uid.substring(0,12)}... | Saldo:${Number(coin).toLocaleString()} Coin</div><div class="reqBox"><div style="font-weight:900;color:#92400e">💰 Minta: ${Number(g.amount).toLocaleString()} Coin</div><div style="font-size:11px">Donasi: <b>Rp ${g.donasi}</b></div><div style="font-size:9px;color:#888">${t} ${dup>1?`• ${dup} request`:''}</div><div class="flex2"><button class="btnHijau" onclick="approveGrouped('${g.id}','${uid}',${g.amount})">✅ SETUJUI</button><button class="btnMerah" onclick="rejectGrouped('${g.id}')">❌ CANCEL</button></div></div></div>`;
   }
   document.getElementById("pendingGrouped").innerHTML=html;
  }catch(e){document.getElementById("pendingGrouped").innerHTML="<div style='color:#ff4444;font-size:11px'>Error: "+e.message+"</div>";}
@@ -181,7 +285,7 @@ async function loadPendingGrouped(){
 async function approveGrouped(reqId,uid,amount){
  let g=groupedMap[uid];
  let allIds=g?g.allIds:[reqId];
- if(!confirm("SETUJUI "+Number(amount).toLocaleString()+" Coin untuk "+(g?g.email:uid)+"?\nCoin akan nambah ke peminta dan "+(allIds.length-1)+" duplikat lama akan dihapus.")) return;
+ if(!confirm("SETUJUI "+Number(amount).toLocaleString()+" Coin untuk "+(g?g.email:uid)+"?")) return;
  try{
   let ref=db.collection("players").doc(uid);
   let snap=await ref.get();
@@ -191,7 +295,7 @@ async function approveGrouped(reqId,uid,amount){
    if(id===reqId) await db.collection("coin_requests").doc(id).update({status:"approved",approvedAt:firebase.firestore.FieldValue.serverTimestamp(),approvedBy:"ADMIN A"});
    else await db.collection("coin_requests").doc(id).update({status:"rejected",note:"duplikat group"});
   }
-  showOK("BERHASIL","✅ "+Number(amount).toLocaleString()+" Coin ditambahkan ke "+(g?g.email:uid));
+  showOK("BERHASIL","✅ "+Number(amount).toLocaleString()+" Coin ditambahkan");
   loadPendingGrouped(); loadEmailOnly();
  }catch(e){showOK("GAGAL",e.message);}
 }
@@ -200,18 +304,16 @@ async function rejectGrouped(reqId){
  try{ await db.collection("coin_requests").doc(reqId).update({status:"rejected"}); showOK("OK","Di-CANCEL"); loadPendingGrouped(); loadEmailOnly(); }catch(e){showOK("GAGAL",e.message);}
 }
 async function bersihkanDuplikat(){
- if(!confirm("Bersihkan duplikat? Hanya sisakan 1 terbaru per player")) return;
+ if(!confirm("Bersihkan duplikat?")) return;
  try{
   let snap=await db.collection("coin_requests").where("status","==","pending").limit(50).get();
   let grouped={};
   snap.forEach(doc=>{let d=doc.data(); let uid=d.userId; if(!uid) return; let time=d.createdAt&&d.createdAt.toMillis?d.createdAt.toMillis():0; if(!grouped[uid]) grouped[uid]=[]; grouped[uid].push({id:doc.id,time:time});});
   let del=0;
   for(let uid in grouped){let arr=grouped[uid].sort((a,b)=>b.time-a.time); for(let i=1;i<arr.length;i++){await db.collection("coin_requests").doc(arr[i].id).update({status:"rejected",note:"hapus duplikat"}); del++;}}
-  showOK("SELESAI","Dihapus "+del+" duplikat. Sekarang 1 player = 1 request"); loadPendingGrouped();
+  showOK("SELESAI","Dihapus "+del+" duplikat"); loadPendingGrouped();
  }catch(e){showOK("GAGAL",e.message);}
 }
-
-// === DATA LAMA TETAP SAMA ===
 async function loadEmailOnly(){
  try{
   document.getElementById("playerList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Scan 50 doc...</div>";
@@ -222,7 +324,6 @@ async function loadEmailOnly(){
   let html="";playersCache={};
   filtered.forEach(item=>{
    let uid=item.doc.id; playersCache[uid]=item.doc.data();
-   let hasMinta = groupedMap[uid] ? true : false;
    let g=groupedMap[uid];
    html+=playerCardHtmlOld(uid,item.b,g);
   });
@@ -264,6 +365,58 @@ function openKurang(uid){let p=playersCache[uid];let b=extractBank(p); showInput
 async function refreshPool(){try{document.getElementById("poolInfo").innerHTML="⏳ Loading..."; let snap=await db.collection("global").doc("pool").get(); incRead(1); if(!snap.exists){document.getElementById("poolInfo").innerHTML="❌ global/pool belum ada";return;} let d=snap.data(); document.getElementById("poolInfo").innerHTML=`Pool: <b style="color:#00ff88">Rp${Number(d.pool||0).toLocaleString()}</b><br>Profit: Rp${Number(d.profit||0).toLocaleString()}<br>Bet: Rp${Number(d.totalBet||0).toLocaleString()}`;}catch(e){document.getElementById("poolInfo").innerHTML="Error: "+e.message;}}
 function addPool(){ showInput("TAMBAH SALDO POOL","Jumlah tambah ke pool:", (data)=>{ let amt=Number(data.amount); if(!amt||amt<=0){showOK("LEGENDS","Tidak valid");return;} let note=data.note||"tambah manual A"; showConfirm("KONFIRMASI","Tambah Rp"+amt.toLocaleString()+" ke Pool?", async ()=>{ try{ await db.collection("global").doc("pool").set({ pool: firebase.firestore.FieldValue.increment(amt), lastUpdate: firebase.firestore.FieldValue.serverTimestamp(), lastAddBy: "ADMIN A", lastAddNote: note, lastAddAmount: amt },{merge:true}); incRead(1); showOK("BERHASIL","✅ Pool +Rp"+amt.toLocaleString()); refreshPool(); }catch(e){showOK("Gagal",e.message);} }); });}
 function resetPool(){showReset((val)=>{if(val!=="RESET"){showOK("BATAL","Ketik RESET");return;} showConfirm("YAKIN RESET?","Reset pool jadi 0?", async ()=>{try{await db.collection("global").doc("pool").set({pool:0,profit:0,totalBet:0,lastUpdate:firebase.firestore.FieldValue.serverTimestamp(),resetBy:"ADMIN A"},{merge:true}); incRead(1); showOK("OK","Pool direset 0"); refreshPool();}catch(e){showOK("Gagal",e.message);}});});}
+
+// === FITUR BARU: PENGUNJUNG TANPA LOGIN ===
+async function loadVisits(){
+ try{
+  document.getElementById("visitList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Load kunjungan...</div>";
+  let snap = await db.collection("page_visits").orderBy("time","desc").limit(50).get();
+  incRead(snap.size);
+  document.getElementById("statTotal").textContent = snap.size + " (50 terbaru)";
+  document.getElementById("countVisit").textContent = snap.size + " Visit";
+  // hitung hari ini
+  let today = new Date().toISOString().slice(0,10);
+  let hariIni = 0;
+  let html="";
+  snap.forEach(doc=>{
+    let d=doc.data();
+    let t = d.time && d.time.toDate ? d.time.toDate().toLocaleString('id-ID') : 'baru';
+    if(d.dateStr===today) hariIni++;
+    let isWA = (d.page||'').includes('wa') || (d.url||'').includes('wa') ? '💬 WA' : '👁️';
+    html+=`<div class="visitCard"><div style="display:flex;justify-content:space-between"><b style="color:#00ff88">${isWA} ${d.page||'/'} </b><span style="color:#888;font-size:9px">${t}</span></div><div style="color:#aaa;margin-top:4px">🔗 ${ (d.url||'').substring(0,60) }...</div><div style="color:#666;margin-top:2px">📱 ${ (d.ua||'').substring(0,70) } | ref: ${ (d.ref||'-').substring(0,30) }</div></div>`;
+  });
+  document.getElementById("statHari").textContent = hariIni;
+  document.getElementById("visitList").innerHTML = html || "<div style='text-align:center;color:#888'>Belum ada pengunjung</div>";
+  // load countapi
+  fetch(`https://api.countapi.xyz/get/ruangsadar-${firebaseConfig.projectId}/total`).then(r=>r.json()).then(j=>{ if(j.value) document.getElementById("statTotal").textContent=j.value; }).catch(()=>{});
+  fetch(`https://api.countapi.xyz/get/ruangsadar-${firebaseConfig.projectId}/share_wa`).then(r=>r.json()).then(j=>{ if(j.value) document.getElementById("statWa").textContent=j.value; }).catch(()=>{});
+ }catch(e){
+  document.getElementById("visitList").innerHTML="<div style='color:#ff4444;font-size:11px'>Error: "+e.message+"<br>Pastikan Rules Firestore page_visits allow read/write true</div>";
+ }
+}
+async function hapusVisits(){
+ if(!confirm("Hapus log lama?")) return;
+ try{
+  let snap = await db.collection("page_visits").limit(20).get();
+  let del=0;
+  for(let doc of snap.docs){
+    let d=doc.data();
+    if(d.time && d.time.toDate){
+      let diff = (Date.now() - d.time.toDate().getTime())/(1000*3600*24);
+      if(diff>7){ await doc.ref.delete(); del++; }
+    }
+  }
+  showOK("SELESAI","Dihapus "+del+" log >7 hari");
+  loadVisits();
+ }catch(e){showOK("GAGAL",e.message);}
+}
+function shareToWA(){
+  const url = location.href.replace(/admin.*\.html/,'portal.html');
+  const text = `Aku baru sadar judol itu nipu sistem! Coba cek RUANG SADAR ini biar kamu juga sadar:\n\n${url}\n\nShare ke keluarga biar gak ada yang ketipu lagi 🙏\n\nJika setuju bagikan link ini, bila mau berdonasi untuk pengembangan aplikasi silahkan tap QRIS di halaman Tentang.`;
+  fetch(`https://api.countapi.xyz/hit/ruangsadar-${firebaseConfig.projectId}/share_wa`).catch(()=>{});
+  db.collection("page_visits").add({page:"share_wa",url:url,time:firebase.firestore.FieldValue.serverTimestamp(),ua:navigator.userAgent,ref:"wa_share",dateStr:new Date().toISOString().slice(0,10)}).catch(()=>{});
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank');
+}
 </script>
 </body>
 </html>
