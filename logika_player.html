@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SIMULATOR - SCATTER = 10 FREE SPIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:100%;min-height:100dvh;font-family:Arial;background:#08080a;color:#fff;display:flex;justify-content:center}
+.mainShell{width:100%;max-width:540px;min-height:100dvh;display:flex;flex-direction:column;gap:8px;padding:8px 10px 20px}
+.panel{background:linear-gradient(180deg,#1e1e24,#121215);border:1px solid #ffffff18;border-radius:16px;padding:10px 12px}
+.topPanel{text-align:center}
+#topWinDisplay{font-size:18px;font-weight:900}
+#cycleDisplay{font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;display:inline-block;margin-top:4px}
+#globalInfo{font-size:8px;color:#aaa;margin-top:4px}
+.board{flex:1;display:flex;justify-content:center;align-items:center;min-height:320px;background:radial-gradient(ellipse at center,#1e1e26 0%,#08080a 100%)}
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:100%;aspect-ratio:1/1;max-height:62vh}
+.cell{aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:26px;background:#ffffff08;border:1px solid #ffffff0f;border-radius:8px}
+.cell.scatter{background:radial-gradient(circle at 50% 50%,rgba(255,215,0,0.4),rgba(255,215,0,0.05) 45%,transparent 75%)!important;box-shadow:0 0 12px gold}
+.featureRow{display:flex;justify-content:space-between;align-items:center;background:#1e1e26;border-radius:12px;padding:8px;border:1px solid #ffffff10}
+.sadow-btn{background:linear-gradient(180deg,#3a3a42,#1e1e22);border:1px solid #ffffff20;border-radius:10px;color:#fff;font-weight:900;padding:6px 10px;cursor:pointer;min-width:60px;text-align:center}
+#spinBtn{width:72px;height:72px;border-radius:50%;border:3px solid #fff;background:linear-gradient(180deg,#b8ff44,#2e7d00);display:flex;align-items:center;justify-content:center;font-size:30px}
+.bottomStats{display:flex;gap:8px}
+.saldoDisplay,.betDisplay{flex:1;text-align:center;background:#22222a;border-radius:10px;padding:8px;border:1px solid #ffffff15}
+.saldoDisplay span,.betDisplay span{display:block;font-size:7px;color:#aaa;font-weight:900}
+.saldoDisplay b,.betDisplay b{font-size:14px}
+#message{flex:1;text-align:center;font-size:9px;font-weight:800;background:#0006;border-radius:8px;padding:6px;min-height:22px;display:flex;align-items:center;justify-content:center}
+.comboPopup{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);font-size:26px;font-weight:bold;color:#fff;text-shadow:0 0 12px #000;pointer-events:none;animation:pop 1s forwards;z-index:9999;text-align:center}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
+#freeSpinPopup{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:99999}
+.popupBox{width:min(92vw,400px);background:#1e1e24;border:1px solid #ffffff20;border-radius:18px;padding:18px;text-align:center}
+.log{max-height:160px;overflow:auto;background:#0006;border-radius:10px;padding:8px;font-size:10px;border:1px solid #ffffff0f;margin-top:8px}
+.b-win{background:#00ff8820;color:#00ff88;padding:2px 6px;border-radius:10px;font-size:9px} 
+.b-lose{background:#ff555520;color:#ff5555;padding:2px 6px;border-radius:10px;font-size:9px} 
+.b-scat{background:#ffe60020;color:#ffe600;padding:2px 6px;border-radius:10px;font-size:9px}
+.b-free{background:#00e5ff20;color:#00e5ff;padding:2px 6px;border-radius:10px;font-size:9px}
+</style>
+</head>
+<body>
+<div class="mainShell">
+  <div class="panel topPanel">
+    <div style="font-size:9px;color:#00ff88;font-weight:900">SIMULATOR TANPA FIREBASE - SCATTER = 10 FREE SPIN</div>
+    <div id="topWinDisplay">💰 MENANG : Rp 0</div>
+    <div id="cycleDisplay" style="background:#ff555520;color:#ff5555;border:1px solid #ff555533">FASE NYEDOT: 20k → 1k (70% ZONK)</div>
+    <div id="globalInfo">Pola: Deposit 20k → sisa 1k → SCATTER=10 FREE (45k) → 2 spin → SCATTER=10+5 FREE (52k)</div>
+  </div>
+  <div class="panel board"><div id="grid"></div></div>
+  <div class="panel">
+    <div class="featureRow">
+      <div class="sadow-btn" id="autoBtn">🎡 AUTO 20</div>
+      <div id="message">Spin - saldo akan nyedot ke 1k dulu</div>
+      <div class="sadow-btn" id="resetBtn">🔄 RESET 20K</div>
+    </div>
+    <div class="featureRow" style="justify-content:center;gap:12px;margin-top:8px">
+      <div class="sadow-btn" id="betMinus">−</div>
+      <button id="spinBtn">⟳</button>
+      <div class="sadow-btn" id="betPlus">+</div>
+    </div>
+    <div class="bottomStats" style="margin-top:8px">
+      <div class="saldoDisplay"><span>SALDO VIRTUAL</span><b id="score">20.000</b></div>
+      <div class="betDisplay"><span>BET</span><b id="betText">200</b></div>
+    </div>
+    <div class="log" id="logBox"></div>
+  </div>
+</div>
+<div id="freeSpinPopup"><div class="popupBox">
+  <div id="popupTitle" style="font-size:18px;font-weight:900;color:#ffcc00">🎉 SCATTER! 🎉</div>
+  <div id="popupDiamond" style="font-size:40px;margin:8px 0">💎💎💎💎</div>
+  <div id="scatterInfo" style="font-size:12px;color:#ddd;margin:8px 0"></div>
+  <button id="popupOk" style="width:100%;padding:12px;background:#2e7d00;color:#fff;border:2px solid #fff;border-radius:10px;font-weight:900">GASS 10 FREE SPIN!</button>
+</div></div>
+<script>
+const ROWS=5,COLS=5;
+const symbols=["🍎","🍓","🍍","🥝","🍇","🥭","🍒","🍉","🥥"];
+const SCATTER="💎";
+let board=[],score=20000,currentBet=200,spinning=false;
+let spinTotal=0,firstScatterDone=false,secondScatterDone=false,spinsAfterFirstFree=0;
+let freeSpins=0,inFreeSpin=false,freeSpinAccumulated=0,freeSpinWinCap=0,freeSession=0;
+let tumbleWin=0,globalPool=100000;
+let BET_LEVELS=[]; for(let v=200;v<=2000;v+=200) BET_LEVELS.push(v);
+let betIndex=0;
+
+const grid=document.getElementById('grid'), scoreEl=document.getElementById('score'), betEl=document.getElementById('betText'), msgEl=document.getElementById('message'), cycleEl=document.getElementById('cycleDisplay'), logBox=document.getElementById('logBox');
+
+function log(t,cls="b-lose"){ const d=document.createElement('div'); d.innerHTML=`${t} <span class="${cls}">${cls.replace('b-','').toUpperCase()}</span>`; logBox.appendChild(d); logBox.scrollTop=logBox.scrollHeight; }
+function updateUI(){
+  scoreEl.textContent=score.toLocaleString('id-ID');
+  betEl.textContent=currentBet.toLocaleString('id-ID');
+  if(inFreeSpin){
+    cycleEl.textContent=`FREE SPIN ${freeSpins} | ${freeSpinAccumulated.toLocaleString('id-ID')}/${freeSpinWinCap.toLocaleString('id-ID')} | Sesi ${freeSession}`;
+    cycleEl.style.background="#00ff8820"; cycleEl.style.color="#00ff88"; cycleEl.style.border="1px solid #00ff8833";
+  } else if(!firstScatterDone){
+    cycleEl.textContent=`NYEDOT: Spin ${spinTotal} - Saldo ${score.toLocaleString('id-ID')} → target 1k dulu 📉`;
+    cycleEl.style.background="#ff555520"; cycleEl.style.color="#ff5555";
+  } else if(firstScatterDone && spinsAfterFirstFree<2){
+    cycleEl.textContent=`Setelah FREE 45k - Jeda ${spinsAfterFirstFree}/2 spin → Scatter lagi`;
+    cycleEl.style.background="#00e5ff20"; cycleEl.style.color="#00e5ff";
+  } else {
+    cycleEl.textContent=`Siap Scatter #2 - Pola: 10 FREE +5 FS = 52k`;
+    cycleEl.style.background="#ffe60020"; cycleEl.style.color="#ffe600";
+  }
+}
+function showMsg(t){ msgEl.textContent=t; }
+function randomFruit(){ return symbols[Math.floor(Math.random()*symbols.length)]; }
+function isScatter(v){ return v===SCATTER; }
+function createBoard(){ board=[]; for(let r=0;r<ROWS;r++){ let row=[]; for(let c=0;c<COLS;c++) row.push(randomFruit()); board.push(row); } drawBoard(); }
+function drawBoard(){ grid.innerHTML=""; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ const cell=document.createElement('div'); cell.className='cell'; const v=board[r][c]; if(isScatter(v)) cell.classList.add('scatter'); cell.textContent=v; grid.appendChild(cell); } }
+function countScatter(){ let cnt=0; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(isScatter(board[r][c])) cnt++; return cnt; }
+
+function generateBoard(forceScatter=false){
+  let newBoard=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  let scatterCount=0;
+  if(forceScatter) scatterCount=4;
+  else if(inFreeSpin && Math.random()<0.18) scatterCount=Math.random()<0.5?1:2; // retrigger kecil di free
+  else scatterCount=0;
+
+  let allPos=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) allPos.push({r,c});
+  allPos.sort(()=>Math.random()-0.5);
+  let scatPos=allPos.slice(0,scatterCount);
+  scatPos.forEach(p=>newBoard[p.r][p.c]=SCATTER);
+
+  if(!forceScatter){
+    // Biar ada yang pecah / tidak ZONK total saat free
+    let winSym=symbols[Math.floor(Math.random()*symbols.length)];
+    let winCount=inFreeSpin?7+Math.floor(Math.random()*3):0;
+    if(winCount>0){
+      let avail=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(newBoard[r][c]!==SCATTER) avail.push({r,c});
+      avail.sort(()=>Math.random()-0.5);
+      for(let i=0;i<Math.min(winCount,avail.length);i++) newBoard[avail[i].r][avail[i].c]=winSym;
+      for(let i=winCount;i<avail.length;i++){ let p=avail[i]; if(!newBoard[p.r][p.c]) newBoard[p.r][p.c]=randomFruit(); }
+    } else {
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(!newBoard[r][c]) newBoard[r][c]=randomFruit();
+    }
+  } else {
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(!newBoard[r][c]) newBoard[r][c]=randomFruit();
+  }
+  return {board:newBoard, scatPos};
+}
+
+function showWin(t){ const d=document.createElement('div'); d.className='comboPopup'; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),1000); }
+function showPopup(title,info,btnText="GASS 10 FREE SPIN!"){ return new Promise(res=>{ document.getElementById('popupTitle').textContent=title; document.getElementById('scatterInfo').innerHTML=info; document.getElementById('popupOk').textContent=btnText; document.getElementById('freeSpinPopup').style.display='flex'; document.getElementById('popupOk').onclick=()=>{ document.getElementById('freeSpinPopup').style.display='none'; res(); }; }); }
+
+async function spin(){
+  if(spinning || inFreeSpin) return;
+  if(score<currentBet){ showMsg("Saldo habis - RESET"); return; }
+  spinning=true; spinTotal++;
+
+  // CEK TRIGGER SCATTER PERTAMA: saat saldo <=1200 dan belum pernah scatter
+  if(!firstScatterDone && score<=1200){
+    // SCATTER = 10 FREE SPIN dengan total 45k
+    let target=generateBoard(true);
+    board=target.board; drawBoard();
+    await new Promise(r=>setTimeout(r,300));
+    freeSession=1;
+    freeSpinWinCap=45000;
+    freeSpinAccumulated=0;
+    freeSpins=10;
+    inFreeSpin=true;
+    await showPopup(`SCATTER #1! 10 FREE SPIN`, `Sesuai data kamu:<br>Saldo sisa ~1k → Dapat 4 Scatter<br>= <b>10 Free Spin</b><br>Total Free nanti Rp45.000<br>Saldo saat ini Rp${score.toLocaleString('id-ID')}`, "GASS 10 FREE (45k)!");
+    log(`SCATTER #1 di saldo ${score.toLocaleString('id-ID')} → 10 FREE target 45k`, "b-scat");
+    await startFreeSpins();
+    spinning=false;
+    updateUI();
+    return;
+  }
+
+  // CEK TRIGGER SCATTER KEDUA: setelah 2 spin jeda dari free pertama
+  if(firstScatterDone && spinsAfterFirstFree>=2 && !secondScatterDone){
+    let target=generateBoard(true);
+    board=target.board; drawBoard();
+    await new Promise(r=>setTimeout(r,300));
+    freeSession=2;
+    freeSpinWinCap=52000;
+    freeSpinAccumulated=0;
+    freeSpins=10; // nanti +5
+    inFreeSpin=true;
+    await showPopup(`SCATTER #2! 10 FREE SPIN +5`, `Sesuai data kamu:<br>Setelah 2 spin, dapat Scatter lagi<br>= 10 Free Spin + 5 tambahan<br>= Total 15 Free Spin<br>Total menang sesi ini Rp52.000`, "GASS 10+5 FREE (52k)!");
+    log(`SCATTER #2 → 10+5 FREE target 52k`, "b-scat");
+    await startFreeSpins();
+    spinning=false;
+    updateUI();
+    return;
+  }
+
+  // SPIN BIASA - NYEDOT
+  score-=currentBet;
+  let target=generateBoard(false);
+  board=target.board; drawBoard();
+  await new Promise(r=>setTimeout(r,150));
+
+  // ZONK dominan saat nyedot
+  let isWin = Math.random()<0.18; // 18% win kecil saat nyedot
+  if(isWin && !firstScatterDone){
+    let win=Math.floor(currentBet*(0.3+Math.random()*0.5));
+    score+=win; tumbleWin+=win;
+    document.getElementById('topWinDisplay').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`;
+    log(`Spin ${spinTotal} +${win} - Saldo ${score.toLocaleString('id-ID')} (nyedot)`, "b-win");
+    showWin(`+${win}`);
+  } else {
+    log(`Spin ${spinTotal} ZONK -${currentBet} - Saldo ${score.toLocaleString('id-ID')}`, "b-lose");
+    if(firstScatterDone) spinsAfterFirstFree++;
+  }
+
+  showMsg(`Spin ${spinTotal} | Saldo ${score.toLocaleString('id-ID')} ${!firstScatterDone?'→ target 1k dulu':''}`);
+  updateUI();
+  spinning=false;
+}
+
+async function startFreeSpins(){
+  let total=0;
+  let spinsDone=0;
+  updateUI();
+  while(freeSpins>0){
+    freeSpins--; spinsDone++;
+    // Hitung win per free spin agar total pas target
+    let remaining=freeSpinWinCap-freeSpinAccumulated;
+    let remSpins=Math.max(1,freeSpins+1);
+    let win=Math.floor(remaining/remSpins * (0.8+Math.random()*0.6));
+    if(freeSpinAccumulated+win>freeSpinWinCap) win=Math.max(0,freeSpinWinCap-freeSpinAccumulated);
+
+    let target=generateBoard(false);
+    // Kadang di free kedua kasih retrigger +5 di tengah
+    if(freeSession==2 && spinsDone==6 && !secondScatterDone){
+      freeSpins+=5;
+      log(`FREE Sesi 2: Dapat tambahan 5 Free Spin! (retrigger) - Sisa ${freeSpins}`, "b-free");
+      await showPopup(`+5 FREE SPIN!`, `Sesuai data kamu:<br>Di sesi Scatter kedua dapat tambahan 5 Free Spin!<br>Sisa Free sekarang ${freeSpins}<br>Terkumpul ${freeSpinAccumulated}/${freeSpinWinCap}`, "LANJUT FREE!");
+    }
+
+    board=target.board; drawBoard();
+    await new Promise(r=>setTimeout(r,350));
+
+    if(win>0){
+      score+=win; freeSpinAccumulated+=win; total+=win; tumbleWin+=win;
+      document.getElementById('topWinDisplay').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`;
+      log(`FREE ${spinsDone} (${freeSpins} sisa) +${win} - ${freeSpinAccumulated}/${freeSpinWinCap}`, "b-free");
+      showWin(`FREE +${win}`);
+    } else {
+      log(`FREE ${spinsDone} ZONK`, "b-lose");
+    }
+    updateUI();
+  }
+
+  if(freeSession==1){
+    await showPopup(`FREE #1 SELESAI 🎉`, `Total Menang Free #1: Rp${total.toLocaleString('id-ID')} (45k)<br>Sesuai data kamu<br>Saldo sekarang Rp${score.toLocaleString('id-ID')}<br><br>Lanjut 2 spin biasa akan Scatter lagi 52k+5FS`, "LANJUT 2 SPIN");
+    log(`FREE #1 SELESAI total ${total} (45k) - Saldo ${score}`, "b-win");
+    firstScatterDone=true;
+    spinsAfterFirstFree=0;
+  } else {
+    await showPopup(`FREE #2 SELESAI 🎉`, `Total Menang Free #2: Rp${total.toLocaleString('id-ID')} (52k)<br>10 Free +5 Tambahan = 15 Free<br>Sesuai data kamu<br>Saldo akhir Rp${score.toLocaleString('id-ID')}`, "KLAIM 52k!");
+    log(`FREE #2 SELESAI total ${total} (52k) +5 FS - Saldo akhir ${score}`, "b-win");
+    secondScatterDone=true;
+  }
+
+  inFreeSpin=false;
+  updateUI();
+}
+
+document.getElementById('spinBtn').onclick=spin;
+document.getElementById('betMinus').onclick=()=>{ if(betIndex>0){ betIndex--; currentBet=BET_LEVELS[betIndex]; updateUI(); } };
+document.getElementById('betPlus').onclick=()=>{ if(betIndex<BET_LEVELS.length-1){ betIndex++; currentBet=BET_LEVELS[betIndex]; updateUI(); } };
+document.getElementById('resetBtn').onclick=()=>{
+  score=20000; spinTotal=0; firstScatterDone=false; secondScatterDone=false; spinsAfterFirstFree=0; freeSpins=0; inFreeSpin=false; tumbleWin=0; freeSession=0;
+  document.getElementById('topWinDisplay').textContent=`💰 MENANG : Rp 0`;
+  document.getElementById('logBox').innerHTML="";
+  log("RESET 20k - Akan NYEDOT ke 1k dulu, Scatter=10 FREE", "b-lose");
+  createBoard(); updateUI(); showMsg("RESET - Spin, akan nyedot ke 1k");
+};
+document.getElementById('autoBtn').onclick=async()=>{
+  for(let i=0;i<30;i++){
+    if(score<currentBet) break;
+    if(inFreeSpin) break;
+    await spin();
+    await new Promise(r=>setTimeout(r,400));
+    if(secondScatterDone) break;
+  }
+};
+
+createBoard(); updateUI();
+log("Deposit 20k - NYEDOT dulu ke 1k, Scatter=10 FREE", "b-lose");
+</script>
+</body>
+</html>
