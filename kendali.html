@@ -19,26 +19,6 @@
     return origAdd.call(this, type, listener, options);
   };
 })();
-</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
-<script>
-(function() {
-  if (window.__playableTouchPatchInstalled) return;
-  window.__playableTouchPatchInstalled = true;
-  var origAdd = EventTarget.prototype.addEventListener;
-  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
-  EventTarget.prototype.addEventListener = function(type, listener, options) {
-    if (blockedTypes[type]) {
-      if (options === undefined || options === null) {
-        options = { passive: true };
-      } else if (typeof options === 'boolean') {
-        options = { capture: options, passive: true };
-      } else {
-        options = Object.assign({}, options, { passive: true });
-      }
-    }
-    return origAdd.call(this, type, listener, options);
-  };
-})();
 </script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Admin Juragan + Pengunjung + Ruang Sadar</title>
@@ -64,7 +44,7 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 .btnHijau{flex:1;background:#00ff88;color:#000;padding:14px;border-radius:10px;font-weight:900;border:none;font-size:13px;cursor:pointer}
 .btnMerah{flex:1;background:#ff3b3b;color:#fff;padding:14px;border-radius:10px;font-weight:900;border:none;font-size:13px;cursor:pointer}
 .flex2{display:flex;gap:8px;margin-top:8px}
-.visitCard{background:#101010;border:1px solid #333;border-radius:10px;padding:10px;margin-bottom:8px;font-size:11px}
+.visitCard{background:#101010;border:1px solid #333;border-radius:10px;padding:10px;margin-bottom:8px;font-size:11px;line-height:1.5}
 .badge{display:inline-block;padding:2px 6px;border-radius:6px;font-size:9px;font-weight:900}
 </style>
 </head>
@@ -77,13 +57,13 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 <input id="adminPass" type="password" value="A" placeholder="Pass A">
 <button class="btn btnLogin" onclick="loginA()">LOGIN A</button>
 <div id="loginMsg" style="text-align:center;font-size:11px;color:#888;margin-top:8px"></div>
-<div id="autoTrackInfo" style="text-align:center;font-size:9px;color:#00ff88;margin-top:8px">🟢 Tracking pengunjung aktif...</div>
+<div id="autoTrackInfo" style="text-align:center;font-size:9px;color:#00ff88;margin-top:8px">🟢 Tracking pengunjung aktif... HP/Laptop/IP/WIFI ke-track</div>
 </div>
 
 <div id="adminPanel" style="display:none">
 <div class="card" style="border-color:#00ff88;padding:10px">
 <div style="font-size:11px">Juragan: <b style="color:#00ff88">servicehpmaja@gmail.com</b> | <span id="countReq" style="background:#f59e0b;color:#000;padding:4px 8px;border-radius:8px;font-weight:900">0 Minta</span> | <span id="countVisit" style="background:#00ff88;color:#000;padding:4px 8px;border-radius:8px;font-weight:900">0 Visit</span></div>
-<div style="font-size:10px;color:#888">Read: <span id="readCount">0</span> | Tanpa Login = Tetap Ke-Track</div>
+<div style="font-size:10px;color:#888">Read: <span id="readCount">0</span> | Tanpa Login = Tetap Ke-Track + Device</div>
 </div>
 
 <div class="card">
@@ -118,17 +98,17 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 
 <div id="tabVisit" style="display:none">
 <div style="background:#0a1a0a;border:1px solid #00ff88;border-radius:10px;padding:10px;margin-top:10px">
-<div style="font-size:11px;font-weight:900;color:#00ff88">👁️ TRACK PENGUNJUNG TANPA LOGIN</div>
-<div style="font-size:10px;color:#aaa;margin-top:4px">Setiap orang buka link portal.html / tentang-ruang-sadar.html langsung ke-log kesini walau tanpa login.</div>
+<div style="font-size:11px;font-weight:900;color:#00ff88">👁️ TRACK PENGUNJUNG TANPA LOGIN - DETAIL DEVICE</div>
+<div style="font-size:10px;color:#aaa;margin-top:4px">Setiap buka portal.html / login.html walau tanpa login: HP/Laptop, IP, RAM, Koneksi langsung ke-log. Email & Nama Wifi tidak bisa auto karena dibatasi browser.</div>
 <div style="display:flex;gap:6px;margin-top:8px">
 <div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#00ff88" id="statTotal">0</div><div style="font-size:9px;color:#888">Total Buka</div></div>
 <div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#ffd84d" id="statHari">0</div><div style="font-size:9px;color:#888">Hari Ini</div></div>
-<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#25D366" id="statWa">0</div><div style="font-size:9px;color:#888">Share WA</div></div>
+<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#25D366" id="statWa">0</div><div style="font-size:9px;color:#888">Tamu Device</div></div>
 </div>
 </div>
-<button class="btn" style="width:100%;background:#00ff88;color:#000;margin-top:8px;font-size:11px;font-weight:900" onclick="loadVisits()">🔄 REFRESH PENGUNJUNG</button>
+<button class="btn" style="width:100%;background:#00ff88;color:#000;margin-top:8px;font-size:11px;font-weight:900" onclick="loadVisits()">🔄 REFRESH PENGUNJUNG + DEVICE TAMU</button>
 <button class="btn" style="width:100%;background:#222;color:#fff;border:1px solid #555;margin-top:6px;font-size:10px" onclick="hapusVisits()">🗑️ HAPUS LOG 7 HARI LALU</button>
-<div id="visitList" style="margin-top:10px;max-height:60vh;overflow-y:auto"><div style="text-align:center;color:#888;font-size:11px;padding:20px">Belum load</div></div>
+<div id="visitList" style="margin-top:10px;max-height:70vh;overflow-y:auto"><div style="text-align:center;color:#888;font-size:11px;padding:20px">Belum load - klik Refresh</div></div>
 </div>
 
 <div id="tabTentang" style="display:none">
@@ -137,24 +117,21 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 <div style="font-size:11px;color:#d0d8ff;margin-top:6px;line-height:1.6">Portal edukasi interaktif untuk membongkar ilusi judi online. Tidak mengajarkan cara main, tapi cara SADAR kalau sedang ditipu sistem. 100% EDUKASI.</div>
 <div style="margin-top:8px;background:#fff;color:#1a4aff;font-size:10px;font-weight:900;padding:4px 10px;border-radius:20px;display:inline-block">BUKAN JUDI BENERAN</div>
 </div>
-
 <div style="background:#fff;border-radius:14px;padding:12px;margin-top:10px;color:#000">
 <div style="font-weight:900;font-size:12px">🤝 Dukung Gerakan Berhenti Judol</div>
 <div style="font-size:11px;color:#444;margin-top:6px;line-height:1.6">Jika kamu setuju dengan misi RUANG SADAR, <b>tolong bagikan link ini ke teman/keluarga.</b> Satu share bisa selamatkan satu keluarga.<br><br>Jika berkenan donasi untuk pengembangan aplikasi, silahkan tap QRIS di bawah ini.</div>
-<button onclick="document.getElementById('qrisModal').classList.remove('hidden')" style="width:100%;background:linear-gradient(90deg,#1a4aff,#3b66ff);color:#fff;padding:12px;border-radius:10px;font-weight:900;border:none;margin-top:10px;font-size:12px">📱 Tap untuk Donasi via QRIS</button>
+<button onclick="document.getElementById('qrisModal').classList.add('show')" style="width:100%;background:linear-gradient(90deg,#1a4aff,#3b66ff);color:#fff;padding:12px;border-radius:10px;font-weight:900;border:none;margin-top:10px;font-size:12px">📱 Tap untuk Donasi via QRIS</button>
 <div style="font-size:9px;color:#888;text-align:center;margin-top:4px">QRIS - DANA/OVO/Gopay/ShopeePay/MBanking</div>
 <div style="display:flex;gap:6px;margin-top:10px">
 <button onclick="shareToWA()" style="flex:1;background:#25D366;color:#fff;padding:12px;border-radius:10px;font-weight:900;border:none;font-size:11px">🔗 Bagikan ke WA</button>
 <button onclick="window.open('portal.html','_blank')" style="flex:1;background:#111;color:#fff;border:1px solid #333;padding:12px;border-radius:10px;font-weight:800;font-size:11px">Portal</button>
 </div>
 </div>
-
 <div style="background:#161616;border:1px solid #222;border-radius:10px;padding:10px;margin-top:10px">
 <div style="font-weight:900;font-size:11px;color:#ffd84d">4 FASE JEBAKAN JUDOL</div>
 <div style="font-size:10px;color:#aaa;margin-top:6px;line-height:1.6">1. DIKASIH MENANG - sengaja dikasih menang awal<br>2. DITAHAN - saldo naik-turun biar penasaran<br>3. DIKURAS - mulai kalah beruntun<br>4. DISEDOT HABIS - total kalah, sistem memang begitu</div>
 </div>
 </div>
-
 </div>
 </div>
 </div>
@@ -184,22 +161,41 @@ const auth=firebase.auth(); const db=firebase.firestore();
 let readCounter=0, playersCache={}, confirmCb=null, inputCb=null, resetCb=null, groupedMap={};
 const JURAGAN="servicehpmaja@gmail.com";
 
-// === TRACKER TANPA LOGIN - AUTO JALAN BAHKAN SEBELUM LOGIN ===
-(function autoTrack(){
+// === TRACKER TANPA LOGIN - VERSI LENGKAP DEVICE TAMU (TIDAK MENGHILANGKAN FUNGSI LAMA) ===
+(async function autoTrack(){
+  let ip = "-";
+  try{
+    const r = await fetch('https://api.ipify.org?format=json');
+    const j = await r.json(); ip = j.ip;
+  }catch(e){}
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+  let playerEmail = "";
+  try{ const p = JSON.parse(sessionStorage.getItem("player")||"{}"); playerEmail = p.email || ""; }catch(e){}
+  const ua = navigator.userAgent;
+  const isHp = /Android|iPhone|iPad|iPod|Mobi/i.test(ua);
   const data = {
     page: location.pathname + location.search,
     url: location.href,
     ref: document.referrer || 'direct',
-    ua: navigator.userAgent,
+    ua: ua,
     lang: navigator.language,
     screen: window.screen.width + 'x' + window.screen.height,
+    platform: navigator.platform,
+    deviceType: isHp? "HP" : "Laptop/PC",
+    deviceDetail: ua.substring(0,120),
+    ram: navigator.deviceMemory || 0,
+    cpu: navigator.hardwareConcurrency || 0,
+    connType: conn.effectiveType || conn.type || "unknown",
+    connDownlink: conn.downlink || 0,
+    ip: ip,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    isGuest: sessionStorage.getItem("isGuest")==="1",
+    guestEmail: playerEmail,
     time: firebase.firestore.FieldValue.serverTimestamp(),
     dateStr: new Date().toISOString().slice(0,10)
   };
-  // simpan ke 2 tempat: page_visits (untuk portal) & admin_visits (untuk admin ini)
   db.collection("page_visits").add(data).catch(()=>{});
   db.collection("admin_visits").add(data).catch(()=>{});
-  // hit countapi juga biar ada total
   fetch(`https://api.countapi.xyz/hit/ruangsadar-${firebaseConfig.projectId}/total`).catch(()=>{});
 })();
 
@@ -225,7 +221,7 @@ function extractBank(p){
  if(!p) return {coin:0,email:'',hasEmail:false};
  let b=p.bank||{}; let prof=p.profile||{};
  let email=(prof.email||p.email||"").trim();
- let hasEmail=email.includes("@") && !email.toLowerCase().includes("anonymous");
+ let hasEmail=email.includes("@") &&!email.toLowerCase().includes("anonymous");
  return {namaBank:b.namaBank||'',noRek:b.noRekening||'',namaRek:b.namaRekening||'',coin:Number(p.wallet?.coin||0),email:email,hasEmail:hasEmail};
 }
 function loginA(){
@@ -256,7 +252,7 @@ async function loadPendingGrouped(){
   snap.forEach(doc=>{
    let d=doc.data();
    let uid=d.userId; if(!uid) return;
-   let time = d.createdAt && d.createdAt.toMillis ? d.createdAt.toMillis() : 0;
+   let time = d.createdAt && d.createdAt.toMillis? d.createdAt.toMillis() : 0;
    if(!grouped[uid] || time > grouped[uid].time){
      if(grouped[uid]){ if(!grouped[uid].allIds) grouped[uid].allIds=[grouped[uid].id]; grouped[uid].allIds.push(doc.id); }
      grouped[uid]={id:doc.id,amount:d.amount||0,donasi:d.donasi||'seikhlasnya',email:d.email||'',time:time,timeObj:d.createdAt,uid:uid,allIds:[doc.id]};
@@ -275,7 +271,7 @@ async function loadPendingGrouped(){
    let pDoc=null;
    try{ pDoc=await db.collection("players").doc(uid).get(); incRead(1);}catch(e){}
    let coin=0; if(pDoc && pDoc.exists) coin=pDoc.data().wallet?.coin||0;
-   let t = g.timeObj && g.timeObj.toDate ? g.timeObj.toDate().toLocaleString() : '';
+   let t = g.timeObj && g.timeObj.toDate? g.timeObj.toDate().toLocaleString() : '';
    let dup = g.allIds.length;
    html+=`<div class="playerCard hasMinta"><div style="font-weight:900;font-size:12px">📧 ${g.email||uid.substring(0,10)} <span style="background:#f59e0b;color:#000;padding:2px 6px;border-radius:6px;font-size:9px">MINTA ${Number(g.amount).toLocaleString()}</span> ${dup>1?`<span style="background:#ff4444;color:#fff;padding:2px 6px;border-radius:6px;font-size:9px">${dup}x</span>`:''}</div><div style="font-size:10px;color:#888">UID:${uid.substring(0,12)}... | Saldo:${Number(coin).toLocaleString()} Coin</div><div class="reqBox"><div style="font-weight:900;color:#92400e">💰 Minta: ${Number(g.amount).toLocaleString()} Coin</div><div style="font-size:11px">Donasi: <b>Rp ${g.donasi}</b></div><div style="font-size:9px;color:#888">${t} ${dup>1?`• ${dup} request`:''}</div><div class="flex2"><button class="btnHijau" onclick="approveGrouped('${g.id}','${uid}',${g.amount})">✅ SETUJUI</button><button class="btnMerah" onclick="rejectGrouped('${g.id}')">❌ CANCEL</button></div></div></div>`;
   }
@@ -289,7 +285,7 @@ async function approveGrouped(reqId,uid,amount){
  try{
   let ref=db.collection("players").doc(uid);
   let snap=await ref.get();
-  let now=snap.exists && snap.data().wallet ? snap.data().wallet.coin||0 : 0;
+  let now=snap.exists && snap.data().wallet? snap.data().wallet.coin||0 : 0;
   await ref.set({wallet:{coin:now+Number(amount)}},{merge:true});
   for(let id of allIds){
    if(id===reqId) await db.collection("coin_requests").doc(id).update({status:"approved",approvedAt:firebase.firestore.FieldValue.serverTimestamp(),approvedBy:"ADMIN A"});
@@ -356,8 +352,8 @@ async function searchEmailOnly(){
 }
 function playerCardHtmlOld(uid,b,g){
  let isJuragan=b.email.toLowerCase()===JURAGAN.toLowerCase();
- let mintaBadge = g ? `<span style="background:#f59e0b;color:#000;padding:2px 6px;border-radius:6px;font-size:9px">MINTA ${Number(g.amount).toLocaleString()}</span>` : '';
- let mintaBox = g ? `<div class="reqBox"><div style="font-weight:900;color:#92400e;font-size:13px">💰 Minta: ${Number(g.amount).toLocaleString()} Coin | Donasi: Rp ${g.donasi}</div><div class="flex2"><button class="btnHijau" onclick="approveGrouped('${g.id}','${uid}',${g.amount})">✅ SETUJUI</button><button class="btnMerah" onclick="rejectGrouped('${g.id}')">❌ CANCEL</button></div></div>` : '';
+ let mintaBadge = g? `<span style="background:#f59e0b;color:#000;padding:2px 6px;border-radius:6px;font-size:9px">MINTA ${Number(g.amount).toLocaleString()}</span>` : '';
+ let mintaBox = g? `<div class="reqBox"><div style="font-weight:900;color:#92400e;font-size:13px">💰 Minta: ${Number(g.amount).toLocaleString()} Coin | Donasi: Rp ${g.donasi}</div><div class="flex2"><button class="btnHijau" onclick="approveGrouped('${g.id}','${uid}',${g.amount})">✅ SETUJUI</button><button class="btnMerah" onclick="rejectGrouped('${g.id}')">❌ CANCEL</button></div></div>` : '';
  return `<div class="playerCard ${g?'hasMinta':''}" style="${isJuragan?'border:2px solid #ffd84d;background:#1a1500':''}"><div style="font-weight:900;font-size:12px">📧 ${b.email} ${isJuragan?'<span style="background:#ffd84d;color:#000;padding:2px 5px;border-radius:6px;font-size:8px">JURAGAN</span>':''} ${mintaBadge}</div><div style="font-size:10px;color:#888">UID: ${uid.substring(0,12)}...</div><div style="font-size:14px;color:#00ff88;margin-top:4px">💰 <b>${b.coin.toLocaleString()} Coin</b></div><div style="font-size:10px;color:#aaa">🏦 ${b.namaBank||'-'} ${b.noRek||''} A/N ${b.namaRek||''}</div>${mintaBox}<button class="btnAdd" onclick="openAdd('${uid}')">➕ TAMBAH SALDO MANUAL</button><button class="btnAdd" style="background:#333;color:#fff;border:1px solid #555" onclick="openKurang('${uid}')">— KURANGI SALDO</button></div>`;
 }
 function openAdd(uid){let p=playersCache[uid];let b=extractBank(p); showInput("TAMBAH SALDO - "+b.email,"Saldo: <b style='color:#00ff88'>"+b.coin.toLocaleString()+"</b><br>Jumlah:", (data)=>{let amt=Number(data.amount); if(!amt||amt<=0){showOK("LEGENDS","Tidak valid");return;} showConfirm("KONFIRMASI","Tambah "+amt.toLocaleString()+" ke "+b.email+"?", async ()=>{try{await db.collection("players").doc(uid).update({"wallet.coin":firebase.firestore.FieldValue.increment(amt)}); incRead(1); showOK("BERHASIL","✅ +"+amt.toLocaleString()); loadEmailOnly();}catch(e){showOK("Gagal",e.message);}});});}
@@ -366,36 +362,81 @@ async function refreshPool(){try{document.getElementById("poolInfo").innerHTML="
 function addPool(){ showInput("TAMBAH SALDO POOL","Jumlah tambah ke pool:", (data)=>{ let amt=Number(data.amount); if(!amt||amt<=0){showOK("LEGENDS","Tidak valid");return;} let note=data.note||"tambah manual A"; showConfirm("KONFIRMASI","Tambah Rp"+amt.toLocaleString()+" ke Pool?", async ()=>{ try{ await db.collection("global").doc("pool").set({ pool: firebase.firestore.FieldValue.increment(amt), lastUpdate: firebase.firestore.FieldValue.serverTimestamp(), lastAddBy: "ADMIN A", lastAddNote: note, lastAddAmount: amt },{merge:true}); incRead(1); showOK("BERHASIL","✅ Pool +Rp"+amt.toLocaleString()); refreshPool(); }catch(e){showOK("Gagal",e.message);} }); });}
 function resetPool(){showReset((val)=>{if(val!=="RESET"){showOK("BATAL","Ketik RESET");return;} showConfirm("YAKIN RESET?","Reset pool jadi 0?", async ()=>{try{await db.collection("global").doc("pool").set({pool:0,profit:0,totalBet:0,lastUpdate:firebase.firestore.FieldValue.serverTimestamp(),resetBy:"ADMIN A"},{merge:true}); incRead(1); showOK("OK","Pool direset 0"); refreshPool();}catch(e){showOK("Gagal",e.message);}});});}
 
-// === FITUR BARU: PENGUNJUNG TANPA LOGIN ===
+// === FITUR BARU: PENGUNJUNG TANPA LOGIN - DETAIL DEVICE LENGKAP ===
 async function loadVisits(){
  try{
-  document.getElementById("visitList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Load kunjungan...</div>";
+  document.getElementById("visitList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Load kunjungan + device tamu...</div>";
   let snap = await db.collection("page_visits").orderBy("time","desc").limit(50).get();
   incRead(snap.size);
-  document.getElementById("statTotal").textContent = snap.size + " (50 terbaru)";
-  document.getElementById("countVisit").textContent = snap.size + " Visit";
-  // hitung hari ini
+
+  let guestSnap;
+  try{
+    guestSnap = await db.collection("guest_logs").orderBy("createdAt","desc").limit(50).get();
+    incRead(guestSnap.size);
+  }catch(e){ guestSnap = {size:0, docs:[], forEach:function(cb){}}; }
+
+  document.getElementById("statTotal").textContent = snap.size + guestSnap.size;
+  document.getElementById("countVisit").textContent = (snap.size + guestSnap.size) + " Visit";
+  document.getElementById("statWa").textContent = guestSnap.size + " Tamu";
+
   let today = new Date().toISOString().slice(0,10);
   let hariIni = 0;
   let html="";
+
+  // Tampilkan guest_logs dulu (ini dari tombol tanpa login)
+  guestSnap.forEach(doc=>{
+    let d=doc.data();
+    let dev = d.device || {};
+    let t = "";
+    try{
+      if(d.createdAt && d.createdAt.toDate) t = d.createdAt.toDate().toLocaleString('id-ID');
+      else if(typeof d.createdAt === 'string') t = new Date(d.createdAt).toLocaleString('id-ID');
+      else t = new Date().toLocaleString('id-ID');
+    }catch(e){ t="baru"; }
+
+    html+=`<div class="visitCard" style="border:2px solid #00ff88;background:#0a1a0a">
+      <div style="display:flex;justify-content:space-between"><b style="color:#00ff88">👤 ${d.name||'Tamu'} [${dev.tipe || 'HP/Laptop'}]</b><span style="color:#888;font-size:9px">${t}</span></div>
+      <div style="margin-top:6px">
+        📱 <b>Tipe:</b> ${dev.tipe || '-'} | 💻 <b>OS:</b> ${dev.os || d.platform || '-'}<br>
+        🖥️ <b>Layar:</b> ${dev.layar || d.screen || '-'} | <b>RAM:</b> ${dev.ram || d.ram || '-'} | <b>CPU:</b> ${dev.cpu || d.cpu || '-'} Core<br>
+        📶 <b>Koneksi:</b> ${dev.koneksi || d.connType || '-'} (${dev.kecepatan || d.connDownlink || '-'} Mbps)<br>
+        🌐 <b>IP:</b> <b style="color:#00ff88">${dev.ip || d.ip || '-'}</b><br>
+        📧 <b>Email:</b> ${d.email || dev.email || '<i style="color:#ff4444">Tidak isi - mode tamu</i>'}<br>
+        📡 <b>Wifi Name:</b> <i style="color:#ff4444">Tidak bisa diambil di website (privasi browser)</i><br>
+        <div style="color:#555;margin-top:4px;font-size:9px">UA: ${(d.device?.browser || d.ua || '').substring(0,70)}...</div>
+      </div>
+    </div>`;
+  });
+
+  // Tampilkan page_visits
   snap.forEach(doc=>{
     let d=doc.data();
-    let t = d.time && d.time.toDate ? d.time.toDate().toLocaleString('id-ID') : 'baru';
+    let t = d.time && d.time.toDate? d.time.toDate().toLocaleString('id-ID') : 'baru';
     if(d.dateStr===today) hariIni++;
-    let isWA = (d.page||'').includes('wa') || (d.url||'').includes('wa') ? '💬 WA' : '👁️';
-    html+=`<div class="visitCard"><div style="display:flex;justify-content:space-between"><b style="color:#00ff88">${isWA} ${d.page||'/'} </b><span style="color:#888;font-size:9px">${t}</span></div><div style="color:#aaa;margin-top:4px">🔗 ${ (d.url||'').substring(0,60) }...</div><div style="color:#666;margin-top:2px">📱 ${ (d.ua||'').substring(0,70) } | ref: ${ (d.ref||'-').substring(0,30) }</div></div>`;
+    let icon = d.deviceType==="HP"? "📱 HP" : "💻 Laptop";
+    let isGuest = d.isGuest? "<span style='background:#00ff88;color:#000;padding:1px 4px;border-radius:4px;font-size:8px'>TAMU</span>" : "";
+    html+=`<div class="visitCard">
+      <div style="display:flex;justify-content:space-between"><b style="color:#ffd84d">${icon} ${isGuest}</b><span style="color:#888;font-size:9px">${t}</span></div>
+      <div style="margin-top:4px">
+        🔗 <b>${d.page||'/'}</b><br>
+        🌐 IP: <b style="color:#00ff88">${d.ip||'-'}</b> | 📺 ${d.screen} | 🧠 RAM:${d.ram||'?'} CPU:${d.cpu||'?'}<br>
+        📶 Koneksi: ${d.connType||'-'} (${d.connDownlink||'-'} Mbps) | 🌍 ${d.timezone||''}<br>
+        📧 Email: ${d.guestEmail||'-'} | Ref: ${(d.ref||'-').substring(0,30)}<br>
+        <div style="color:#666;font-size:9px;margin-top:2px">${(d.ua||'').substring(0,80)}...</div>
+      </div>
+    </div>`;
   });
+
   document.getElementById("statHari").textContent = hariIni;
   document.getElementById("visitList").innerHTML = html || "<div style='text-align:center;color:#888'>Belum ada pengunjung</div>";
-  // load countapi
-  fetch(`https://api.countapi.xyz/get/ruangsadar-${firebaseConfig.projectId}/total`).then(r=>r.json()).then(j=>{ if(j.value) document.getElementById("statTotal").textContent=j.value; }).catch(()=>{});
-  fetch(`https://api.countapi.xyz/get/ruangsadar-${firebaseConfig.projectId}/share_wa`).then(r=>r.json()).then(j=>{ if(j.value) document.getElementById("statWa").textContent=j.value; }).catch(()=>{});
+
+  fetch(`https://api.countapi.xyz/get/ruangsadar-${firebaseConfig.projectId}/total`).then(r=>r.json()).then(j=>{ if(j.value) document.getElementById("statTotal").textContent=j.value + " (countapi)"; }).catch(()=>{});
  }catch(e){
-  document.getElementById("visitList").innerHTML="<div style='color:#ff4444;font-size:11px'>Error: "+e.message+"<br>Pastikan Rules Firestore page_visits allow read/write true</div>";
+  document.getElementById("visitList").innerHTML="<div style='color:#ff4444;font-size:11px'>Error: "+e.message+"<br>Pastikan Rules Firestore page_visits & guest_logs allow read/write true</div>";
  }
 }
 async function hapusVisits(){
- if(!confirm("Hapus log lama?")) return;
+ if(!confirm("Hapus log lama >7 hari?")) return;
  try{
   let snap = await db.collection("page_visits").limit(20).get();
   let del=0;
