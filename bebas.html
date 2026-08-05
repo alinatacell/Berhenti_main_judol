@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulator - Input Logika Custom</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#0a0a0f;color:#fff;min-height:100vh;display:flex;justify-content:center}
+.main{width:100%;max-width:560px;padding:10px;display:flex;flex-direction:column;gap:10px}
+.panel{background:#1a1a24;border:1px solid #ffffff18;border-radius:14px;padding:12px}
+.inputBox{width:100%;padding:12px;border-radius:10px;border:2px solid #4a4a6a;background:#0f0f1a;color:#fff;font-size:13px;min-height:70px;resize:vertical}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-weight:900;cursor:pointer;font-size:11px}
+.btn-primary{background:linear-gradient(90deg,#a855f7,#7e22ce);color:#fff}
+.btn-green{background:linear-gradient(90deg,#22c55e,#15803d);color:#fff}
+.btn-dark{background:#2a2a36;color:#fff;border:1px solid #ffffff20}
+.example{font-size:10px;background:#2a2a36;padding:6px 8px;border-radius:8px;cursor:pointer;border:1px solid #ffffff10;margin:3px;display:inline-block}
+.example:hover{background:#3a3a4a}
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;aspect-ratio:1/1}
+.cell{aspect-ratio:1;background:#ffffff08;border:1px solid #ffffff10;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}
+.cell.scatter{box-shadow:0 0 10px gold;background:radial-gradient(circle,rgba(255,215,0,.3),transparent 70%)}
+.scatter-img{width:80%;height:80%;object-fit:contain}
+#log{max-height:140px;overflow:auto;background:#0006;border-radius:8px;padding:8px;font-size:10px;border:1px solid #ffffff10}
+#cycle{font-size:10px;font-weight:800;padding:4px 8px;border-radius:20px;display:inline-block;background:#00e5ff20;color:#00e5ff;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="main">
+<div class="panel">
+<div style="font-size:14px;font-weight:900;color:#a855f7">🎛️ INPUT LOGIKA CUSTOM - Tulis yang kamu mau</div>
+<div style="font-size:10px;color:#aaa;margin:4px 0">Contoh: <i>spin 3x dapat free 10 spin dengan nilai 10jt</i> → Game otomatis ngikutin</div>
+<textarea id="customInput" class="inputBox" placeholder="Tulis logika kamu di sini... contoh:
+spin 3x dapat free 10 spin dengan nilai 10jt
+atau
+saldo 20rb sedot sampai 1rb dapat free 10 spin nilai 45k, lanjut 2 spin dapat free 15 spin nilai 52k">saldo 20rb sedot sampai dibawah 1rb dapat free 10 spin nilai 45k, lanjut 2 spin dapat free 15 spin nilai 52k</textarea>
+
+<div style="margin-top:8px">
+<span class="example" onclick="setExample('spin 3x dapat free 10 spin dengan nilai 10jt')">spin 3x free 10 spin 10jt</span>
+<span class="example" onclick="setExample('spin 5x dapat free 10 spin dengan nilai 100jt')">spin 5x free 10 spin 100jt</span>
+<span class="example" onclick="setExample('saldo 20rb sedot sampai 1rb dapat free 10 spin nilai 45k')">20rb sedot ke 1rb free 45k</span>
+<span class="example" onclick="setExample('spin 1x dapat free 10 spin dengan nilai 10jt')">spin 1x free 10jt</span>
+<span class="example" onclick="setExample('spin 10x zonk, spin 11 dapat free 10 spin nilai 50k')">10x zonk, spin 11 free 50k</span>
+</div>
+
+<div style="display:flex;gap:6px;margin-top:10px">
+<button class="btn btn-primary" style="flex:1" onclick="terapkanLogika()">✅ TERAPKAN LOGIKA</button>
+<button class="btn btn-dark" onclick="resetGame()">🔄 RESET</button>
+</div>
+
+<div id="parsed" style="margin-top:8px;background:#0f0f1a;border-radius:8px;padding:8px;font-size:10px;border:1px dashed #a855f755"></div>
+<div id="cycle">Belum ada logika - Tulis & Terapkan</div>
+</div>
+
+<div class="panel" style="text-align:center">
+<div style="font-size:11px;color:#22c55e;font-weight:800">SIMULATOR - SCATTER = 10 FREE (pakai scatter.png)</div>
+<div id="topWin" style="font-size:16px;font-weight:900;margin-top:4px">💰 MENANG : Rp 0</div>
+</div>
+
+<div class="panel" style="display:flex;justify-content:center;align-items:center;min-height:320px;background:radial-gradient(ellipse at center,#1e1e26 0%,#0a0a0f 100%)">
+<div id="grid" style="width:100%;max-width:100%"></div>
+</div>
+
+<div class="panel">
+<div style="display:flex;gap:8px;align-items:center">
+<button class="btn btn-dark" id="betMinus">−</button>
+<button class="btn btn-green" id="spinBtn" style="width:64px;height:64px;border-radius:50%;font-size:26px;border:2px solid #fff">⟳</button>
+<button class="btn btn-dark" id="betPlus">+</button>
+<div style="flex:1;text-align:center">
+<div style="font-size:9px;color:#aaa">SALDO</div><div id="score" style="font-weight:900">20.000</div>
+</div>
+<div style="flex:1;text-align:center">
+<div style="font-size:9px;color:#aaa">BET</div><div id="betText" style="font-weight:900">200</div>
+</div>
+<button class="btn btn-dark" onclick="auto20()">AUTO 20</button>
+</div>
+<div id="msg" style="margin-top:8px;font-size:10px;font-weight:800;background:#0006;border-radius:8px;padding:6px;text-align:center;min-height:20px">Tulis logika di atas lalu klik Terapkan</div>
+<div id="log" style="margin-top:8px"></div>
+</div>
+</div>
+
+<div id="freePopup" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:9999">
+<div style="background:#1e1e24;border:1px solid #ffffff20;border-radius:16px;padding:16px;width:min(92vw,360px);text-align:center">
+<div id="popupTitle" style="font-weight:900;color:#ffcc00">SCATTER!</div>
+<div id="popupScatter" style="display:flex;justify-content:center;gap:6px;margin:8px 0;min-height:40px"></div>
+<div id="popupInfo" style="font-size:11px;color:#ddd"></div>
+<button style="width:100%;padding:12px;background:#2e7d00;color:#fff;border:2px solid #fff;border-radius:10px;font-weight:900;margin-top:10px" onclick="closePopup()">GASS FREE!</button>
+</div>
+</div>
+
+<script>
+const ROWS=5,COLS=5;
+const symbols=["🍎","🍓","🍍","🥝","🍇","🥭","🍒","🍉","🥥"];
+const SCATTER="SCATTER";
+let board=[],score=20000,currentBet=200,spinning=false,spinTotal=0,tumbleWin=0;
+let freeSpins=0,inFreeSpin=false,freeAcc=0,freeCap=0,freeSession=0;
+let betIndex=0,BET_LEVELS=[];for(let v=200;v<=2000;v+=200)BET_LEVELS.push(v);
+let customRules=null; // hasil parsing
+let firstDone=false,secondDone=false,afterFirst=0;
+let isSedotPhase=true;
+
+const grid=document.getElementById('grid');
+const scoreEl=document.getElementById('score'),betEl=document.getElementById('betText'),msgEl=document.getElementById('msg'),logBox=document.getElementById('log'),cycleEl=document.getElementById('cycle');
+
+function log(t){let d=document.createElement('div');d.style.padding="2px 0";d.style.borderBottom="1px solid #ffffff0a";d.textContent=t;logBox.appendChild(d);logBox.scrollTop=logBox.scrollHeight;}
+function setExample(txt){document.getElementById('customInput').value=txt;}
+function parseNumber(str, suffix){
+  let n=parseFloat(str.replace(/[^0-9.,]/g,'').replace(',','.'));
+  if(isNaN(n)) return 0;
+  suffix=(suffix||'').toLowerCase();
+  if(suffix.includes('jt')||suffix.includes('juta')) n*=1000000;
+  else if(suffix.includes('k')||suffix.includes('rb')) n*=1000;
+  return Math.floor(n);
+}
+function terapkanLogika(){
+  let text=document.getElementById('customInput').value.toLowerCase();
+  if(!text.trim()){alert("Tulis dulu logikanya!");return;}
+  // Default
+  let rules={sedotTarget:1000,triggerSpin:3,freeCount:10,winValue:10000000,raw:text};
+  // 1. Cari sedot sampai X
+  let mSedot=text.match(/sedot.*?sampai.*?(\d+)\s*(rb|k|jt)?/);
+  if(mSedot){ rules.sedotTarget=parseNumber(mSedot[1],mSedot[2]); }
+  let mSisa=text.match(/sisa.*?(\d+)\s*(rb|k|jt)?/);
+  if(mSisa && !mSedot){ rules.sedotTarget=parseNumber(mSisa[1],mSisa[2]); }
+  let mDibawah=text.match(/dibawah\s*(\d+)\s*(rb|k|jt)?/);
+  if(mDibawah){ rules.sedotTarget=parseNumber(mDibawah[1],mDibawah[2]); }
+
+  // 2. Cari trigger spin X - ambil yang pertama
+  let mSpin=text.match(/spin\s*(\d+)\s*x?/);
+  let mSpin2=text.match(/(\d+)\s*x\s*spin/);
+  if(mSpin) rules.triggerSpin=parseInt(mSpin[1]);
+  else if(mSpin2) rules.triggerSpin=parseInt(mSpin2[1]);
+
+  // 3. Cari free X spin
+  let mFree=text.match(/free\s*(\d+)\s*spin/);
+  let mFree2=text.match(/(\d+)\s*free\s*spin/);
+  if(mFree) rules.freeCount=parseInt(mFree[1]);
+  else if(mFree2) rules.freeCount=parseInt(mFree2[1]);
+
+  // 4. Cari nilai / nilai X jt
+  let mNilai=text.match(/nilai\s*([\d.,]+)\s*(jt|juta|k|rb)?/);
+  let mNilai2=text.match(/([\d.,]+)\s*(jt|juta)\b/);
+  if(mNilai){ rules.winValue=parseNumber(mNilai[1],mNilai[2]); }
+  else if(mNilai2){ rules.winValue=parseNumber(mNilai2[1],mNilai2[2]); }
+
+  // Jika ada 2 sesi (lanjutan) - cari pola "lanjut X spin dapat free Y"
+  let mLanjut=text.match(/lanjut\s*(\d+)\s*spin.*?free\s*(\d+).*?nilai\s*([\d.,]+)\s*(jt|k|rb)?/);
+  if(mLanjut){
+    rules.secondPhase={after:parseInt(mLanjut[1]),freeCount:parseInt(mLanjut[2]),winValue:parseNumber(mLanjut[3],mLanjut[4])};
+  }
+
+  customRules=rules;
+  document.getElementById('parsed').innerHTML=`
+    <b>✅ LOGIKA DITERAPKAN:</b><br>
+    • Sedot dari 20k sampai <b>di bawah ${rules.sedotTarget.toLocaleString('id-ID')}</b> baru trigger<br>
+    • Setelah <b>${rules.triggerSpin}x spin</b> → Free <b>${rules.freeCount} spin</b> total <b>Rp${rules.winValue.toLocaleString('id-ID')}</b><br>
+    ${rules.secondPhase?`• Lanjut ${rules.secondPhase.after}x spin → Free ${rules.secondPhase.freeCount} spin total Rp${rules.secondPhase.winValue.toLocaleString('id-ID')}<br>`:""}
+    • Pakai scatter.png + jeda 5 detik sebelum free<br>
+    • Setelah scatter ke-2 selesai → sedot sampai habis
+  `;
+  cycleEl.textContent=`LOGIKA: ${rules.triggerSpin}x spin → Free ${rules.freeCount} (${rules.winValue.toLocaleString('id-ID')}) | Sedot ke <${rules.sedotTarget}`;
+  cycleEl.style.background="#22c55e20"; cycleEl.style.color="#22c55e";
+  resetGame();
+  log(`Logika diterapkan: ${text}`);
+  msgEl.textContent=`Logika aktif! Spin ${rules.triggerSpin}x akan Free ${rules.freeCount} senilai ${rules.winValue.toLocaleString('id-ID')}`;
+}
+
+function isScatter(v){return v===SCATTER;}
+function renderScatterImg(){
+  let img=document.createElement('img'); img.src='scatter.png'; img.className='scatter-img'; img.onerror=()=>{img.replaceWith(document.createTextNode('💎'));}; return img;
+}
+function drawBoard(){
+  grid.innerHTML="";
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    let cell=document.createElement('div'); cell.className='cell';
+    let v=board[r][c];
+    if(isScatter(v)){ cell.classList.add('scatter'); cell.appendChild(renderScatterImg()); }
+    else cell.textContent=v;
+    grid.appendChild(cell);
+  }
+}
+function createBoard(){ board=[]; for(let r=0;r<ROWS;r++){ let row=[]; for(let c=0;c<COLS;c++) row.push(symbols[Math.floor(Math.random()*symbols.length)]); board.push(row);} drawBoard(); }
+function generateBoard(forceScatter=false){
+  let nb=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  let cnt=forceScatter?4:0;
+  let all=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) all.push({r,c}); all.sort(()=>Math.random()-0.5);
+  let scat=all.slice(0,cnt); scat.forEach(p=>nb[p.r][p.c]=SCATTER);
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(!nb[r][c]) nb[r][c]=symbols[Math.floor(Math.random()*symbols.length)];
+  return {board:nb};
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function renderPopupScatter(n){
+  let cont=document.getElementById('popupScatter'); cont.innerHTML="";
+  for(let i=0;i<n;i++){ let img=document.createElement('img'); img.src='scatter.png'; img.style.width='44px'; img.style.height='44px'; img.style.objectFit='contain'; img.onerror=()=>{img.replaceWith(document.createTextNode('💎'));}; cont.appendChild(img); }
+}
+function showPopup(title,info){ return new Promise(res=>{ document.getElementById('popupTitle').textContent=title; document.getElementById('popupInfo').innerHTML=info; document.getElementById('freePopup').style.display='flex'; document.getElementById('freePopup').onclick=()=>{}; document.querySelector('#freePopup button').onclick=()=>{document.getElementById('freePopup').style.display='none'; res();}; }); }
+function closePopup(){ document.getElementById('freePopup').style.display='none'; }
+
+async function spin(){
+  if(spinning || inFreeSpin) return;
+  if(!customRules){ msgEl.textContent="Terapkan logika dulu di atas!"; return; }
+  if(score<currentBet){ msgEl.textContent="Saldo habis - Reset"; return; }
+  spinning=true; spinTotal++;
+
+  // Cek trigger pertama: saldo < target
+  if(!firstDone && score < customRules.sedotTarget){
+    let target=generateBoard(true); board=target.board; drawBoard(); renderPopupScatter(4);
+    log(`💎 4 SCATTER (scatter.png) di saldo ${score} (<${customRules.sedotTarget})`);
+    for(let i=5;i>=1;i--){ msgEl.textContent=`💎 SCATTER! FREE ${customRules.freeCount} DALAM ${i} DETIK...`; cycleEl.textContent=`SCATTER! FREE DALAM ${i}...`; await sleep(1000); }
+    freeSession=1; freeCap=customRules.winValue; freeAcc=0; freeSpins=customRules.freeCount; inFreeSpin=true;
+    await showPopup(`SCATTER #1 - ${customRules.freeCount} FREE`, `Logika kamu:<br>${customRules.raw}<br><br>Trigger: saldo <${customRules.sedotTarget}<br>Free: ${customRules.freeCount}x total Rp${customRules.winValue.toLocaleString('id-ID')}`);
+    await startFree();
+    spinning=false; return;
+  }
+
+  // Cek trigger kedua jika ada secondPhase
+  if(firstDone && customRules.secondPhase && afterFirst>=customRules.secondPhase.after && !secondDone){
+    let target=generateBoard(true); board=target.board; drawBoard(); renderPopupScatter(4);
+    for(let i=5;i>=1;i--){ msgEl.textContent=`💎 SCATTER #2! FREE ${customRules.secondPhase.freeCount} DALAM ${i} DETIK...`; await sleep(1000); }
+    freeSession=2; freeCap=customRules.secondPhase.winValue; freeAcc=0; freeSpins=customRules.secondPhase.freeCount; inFreeSpin=true;
+    await showPopup(`SCATTER #2 - ${customRules.secondPhase.freeCount} FREE`, `Lanjutan logika:<br>Free ${customRules.secondPhase.freeCount}x total Rp${customRules.secondPhase.winValue.toLocaleString('id-ID')}`);
+    await startFree(); spinning=false; return;
+  }
+
+  // Cek trigger berdasarkan jumlah spin (contoh: spin 3x)
+  if(!firstDone && spinTotal>=customRules.triggerSpin && score>=customRules.sedotTarget){
+    // Jika belum sedot sampai target, tapi spin count sudah tercapai, tetap trigger jika user tulis "spin 3x"
+    // Untuk contoh "spin 3x dapat free 10 spin"
+    if(customRules.raw.includes('spin') && customRules.raw.match(/\d+\s*x/)){
+      let target=generateBoard(true); board=target.board; drawBoard(); renderPopupScatter(4);
+      log(`💎 Trigger spin ${customRules.triggerSpin}x tercapai!`);
+      for(let i=5;i>=1;i--){ msgEl.textContent=`💎 SCATTER! FREE DALAM ${i} DETIK...`; await sleep(1000); }
+      freeSession=1; freeCap=customRules.winValue; freeAcc=0; freeSpins=customRules.freeCount; inFreeSpin=true;
+      await showPopup(`SCATTER! ${customRules.freeCount} FREE - Rp${customRules.winValue.toLocaleString('id-ID')}`, `Logika: ${customRules.raw}<br>Trigger ${customRules.triggerSpin}x spin`);
+      await startFree(); spinning=false; return;
+    }
+  }
+
+  // Spin biasa - nyedot
+  score-=currentBet;
+  let t=generateBoard(false); board=t.board; drawBoard();
+  await sleep(150);
+  if(secondDone){
+    log(`[SEDOT AKHIR] ZONK -${currentBet} Saldo ${score} → habis`);
+    if(score<=0){ score=0; await showPopup("SALDO HABIS!","Setelah scatter ke-2, sedot sampai habis - Edukasi bandar"); }
+  } else {
+    let winChance=Math.random()<0.15;
+    if(winChance){ let w=Math.floor(currentBet*0.3); score+=w; tumbleWin+=w; document.getElementById('topWin').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`; log(`Spin ${spinTotal} +${w} Saldo ${score}`); }
+    else { log(`Spin ${spinTotal} ZONK -${currentBet} Saldo ${score} ${!firstDone?`→ target <${customRules.sedotTarget}`:''}`); if(firstDone) afterFirst++; }
+  }
+  document.getElementById('score').textContent=score.toLocaleString('id-ID');
+  msgEl.textContent=`Spin ${spinTotal} | Saldo ${score.toLocaleString('id-ID')} | Target <${customRules.sedotTarget}`;
+  spinning=false;
+}
+
+async function startFree(){
+  let total=0, done=0;
+  while(freeSpins>0){
+    freeSpins--; done++;
+    let remain=freeCap-freeAcc;
+    let remSpins=Math.max(1,freeSpins+1);
+    let win=Math.floor(remain/remSpins * (0.8+Math.random()*0.6));
+    if(freeAcc+win>freeCap) win=Math.max(0,freeCap-freeAcc);
+    let t=generateBoard(false); board=t.board; drawBoard(); await sleep(300);
+    if(win>0){ score+=win; freeAcc+=win; total+=win; tumbleWin+=win; document.getElementById('topWin').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`; log(`FREE ${done} +${win.toLocaleString('id-ID')} ${freeAcc}/${freeCap}`); }
+  }
+  if(freeSession==1){
+    await showPopup(`FREE #1 SELESAI - Rp${total.toLocaleString('id-ID')}`, `Total Free: Rp${total.toLocaleString('id-ID')}<br>Saldo ${score.toLocaleString('id-ID')}<br>Lanjut ${customRules.secondPhase?customRules.secondPhase.after:2} spin → Scatter lagi`);
+    firstDone=true; afterFirst=0;
+  } else {
+    await showPopup(`FREE #2 SELESAI - Rp${total.toLocaleString('id-ID')}`, `Total Free: Rp${total.toLocaleString('id-ID')}<br>Setelah ini SEDOT SAMPAI HABIS`);
+    secondDone=true; isSedotPhase=true;
+  }
+  inFreeSpin=false;
+  document.getElementById('score').textContent=score.toLocaleString('id-ID');
+}
+
+function resetGame(){
+  score=20000; spinTotal=0; firstDone=false; secondDone=false; afterFirst=0; freeSpins=0; inFreeSpin=false; tumbleWin=0; freeSession=0;
+  document.getElementById('topWin').textContent="💰 MENANG : Rp 0";
+  document.getElementById('score').textContent=score.toLocaleString('id-ID');
+  document.getElementById('log').innerHTML="";
+  createBoard();
+  msgEl.textContent=customRules?`Logika aktif: ${customRules.triggerSpin}x spin → Free ${customRules.freeCount} Rp${customRules.winValue.toLocaleString('id-ID')}`:"Tulis logika & Terapkan";
+}
+
+document.getElementById('spinBtn').onclick=spin;
+document.getElementById('betMinus').onclick=()=>{ if(betIndex>0){betIndex--; currentBet=BET_LEVELS[betIndex]; document.getElementById('betText').textContent=currentBet.toLocaleString('id-ID');}};
+document.getElementById('betPlus').onclick=()=>{ if(betIndex<BET_LEVELS.length-1){betIndex++; currentBet=BET_LEVELS[betIndex]; document.getElementById('betText').textContent=currentBet.toLocaleString('id-ID');}};
+function auto20(){ (async()=>{ for(let i=0;i<20;i++){ if(score<currentBet) break; await spin(); await sleep(400); if(secondDone && score<=0) break; } })(); }
+
+createBoard();
+document.getElementById('score').textContent=score.toLocaleString('id-ID');
+document.getElementById('betText').textContent=currentBet.toLocaleString('id-ID');
+</script>
+</body>
+</html>
