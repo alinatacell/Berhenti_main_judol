@@ -34,8 +34,11 @@ body{width:100%;min-height:100dvh;font-family:Arial;background:#08080a;color:#ff
 #globalInfo{font-size:8px;color:#aaa;margin-top:4px}
 .board{flex:1;display:flex;justify-content:center;align-items:center;min-height:320px;background:radial-gradient(ellipse at center,#1e1e26 0%,#08080a 100%)}
 #grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:100%;aspect-ratio:1/1;max-height:62vh}
-.cell{aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:26px;background:#ffffff08;border:1px solid #ffffff0f;border-radius:8px}
+.cell{aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:26px;background:#ffffff08;border:1px solid #ffffff0f;border-radius:8px;position:relative;overflow:hidden}
 .cell.scatter{background:radial-gradient(circle at 50% 50%,rgba(255,215,0,0.4),rgba(255,215,0,0.05) 45%,transparent 75%)!important;box-shadow:0 0 12px gold}
+.cell .scatter-img{width:82%;height:82%;object-fit:contain;filter:drop-shadow(0 0 6px gold);animation:scatterFloat 1.5s ease-in-out infinite alternate}
+@keyframes scatterFloat{from{transform:scale(1) rotate(-2deg)}to{transform:scale(1.08) rotate(2deg)}}
+
 .featureRow{display:flex;justify-content:space-between;align-items:center;background:#1e1e26;border-radius:12px;padding:8px;border:1px solid #ffffff10}
 .sadow-btn{background:linear-gradient(180deg,#3a3a42,#1e1e22);border:1px solid #ffffff20;border-radius:10px;color:#fff;font-weight:900;padding:6px 10px;cursor:pointer;min-width:60px;text-align:center}
 #spinBtn{width:72px;height:72px;border-radius:50%;border:3px solid #fff;background:linear-gradient(180deg,#b8ff44,#2e7d00);display:flex;align-items:center;justify-content:center;font-size:30px}
@@ -84,7 +87,7 @@ body{width:100%;min-height:100dvh;font-family:Arial;background:#08080a;color:#ff
 </div>
 <div id="freeSpinPopup"><div class="popupBox">
   <div id="popupTitle" style="font-size:18px;font-weight:900;color:#ffcc00">🎉 SCATTER! 🎉</div>
-  <div id="popupDiamond" style="font-size:40px;margin:8px 0">💎💎💎💎</div>
+  <div id="popupDiamond" style="display:flex;justify-content:center;gap:6px;margin:8px 0;min-height:48px"></div>
   <div id="scatterInfo" style="font-size:12px;color:#ddd;margin:8px 0"></div>
   <button id="popupOk" style="width:100%;padding:12px;background:#2e7d00;color:#fff;border:2px solid #fff;border-radius:10px;font-weight:900">GASS 10 FREE SPIN!</button>
 </div></div>
@@ -123,7 +126,43 @@ function showMsg(t){ msgEl.textContent=t; }
 function randomFruit(){ return symbols[Math.floor(Math.random()*symbols.length)]; }
 function isScatter(v){ return v===SCATTER; }
 function createBoard(){ board=[]; for(let r=0;r<ROWS;r++){ let row=[]; for(let c=0;c<COLS;c++) row.push(randomFruit()); board.push(row); } drawBoard(); }
-function drawBoard(){ grid.innerHTML=""; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ const cell=document.createElement('div'); cell.className='cell'; const v=board[r][c]; if(isScatter(v)) cell.classList.add('scatter'); cell.textContent=v; grid.appendChild(cell); } }
+function renderScatterImg(){
+  let img=document.createElement('img');
+  img.src='scatter.png';
+  img.className='scatter-img';
+  img.alt='SCATTER';
+  img.onerror=()=>{ img.replaceWith(document.createTextNode('💎')); };
+  return img;
+}
+function drawBoard(){
+  grid.innerHTML="";
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const cell=document.createElement('div');
+    cell.className='cell';
+    const v=board[r][c];
+    if(isScatter(v)){
+      cell.classList.add('scatter');
+      cell.appendChild(renderScatterImg());
+    } else {
+      cell.textContent=v;
+    }
+    grid.appendChild(cell);
+  }
+}
+function renderScatterPopup(count){
+  let cont=document.getElementById('popupDiamond');
+  cont.innerHTML="";
+  for(let i=0;i<count;i++){
+    let img=document.createElement('img');
+    img.src='scatter.png';
+    img.style.width='48px'; img.style.height='48px'; img.style.objectFit='contain';
+    img.style.filter='drop-shadow(0 0 6px gold)';
+    img.onerror=()=>{ img.replaceWith(document.createTextNode('💎')); };
+    cont.appendChild(img);
+  }
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
 function countScatter(){ let cnt=0; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(isScatter(board[r][c])) cnt++; return cnt; }
 
 function generateBoard(forceScatter=false){
@@ -183,18 +222,24 @@ async function spin(){
     return;
   }
 
-  // CEK TRIGGER SCATTER KEDUA: setelah 2 spin jeda dari free pertama
+  // CEK TRIGGER SCATTER KEDUA: setelah 2 spin + jeda 5 detik + scatter.png
   if(firstScatterDone && spinsAfterFirstFree>=2 && !secondScatterDone){
     let target=generateBoard(true);
     board=target.board; drawBoard();
-    await new Promise(r=>setTimeout(r,300));
+    renderScatterPopup(4);
+    log(`💎 4 SCATTER KEDUA (scatter.png)! Jeda 5 detik sebelum Free 10+5`, "b-scat");
+    for(let i=5;i>=1;i--){
+      showMsg(`💎 SCATTER #2! FREE 10+5 DALAM ${i} DETIK...`);
+      cycleEl.textContent=`SCATTER #2! FREE DALAM ${i}...`;
+      await sleep(1000);
+    }
     freeSession=2;
     freeSpinWinCap=52000;
     freeSpinAccumulated=0;
-    freeSpins=10; // nanti +5
+    freeSpins=10;
     inFreeSpin=true;
-    await showPopup(`SCATTER #2! 10 FREE SPIN +5`, `Sesuai data kamu:<br>Setelah 2 spin, dapat Scatter lagi<br>= 10 Free Spin + 5 tambahan<br>= Total 15 Free Spin<br>Total menang sesi ini Rp52.000`, "GASS 10+5 FREE (52k)!");
-    log(`SCATTER #2 → 10+5 FREE target 52k`, "b-scat");
+    await showPopup(`SCATTER #2! 10 FREE SPIN +5`, `Pakai scatter.png + Jeda 5 detik<br>Setelah 2 spin, dapat Scatter lagi<br>= 10 Free + 5 tambahan = 15 Free<br>Total Rp52.000`, "GASS 10+5 FREE (52k)!");
+    log(`SCATTER #2 → 10+5 FREE target 52k (scatter.png)`, "b-scat");
     await startFreeSpins();
     spinning=false;
     updateUI();
