@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="id"><head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+<html lang="id">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
 (function() {
   if (window.__playableTouchPatchInstalled) return;
   window.__playableTouchPatchInstalled = true;
@@ -18,29 +19,92 @@
     return origAdd.call(this, type, listener, options);
   };
 })();
-</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Logika Player 50RB - Simulator</title>
-<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#f0f7ff;padding:12px}header{background:#fff;border:2px solid #bfdbfe;border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center}
-.panel{background:#fff;border:2px solid #bfdbfe;border-radius:16px;padding:14px;margin-top:12px}
-.coinBig{font-size:28px;font-weight:900;color:#0d47a1}.btn{width:100%;height:52px;border:none;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;margin-top:10px}
-.btn-primary{background:linear-gradient(90deg,#22c55e,#15803d);color:#fff}.logika{background:#eff6ff;border:2px dashed #93c5fd;border-radius:12px;padding:10px;margin-top:10px}
-.logika ul{font-size:10px;padding-left:14px;margin-top:6px;line-height:1.5}
-</style></head><body>
-<header><div><div style="font-weight:900;color:#0d47a1">LOGIKA PLAYER 50RB - SIMULATOR</div><div style="font-size:9px;color:#64748b">Tanpa Firebase - Virtual</div></div><div id="topCoin" style="background:#dcfce7;color:#15803d;padding:6px 10px;border-radius:20px;font-size:11px;font-weight:800">0</div></header>
-<div class="panel" style="text-align:center"><div style="font-size:11px;color:#64748b">Saldo Virtual</div><div class="coinBig" id="walletCoin">20.000</div></div>
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>RUANG SADAR - Minta Coin Edukasi</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#f0f7ff;min-height:100vh}
+header{background:#fff;border-bottom:2px solid #bfdbfe;padding:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.btn{width:100%;height:56px;border:none;border-radius:14px;font-weight:900;font-size:14px;cursor:pointer;margin-top:12px}
+.card{margin:12px;padding:16px;background:#fff;border:2px solid #bfdbfe;border-radius:16px}
+.input{width:100%;padding:14px;border-radius:12px;border:2px solid #bfdbfe;background:#f8fafc;font-weight:700;margin-top:8px;font-size:15px}
+.qrisBox{background:#fff;border:2px solid #0d47a1;border-radius:16px;padding:14px;text-align:center;margin-top:14px}
+.qrisImg{width:100%;max-width:320px;border-radius:16px;border:2px solid #0d47a1;margin:10px auto;display:block}
+</style>
+</head>
+<body>
+<header>
+<div style="display:flex;align-items:center;gap:8px">
+<button onclick="location.href='portal.html'" style="width:36px;height:36px;border:none;border-radius:10px;background:#dbeafe;color:#0d47a1;font-weight:900">←</button>
+<div><div style="font-weight:900;color:#0d47a1;font-size:13px">RUANG SADAR</div><div style="font-size:9px;color:#64748b">MINTA COIN EDUKASI</div></div>
+</div>
+<div id="topCoin" style="background:#dcfce7;color:#15803d;padding:6px 10px;border-radius:20px;font-size:11px;font-weight:800">0 Coin</div>
+</header>
 
-<div>
-<button class="btn btn-primary" onclick="minta50()">🎁 MINTA 50.000 GRATIS</button>
-<div id="msg" style="text-align:center;margin-top:10px;font-size:11px;font-weight:800"></div>
+<div class="card" style="text-align:center">
+<div style="font-size:11px;color:#64748b">Saldo Coin Edukasi Kamu</div>
+<div id="walletCoin" style="font-size:36px;font-weight:900;color:#0d47a1;margin:6px 0">0</div>
+<div id="myEmail" style="font-size:10px;color:#94a3b8"></div>
+</div>
+
+<div class="card">
+<div style="text-align:center;font-weight:900;color:#15803d;font-size:15px">🎁 MINTA 50.000 GRATIS - AUTO MASUK</div>
+<button class="btn" style="background:linear-gradient(90deg,#22c55e,#15803d);color:#fff" onclick="mintaAuto()">🎁 MINTA 50.000 COIN GRATIS</button>
+
+<div style="margin:20px 0;height:2px;background:#e2e8f0"></div>
+
+
+<div id="qrisBox" style="display:none">
+<div class="qrisBox">
+<div style="font-weight:900;color:#0d47a1;font-size:15px">📱 MINTA DI ATAS 50RB - SILAHKAN DONASI SEIKHLASNYA</div>
+<div style="font-size:11px;color:#64748b;margin:6px 0">Minta: <b id="coinText" style="color:#15803d">-</b> | Donasi Seikhlasnya</div>
+
+<img src="qris.jpg?v=4" class="qrisImg" alt="QRIS Alinsta Cellular" onerror="this.src='qris_final.jpg'">
+
+<div style="display:flex;gap:8px">
+<a href="qris.jpg" target="_blank" style="flex:1;background:#f1f5f9;color:#0d47a1;padding:12px;border-radius:10px;text-decoration:none;font-weight:800;font-size:11px;text-align:center;border:1px solid #bfdbfe">🔍 BUKA QRIS.JPG</a>
+<a id="tgLink" target="_blank" style="flex:1;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;padding:12px;border-radius:10px;text-decoration:none;font-weight:900;font-size:11px;text-align:center">💬 KIRIM BUKTI</a>
+</div>
+
+<div style="background:#eff6ff;border-radius:10px;padding:10px;font-size:11px;text-align:left;margin-top:10px">
+<b>💙 Minta di atas 50RB silahkan donasi seikhlasnya:</b><br>• Scan QRIS.JPG di bawah<br>• Donasi bebas seikhlasnya (tidak wajib nominal besar)<br>• Screenshot bukti → Kirim ke Admin untuk ACC
+</div>
+</div>
+</div>
+
+<div id="msg" style="text-align:center;margin-top:14px;font-size:12px;font-weight:800;min-height:20px;color:#0d47a1"></div>
+</div>
 
 <script>
-let coin=parseInt(localStorage.getItem("ruangSadar_coin")||"20000");
-let last=parseInt(localStorage.getItem("lastMinta50")||"0");
-function update(){document.getElementById('walletCoin').textContent=coin.toLocaleString('id-ID');document.getElementById('topCoin').textContent=coin.toLocaleString('id-ID')+" Coin";localStorage.setItem("ruangSadar_coin",coin);}
-function minta50(){
- let msg=document.getElementById('msg');
- if(coin>=5000){msg.style.color="red";msg.textContent="❌ Saldo masih "+coin.toLocaleString()+" (>5k). Habiskan dulu ke ~1k!";return;}
- if(Date.now()-last<60*60*1000){msg.style.color="orange";msg.textContent="⏳ Cooldown 1 jam!";return;}
- coin+=50000;last=Date.now();localStorage.setItem("lastMinta50",last);update();msg.style.color="green";msg.textContent="✅ +50.000 Masuk! Pola reset 20k→1k→45k→52k";
+const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();const db=firebase.firestore();
+let curUser=null;
+auth.onAuthStateChanged(u=>{if(!u){location.href="index.html";return;}curUser=u;document.getElementById("myEmail").textContent=u.email;db.collection("players").doc(u.uid).onSnapshot(doc=>{let coin=doc.exists?doc.data().wallet?.coin||0:0;document.getElementById("topCoin").textContent=Number(coin).toLocaleString()+" Coin";document.getElementById("walletCoin").textContent=Number(coin).toLocaleString();});});
+async function mintaAuto(){
+ const msg=document.getElementById("msg");msg.textContent="⏳ Menambahkan 50.000...";
+ try{let ref=db.collection("players").doc(curUser.uid);let doc=await ref.get();let now=doc.exists?doc.data().wallet?.coin||0:0;await ref.set({profile:{email:curUser.email},wallet:{coin:now+50000}},{merge:true});msg.style.color="#15803d";msg.textContent="✅ +50.000 Masuk!";}catch(e){msg.style.color="#dc2626";msg.textContent="❌ "+e.message}
 }
-update();
-</script></body></html>
+async function mintaDonasi(){
+ let coinVal=Number(document.getElementById("reqCoin").value);
+ const msg=document.getElementById("msg");
+ if(!coinVal||coinVal<=50000){alert("Harus >50.000");return;}
+ msg.textContent="⏳ Kirim permintaan "+coinVal.toLocaleString()+"...";
+ try{
+  await db.collection("coin_requests").add({
+   userId:curUser.uid,email:curUser.email,amount:coinVal,donasi:"seikhlasnya",status:"pending",
+   createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  document.getElementById("coinText").textContent=coinVal.toLocaleString()+" Coin";
+  document.getElementById("qrisBox").style.display="block";
+  document.getElementById("tgLink").href="https://t.me/Legends_Portal?text=Halo%20Admin%20Minta%20"+coinVal+"%20Coin%20Email%20"+encodeURIComponent(curUser.email)+"%20Sudah%20Donasi%20via%20qris.jpg";
+  msg.style.color="#15803d";msg.textContent="✅ Terkirim! Scan qris.jpg dibawah";
+  document.getElementById("qrisBox").scrollIntoView({behavior:"smooth"});
+ }catch(e){msg.style.color="#dc2626";msg.textContent="❌ "+e.message}
+}
+</script>
+</body>
+</html>
