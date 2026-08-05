@@ -38,6 +38,13 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 .menuClose{position:absolute;top:15px;right:15px;font-size:24px;cursor:pointer;color:#0d47a1;}
 .overlay{position:fixed;inset:0;background:rgba(15,23,42,.4);display:none;z-index:9998;}.overlay.show{display:block;}
 </style></head><body>
+
+<div style="margin:0;background:#dc2626;border-bottom:4px solid #991b1b;padding:14px 12px;position:sticky;top:0;z-index:200;text-align:center;box-shadow:0 4px 20px rgba(220,38,38,.4)">
+<div style="font-size:18px;font-weight:900;color:#fff;letter-spacing:0.5px;line-height:1.2;text-transform:uppercase">⚠️ PERINGATAN KERAS: JUDOL ILEGAL - SEMUANYA DI SETTING BANDAR! ⚠️</div>
+<div style="font-size:13px;font-weight:900;color:#fef2f2;margin-top:6px;line-height:1.4">DI INDONESIA TIDAK ADA JUDI YANG LEGAL ATAU RESMI! SEMUA SITUS JUDOL ADALAH ILEGAL, MENIPU, DAN DIATUR UNTUK MEMBUAT ANDA KALAH!</div>
+<div style="font-size:11px;font-weight:700;color:#fee2e2;margin-top:4px;line-height:1.3">INI ADALAH PORTAL EDUKASI UNTUK MEMBONGKAR SETTINGAN BANDAR, BUKAN UNTUK BERJUDI. JANGAN PERNAH COBA JUDOL - PASTI RUGI, HUTANG, DAN HANCUR KELUARGA!</div>
+</div>
+
 <header>
 <div class="menu" onclick="openMenu()">☰</div>
 <div class="logo">RUANG SADAR<br><small>Ruang Belajar Sadar Bahaya Judol</small><small id="playerEmail"></small></div>
@@ -47,7 +54,7 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 <div id="sideMenu" class="sideMenu">
 <div class="menuClose" onclick="closeMenu()">✕</div>
 <a href="portal.html">🏠 Beranda Edukasi</a>
-<a href="minta-coin.html">🎓 Minta Coin Edukasi</a>
+<a href="logika_player.html">🎓 Minta Coin Edukasi</a>
 <a href="transaksi.html">📜 Riwayat Edukasi</a>
 <a href="https://t.me/RuangSadar" target="_blank">💬 Live Chat Edukasi</a>
 <a href="about.html">ℹ️ Tentang RUANG SADAR</a>
@@ -56,12 +63,12 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 
 <div id="wallet" style="margin:12px 12px 0 12px;padding:14px;background:#fff;border:2px solid #bfdbfe;border-radius:16px;display:flex;align-items:center;">
 <div style="flex:1"><div id="playerName" style="font-size:14px;font-weight:800;color:#0d47a1;">PLAYER</div><div style="font-size:11px;color:#64748b;margin-top:2px">Coin Edukasi Kamu</div><div style="display:flex;align-items:center;font-size:20px;font-weight:900;margin-top:4px"><span id="coin">0</span> <span style="margin-left:8px;width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block"></span></div></div>
-<button onclick="location.href='minta-coin.html'" style="width:90px;height:38px;border:none;border-radius:10px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🎓 MINTA COIN</button>
+<button onclick="location.href='logika_player.html'" style="width:90px;height:38px;border:none;border-radius:10px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🎓 MINTA COIN</button>
 </div>
 
 <div style="margin:12px;background:#fffbeb;border:2px solid #f59e0b;border-radius:12px;padding:12px;">
-<b style="font-size:11px;color:#92400e">⚠️ 6 SIMULASI INI MEMBONGKAR SETTING BANDAR JUDOL</b>
-<p style="font-size:10px;color:#78350f;margin-top:4px;line-height:1.4">Ini bukan judi. Ini edukasi untuk sadar. Mainkan semua biar paham polanya. Mode 5 kamu jadi bandarnya! Mode 6 adalah pengalaman asli player.</p>
+<b style="font-size:11px;color:#92400e">⚠️ 7 SIMULASI INI MEMBONGKAR SETTING BANDAR JUDOL</b>
+<p style="font-size:10px;color:#78350f;margin-top:4px;line-height:1.4">Ini bukan judi. Ini edukasi untuk sadar. Mainkan semua biar paham polanya. Mode 5 kamu jadi bandarnya! Mode 6 adalah pengalaman asli player. Mode 7 kamu tulis logika sendiri!</p>
 </div>
 
 <div class="grid">
@@ -90,10 +97,29 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 • <b>Melanjutkan permainan sebanyak 2 spin</b> - Jeda 2 spin biasa (zonk/rendah), tidak ada scatter<br>
 • <b>Setelah 2 spin → Kembali mendapatkan Scatter = 10 Free Spin + tambahan 5 Free Spin</b> - Total 15 Free Spin<br>
 • <b>Total kemenangan pada sesi Scatter kedua mencapai sekitar Rp52.000</b> - Dibagi rata di 15 free spin, retrigger +5 di tengah free<br><br>
-<b>Scatter = 10 Free Spin (setelah itu di sedot sampai habis saldo nya)</b>
+<b>Scatter = 10 Free Spin (bukan langsung menang)</b>
 </span><br>
-<b>Silahkan mainkan - Rasakan pola nyedot  20k→1k nya!</b> Ini pengalaman nyata player yang di-simulasikan untuk edukasi.
+<b>Silahkan mainkan - Rasakan pola nyedot 20k→1k nya!</b> Ini pengalaman nyata player yang di-simulasikan untuk edukasi.
 </div><a class='play' href='logika_player.html' style="background:linear-gradient(90deg,#16a34a,#15803d);font-size:13px;padding:12px;">📝 MAIN SIMULASI 6 - PENGALAMAN PLAYER (DATA ASLI)</a></div></div>
+
+
+<!-- GAME 7 - BARU - INPUT BEBAS CUSTOM LOGIC -->
+<div class='card' style="border-color:#f59e0b;box-shadow:0 4px 20px rgba(245,158,11,.30);grid-column:span 2"><div class='cover' style="background:linear-gradient(135deg,#fef3c7,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;">⌨️<div class='badge' style="background:#d97706;animation: pulse 1.5s infinite;">SIMULASI 7 - INPUT BEBAS • CUSTOM</div><div style="position:absolute;right:8px;top:8px;background:#fff;color:#d97706;font-size:8px;font-weight:900;padding:3px 6px;border-radius:20px;border:1px solid #f59e0b">KAMU ATUR</div></div><div class='info'><div class='title'>INPUT BEBAS - TULIS LOGIKA SEMAU MU</div><div class='sub'>
+<b>Fitur baru sesuai permintaan:</b> Ada kolom input, kamu tulis yang kamu mau, game ngikutin!<br><br>
+<span style="background:#fffbeb;border:1px solid #fde68a;padding:6px;border-radius:8px;display:block;line-height:1.5">
+⌨️ <b>Contoh yang bisa kamu tulis:</b><br>
+• <code>spin 3x dapat free 10 spin dengan nilai 10jt</code><br>
+• <code>spin 5x dapat free 10 spin dengan nilai 100jt</code><br>
+• <code>saldo 20rb sedot sampai 1rb dapat free 10 spin nilai 45k</code><br><br>
+<b>Logika yang didukung:</b><br>
+• Sedot sampai di bawah 1rb (<1000) baru free<br>
+• Pakai <b>scatter.png</b> + jeda 5 detik sebelum free 10 spin<br>
+• Setelah scatter ke-2 beres → sedot sampai habis<br>
+• Nilai otomatis: 10jt = 10.000.000, 45k = 45.000
+</span><br>
+<b>Silahkan mainkan - Game akan parsing tulisan kamu jadi setting bandar!</b>
+</div><a class='play' href='bebas.html' style="background:linear-gradient(90deg,#f59e0b,#d97706);font-size:13px;padding:12px;">⌨️ MAIN SIMULASI 7 - INPUT BEBAS (CUSTOM LOGIC)</a></div></div>
+
 
 </div>
 
