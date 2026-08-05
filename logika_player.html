@@ -109,7 +109,7 @@ function updateUI(){
     cycleEl.textContent=`FREE SPIN ${freeSpins} | ${freeSpinAccumulated.toLocaleString('id-ID')}/${freeSpinWinCap.toLocaleString('id-ID')} | Sesi ${freeSession}`;
     cycleEl.style.background="#00ff8820"; cycleEl.style.color="#00ff88"; cycleEl.style.border="1px solid #00ff8833";
   } else if(!firstScatterDone){
-    cycleEl.textContent=`NYEDOT: Spin ${spinTotal} - Saldo ${score.toLocaleString('id-ID')} → target 1k dulu 📉`;
+    cycleEl.textContent=`NYEDOT: Spin ${spinTotal} - Saldo ${score.toLocaleString('id-ID')} → target di bawah 1k (<1000) 📉`;
     cycleEl.style.background="#ff555520"; cycleEl.style.color="#ff5555";
   } else if(firstScatterDone && spinsAfterFirstFree<2){
     cycleEl.textContent=`Setelah FREE 45k - Jeda ${spinsAfterFirstFree}/2 spin → Scatter lagi`;
@@ -165,7 +165,7 @@ async function spin(){
   spinning=true; spinTotal++;
 
   // CEK TRIGGER SCATTER PERTAMA: saat saldo <=1200 dan belum pernah scatter
-  if(!firstScatterDone && score<=1200){
+  if(!firstScatterDone && score<1000){
     // SCATTER = 10 FREE SPIN dengan total 45k
     let target=generateBoard(true);
     board=target.board; drawBoard();
@@ -201,23 +201,44 @@ async function spin(){
     return;
   }
 
-  // SPIN BIASA - NYEDOT
+  // SPIN BIASA - NYEDOT SAMPAI DI BAWAH 1RB (EDIT 1) & SETELAH SCATTER 2 SEDOT SAMPAI HABIS (EDIT 2)
   score-=currentBet;
   let target=generateBoard(false);
   board=target.board; drawBoard();
   await new Promise(r=>setTimeout(r,150));
 
-  // ZONK dominan saat nyedot
-  let isWin = Math.random()<0.18; // 18% win kecil saat nyedot
-  if(isWin && !firstScatterDone){
-    let win=Math.floor(currentBet*(0.3+Math.random()*0.5));
-    score+=win; tumbleWin+=win;
-    document.getElementById('topWinDisplay').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`;
-    log(`Spin ${spinTotal} +${win} - Saldo ${score.toLocaleString('id-ID')} (nyedot)`, "b-win");
-    showWin(`+${win}`);
+  // === EDIT 2: JIKA SUDAH SELESAI SCATTER 2, SEDOT SAMPAI HABIS ===
+  if(secondScatterDone){
+    // 85% ZONK biar cepat habis
+    let isWinAkhir = Math.random()<0.15;
+    if(isWinAkhir){
+      let win=Math.floor(currentBet*(0.1+Math.random()*0.2));
+      score+=win; tumbleWin+=win;
+      document.getElementById('topWinDisplay').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`;
+      log(`[SEDOT AKHIR] Spin ${spinTotal} +${win} - Saldo ${score.toLocaleString('id-ID')} → akan habis`, "b-lose");
+      showWin(`+${win}`);
+    } else {
+      log(`[SEDOT AKHIR] Spin ${spinTotal} ZONK -${currentBet} - Saldo ${score.toLocaleString('id-ID')} → menuju 0`, "b-lose");
+      showWin(`ZONK`);
+    }
+    if(score<=0){
+      score=0;
+      await showPopup(`SALDO HABIS! 🕳️`, `Sesuai permintaan:<br>Setelah Scatter ke-2 beres, saldo disedot sampai habis<br><br>Saldo akhir: Rp0<br>Total spin: ${spinTotal}<br><br>Ini edukasi: Inilah ujung nyata bandar - habis!`, "RESET 20K");
+      log(`SALDO HABIS! Setelah Scatter 2, sedot sampai 0`, "b-lose");
+    }
   } else {
-    log(`Spin ${spinTotal} ZONK -${currentBet} - Saldo ${score.toLocaleString('id-ID')}`, "b-lose");
-    if(firstScatterDone) spinsAfterFirstFree++;
+    // ZONK dominan saat nyedot awal 20k -> <1k
+    let isWin = Math.random()<0.18; // 18% win kecil saat nyedot awal
+    if(isWin && !firstScatterDone){
+      let win=Math.floor(currentBet*(0.3+Math.random()*0.5));
+      score+=win; tumbleWin+=win;
+      document.getElementById('topWinDisplay').textContent=`💰 MENANG : Rp ${tumbleWin.toLocaleString('id-ID')}`;
+      log(`Spin ${spinTotal} +${win} - Saldo ${score.toLocaleString('id-ID')} (nyedot ke <1k)`, "b-win");
+      showWin(`+${win}`);
+    } else {
+      log(`Spin ${spinTotal} ZONK -${currentBet} - Saldo ${score.toLocaleString('id-ID')} ${!firstScatterDone?'→ target <1000':''}`, "b-lose");
+      if(firstScatterDone) spinsAfterFirstFree++;
+    }
   }
 
   showMsg(`Spin ${spinTotal} | Saldo ${score.toLocaleString('id-ID')} ${!firstScatterDone?'→ target 1k dulu':''}`);
@@ -259,7 +280,7 @@ async function startFreeSpins(){
     updateUI();
   }
 
-  if(freeSession==1){
+  if(freeSession==1){ // Sesi 1 selesai
     await showPopup(`FREE #1 SELESAI 🎉`, `Total Menang Free #1: Rp${total.toLocaleString('id-ID')} (45k)<br>Sesuai data kamu<br>Saldo sekarang Rp${score.toLocaleString('id-ID')}<br><br>Lanjut 2 spin biasa akan Scatter lagi 52k+5FS`, "LANJUT 2 SPIN");
     log(`FREE #1 SELESAI total ${total} (45k) - Saldo ${score}`, "b-win");
     firstScatterDone=true;
@@ -268,6 +289,9 @@ async function startFreeSpins(){
     await showPopup(`FREE #2 SELESAI 🎉`, `Total Menang Free #2: Rp${total.toLocaleString('id-ID')} (52k)<br>10 Free +5 Tambahan = 15 Free<br>Sesuai data kamu<br>Saldo akhir Rp${score.toLocaleString('id-ID')}`, "KLAIM 52k!");
     log(`FREE #2 SELESAI total ${total} (52k) +5 FS - Saldo akhir ${score}`, "b-win");
     secondScatterDone=true;
+    // === EDIT 2: SETELAH SCATTER 2 BERES, SEDOT SAMPAI HABIS ===
+    isSedotPhase=true;
+    log(`FASE AKHIR: Sedot sampai habis - Saldo ${score}`, "b-lose");
   }
 
   inFreeSpin=false;
@@ -295,7 +319,7 @@ document.getElementById('autoBtn').onclick=async()=>{
 };
 
 createBoard(); updateUI();
-log("Deposit 20k - NYEDOT dulu ke 1k, Scatter=10 FREE", "b-lose");
+log("Deposit 20k - NYEDOT dulu ke bawah 1k (<1000), Scatter=10 FREE", "b-lose");
 </script>
 </body>
 </html>
