@@ -27,18 +27,20 @@
 header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;padding:14px 18px;display:flex;align-items:center;gap:18px;z-index:100;position:relative;}
 .liveChatBtn{position:absolute;top:14px;right:16px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(#1a73e8,#0d47a1);color:#fff;text-decoration:none;font-size:20px;}
 .menu{font-size:32px;cursor:pointer;color:#0d47a1}.logo{font-size:20px;font-weight:900;line-height:1.1;color:#0d47a1;flex:1;}.logo small{display:block;font-size:11px;margin-top:4px;color:#64748b;font-weight:600;}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px;align-items:start}
-.card.full, .card[style*="span 2"]{grid-column:span 2}
-@media(max-width:600px){.grid{grid-template-columns:1fr}}
-.card{background:#fff;border:2px solid #bfdbfe;border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(26,115,232,.12)}
-.cover{height:110px;background-size:cover;background-position:center;position:relative}
-.badge{position:absolute;left:10px;top:10px;color:#fff;padding:4px 8px;border-radius:8px;font-size:10px;font-weight:800}
-.info{padding:12px}.title{font-size:13px;font-weight:900;margin-bottom:4px;color:#0d47a1}.sub{color:#64748b;font-size:10px;margin-bottom:10px;line-height:1.4}
-.play{display:block;text-decoration:none;text-align:center;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-weight:800;padding:10px;border-radius:10px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px;align-items:stretch}
+.card{background:#fff;border:2px solid #bfdbfe;border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(26,115,232,.12);display:flex;flex-direction:column;height:100%}
+.card[style*="span 2"]{grid-column:span 2}
+.cover{height:110px;min-height:110px;background-size:cover;background-position:center;position:relative;flex-shrink:0}
+.badge{position:absolute;left:8px;top:8px;color:#fff;padding:4px 7px;border-radius:8px;font-size:9px;font-weight:800;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.info{padding:12px;display:flex;flex-direction:column;flex:1}
+.title{font-size:13px;font-weight:900;margin-bottom:4px;color:#0d47a1;line-height:1.2}
+.sub{color:#64748b;font-size:10px;margin-bottom:10px;line-height:1.4;flex:1}
+.play{display:block;text-decoration:none;text-align:center;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-weight:800;padding:10px;border-radius:10px;font-size:12px;margin-top:auto;flex-shrink:0}
 .sideMenu{position:fixed;top:0;left:-280px;width:260px;height:100%;background:#fff;border-right:2px solid #bfdbfe;transition:.3s;z-index:9999;padding-top:70px;}
 .sideMenu.show{left:0;}.sideMenu a{display:block;padding:14px 20px;color:#0f172a;text-decoration:none;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700}.sideMenu a:hover{background:#dbeafe;color:#0d47a1;}
 .menuClose{position:absolute;top:15px;right:15px;font-size:24px;cursor:pointer;color:#0d47a1;}
 .overlay{position:fixed;inset:0;background:rgba(15,23,42,.4);display:none;z-index:9998;}.overlay.show{display:block;}
+@media(max-width:480px){.grid{gap:10px;padding:10px} .cover{height:90px;min-height:90px} .title{font-size:12px} .sub{font-size:9px} .badge{font-size:8px;padding:3px 6px}}
 </style></head><body>
 
 <div style="margin:0;background:#dc2626;border-bottom:4px solid #991b1b;padding:14px 12px;position:sticky;top:0;z-index:200;text-align:center;box-shadow:0 4px 20px rgba(220,38,38,.4)">
@@ -86,8 +88,8 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 <!-- GAME 4 - SEDOT 1 MENIT - DATA LAMA TIDAK DIRUBAH -->
 <div class='card'><div class='cover' style="background:linear-gradient(135deg,#fee2e2,#0f172a);display:flex;align-items:center;justify-content:center;font-size:40px">🕳️<div class='badge' style="background:#000">SIMULASI 4 - SEDOT</div></div><div class='info'><div class='title'>MODE SEDOT 1 MENIT</div><div class='sub'><b>Setting: Kalah total, disedot habis dalam 1 menit.</b> Setting asli saat bandar butuh uang. Inilah ujung nyata semua pemain judol.</div><a class='play' href='fruit4.html' style="background:linear-gradient(90deg,#334155,#000)">MAIN SIMULASI 4</a></div></div>
 
-<!-- GAME 5 - MANUAL / GOD MODE - DIRAPIHKAN GRID SAMA KAYA 6 & 7 -->
-<div class='card' style="border-color:#a855f7;box-shadow:0 4px 20px rgba(168,85,247,.25);grid-column:span 2"><div class='cover' style="background:linear-gradient(135deg,#f3e8ff,#a855f7);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;">🎛️<div class='badge' style="background:#7e22ce;animation: pulse 1.5s infinite;">SIMULASI 5 - MANUAL • BARU</div><div style="position:absolute;right:8px;top:8px;background:#ffcc00;color:#000;font-size:8px;font-weight:900;padding:3px 6px;border-radius:20px;">GOD MODE</div></div><div class='info'><div class='title'>SETTING SEMAUMU - SEOLAH-OLAH KAMU BANDARNYA</div><div class='sub'><b>Setting: Kamu atur sendiri kapan scatter, kapan zonk, kapan jackpot 10jt / 100jt.</b><br><br>🎮 6 pilihan ceklis, hanya boleh 1 aktif, auto reset tiap pindah ceklis.<br>👁️ <b>Simak naik turun saldo nya sesuai yang kamu ceklis</b> - lihat grafik biar sadar polanya.<br><br>• C1: Spin 1-10 scatter geser<br>• C2: 3x spin 10jt<br>• C3: 10x zonk<br>• C4: Scatter zonk<br>• C5: Spin 1 scatter<br>• C6: Spin 1 scatter 100jt</div><a class='play' href='manual.html' style="background:linear-gradient(90deg,#a855f7,#7e22ce);font-size:13px;padding:12px;">🎛️ MAIN SIMULASI 5 - MANUAL (JADI BANDAR)</a></div></div>
+<!-- GAME 5 - MANUAL / GOD MODE - DATA LAMA TIDAK DIRUBAH -->
+<div class='card' style="border-color:#d8b4fe;box-shadow:0 4px 20px rgba(168,85,247,.25);grid-column:span 2"><div class='cover' style="background:linear-gradient(135deg,#f3e8ff,#a855f7);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;">🎛️<div class='badge' style="background:#7e22ce;animation: pulse 1.5s infinite;">SIMULASI 5 - MANUAL • BARU</div><div style="position:absolute;right:8px;top:8px;background:#ffcc00;color:#000;font-size:8px;font-weight:900;padding:3px 6px;border-radius:20px;">GOD MODE</div></div><div class='info'><div class='title'>SETTING SEMAUMU - SEOLAH-OLAH KAMU BANDARNYA</div><div class='sub'><b>Setting: Kamu atur sendiri kapan scatter, kapan zonk, kapan jackpot 10jt / 100jt.</b><br><br>🎮 6 pilihan ceklis, hanya boleh 1 aktif, auto reset tiap pindah ceklis.<br>👁️ <b>Simak naik turun saldo nya sesuai yang kamu ceklis</b> - lihat grafik biar sadar polanya.<br><br>• C1: Spin 1-10 scatter geser<br>• C2: 3x spin 10jt<br>• C3: 10x zonk<br>• C4: Scatter zonk<br>• C5: Spin 1 scatter<br>• C6: Spin 1 scatter 100jt</div><a class='play' href='manual.html' style="background:linear-gradient(90deg,#a855f7,#7e22ce);font-size:13px;padding:12px;">🎛️ MAIN SIMULASI 5 - MANUAL (JADI BANDAR)</a></div></div>
 
 <!-- GAME 6 - BARU - PENGALAMAN PLAYER DITERAPKAN DI SINI -->
 <div class='card' style="border-color:#22c55e;box-shadow:0 4px 20px rgba(34,197,94,.25);grid-column:span 2"><div class='cover' style="background:linear-gradient(135deg,#dcfce7,#16a34a);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;">📝<div class='badge' style="background:#15803d;animation: pulse 1.5s infinite;">SIMULASI 6 - PENGALAMAN PLAYER • REAL DATA</div><div style="position:absolute;right:8px;top:8px;background:#fff;color:#15803d;font-size:8px;font-weight:900;padding:3px 6px;border-radius:20px;border:1px solid #15803d">DATA ASLI</div></div><div class='info'><div class='title'>PENGALAMAN PLAYER DITERAPKAN DI SINI</div><div class='sub'>
@@ -125,7 +127,26 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 
 </div>
 
-<style>@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}</style>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{font-family:Arial;background:#f0f7ff;color:#0f172a;overflow-x:hidden}
+header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;padding:14px 18px;display:flex;align-items:center;gap:18px;z-index:100;position:relative;}
+.liveChatBtn{position:absolute;top:14px;right:16px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(#1a73e8,#0d47a1);color:#fff;text-decoration:none;font-size:20px;}
+.menu{font-size:32px;cursor:pointer;color:#0d47a1}.logo{font-size:20px;font-weight:900;line-height:1.1;color:#0d47a1;flex:1;}.logo small{display:block;font-size:11px;margin-top:4px;color:#64748b;font-weight:600;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px;align-items:stretch}
+.card{background:#fff;border:2px solid #bfdbfe;border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(26,115,232,.12);display:flex;flex-direction:column;height:100%}
+.card[style*="span 2"]{grid-column:span 2}
+.cover{height:110px;min-height:110px;background-size:cover;background-position:center;position:relative;flex-shrink:0}
+.badge{position:absolute;left:8px;top:8px;color:#fff;padding:4px 7px;border-radius:8px;font-size:9px;font-weight:800;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.info{padding:12px;display:flex;flex-direction:column;flex:1}
+.title{font-size:13px;font-weight:900;margin-bottom:4px;color:#0d47a1;line-height:1.2}
+.sub{color:#64748b;font-size:10px;margin-bottom:10px;line-height:1.4;flex:1}
+.play{display:block;text-decoration:none;text-align:center;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-weight:800;padding:10px;border-radius:10px;font-size:12px;margin-top:auto;flex-shrink:0}
+.sideMenu{position:fixed;top:0;left:-280px;width:260px;height:100%;background:#fff;border-right:2px solid #bfdbfe;transition:.3s;z-index:9999;padding-top:70px;}
+.sideMenu.show{left:0;}.sideMenu a{display:block;padding:14px 20px;color:#0f172a;text-decoration:none;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700}.sideMenu a:hover{background:#dbeafe;color:#0d47a1;}
+.menuClose{position:absolute;top:15px;right:15px;font-size:24px;cursor:pointer;color:#0d47a1;}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.4);display:none;z-index:9998;}.overlay.show{display:block;}
+@media(max-width:480px){.grid{gap:10px;padding:10px} .cover{height:90px;min-height:90px} .title{font-size:12px} .sub{font-size:9px} .badge{font-size:8px;padding:3px 6px}}
+</style>
 
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
