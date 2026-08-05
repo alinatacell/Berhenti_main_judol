@@ -37,8 +37,6 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 .sideMenu.show{left:0;}.sideMenu a{display:block;padding:14px 20px;color:#0f172a;text-decoration:none;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700}.sideMenu a:hover{background:#dbeafe;color:#0d47a1;}
 .menuClose{position:absolute;top:15px;right:15px;font-size:24px;cursor:pointer;color:#0d47a1;}
 .overlay{position:fixed;inset:0;background:rgba(15,23,42,.4);display:none;z-index:9998;}.overlay.show{display:block;}
-.historyWrap{margin:12px 12px 0 12px;padding:0;background:#fff;border:2px solid #bfdbfe;border-radius:16px;overflow:hidden;}
-.historyHead{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;background:#eff6ff}
 </style></head><body>
 <header>
 <div class="menu" onclick="openMenu()">☰</div>
@@ -49,7 +47,7 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 <div id="sideMenu" class="sideMenu">
 <div class="menuClose" onclick="closeMenu()">✕</div>
 <a href="portal.html">🏠 Beranda Edukasi</a>
-<a href="minta-coin.html">🎓 Minta Coin Edukasi</a>
+<a href="logika_player.html">🎓 Minta Coin Edukasi</a>
 <a href="transaksi.html">📜 Riwayat Edukasi</a>
 <a href="https://t.me/RuangSadar" target="_blank">💬 Live Chat Edukasi</a>
 <a href="about.html">ℹ️ Tentang RUANG SADAR</a>
@@ -58,29 +56,44 @@ header{position:sticky;top:0;background:#fff;border-bottom:2px solid #bfdbfe;pad
 
 <div id="wallet" style="margin:12px 12px 0 12px;padding:14px;background:#fff;border:2px solid #bfdbfe;border-radius:16px;display:flex;align-items:center;">
 <div style="flex:1"><div id="playerName" style="font-size:14px;font-weight:800;color:#0d47a1;">PLAYER</div><div style="font-size:11px;color:#64748b;margin-top:2px">Coin Edukasi Kamu</div><div style="display:flex;align-items:center;font-size:20px;font-weight:900;margin-top:4px"><span id="coin">0</span> <span style="margin-left:8px;width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block"></span></div></div>
-<button onclick="location.href='minta-coin.html'" style="width:90px;height:38px;border:none;border-radius:10px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🎓 MINTA COIN</button>
+<button onclick="location.href='logika_player.html'" style="width:90px;height:38px;border:none;border-radius:10px;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🎓 MINTA COIN</button>
 </div>
 
 <div style="margin:12px;background:#fffbeb;border:2px solid #f59e0b;border-radius:12px;padding:12px;">
-<b style="font-size:11px;color:#92400e">⚠️ 5 SIMULASI INI MEMBONGKAR SETTING BANDAR JUDOL</b>
-<p style="font-size:10px;color:#78350f;margin-top:4px;line-height:1.4">Ini bukan judi. Ini edukasi untuk sadar. Mainkan semua biar paham polanya. Mode 5 kamu jadi bandarnya!</p>
+<b style="font-size:11px;color:#92400e">⚠️ 6 SIMULASI INI MEMBONGKAR SETTING BANDAR JUDOL</b>
+<p style="font-size:10px;color:#78350f;margin-top:4px;line-height:1.4">Ini bukan judi. Ini edukasi untuk sadar. Mainkan semua biar paham polanya. Mode 5 kamu jadi bandarnya! Mode 6 adalah pengalaman asli player.</p>
 </div>
 
 <div class="grid">
-<!-- GAME 1 - MENANG AWAL -->
+<!-- GAME 1 - MENANG AWAL - DATA LAMA TIDAK DIRUBAH -->
 <div class='card'><div class='cover' style="background:linear-gradient(135deg,#dcfce7,#22c55e);display:flex;align-items:center;justify-content:center;font-size:40px">🍒<div class='badge' style="background:#15803d">SIMULASI 1 - UMPAN</div></div><div class='info'><div class='title'>ILUSI MENANG AWAL</div><div class='sub'><b>Setting: Player baru sengaja dibuat menang.</b> Trik psikologi biar kamu merasa hoki & ketagihan main lagi. Padahal ini umpan awal bandar.</div><a class='play' href='fruit.html'>MAIN SIMULASI 1</a></div></div>
 
-<!-- GAME 2 - DRAW -->
+<!-- GAME 2 - DRAW - DATA LAMA TIDAK DIRUBAH -->
 <div class='card'><div class='cover' style="background:linear-gradient(135deg,#dbeafe,#1a73e8);display:flex;align-items:center;justify-content:center;font-size:40px">⚖️<div class='badge' style="background:#0d47a1">SIMULASI 2 - DITAHAN</div></div><div class='info'><div class='title'>POLA DRAW MENAHAN</div><div class='sub'><b>Setting: Tidak kalah tidak menang.</b> Saldo naik-turun biar betah lama di mesin. Kamu kehabisan waktu & penasaran terus.</div><a class='play' href='fruit2.html'>MAIN SIMULASI 2</a></div></div>
 
-<!-- GAME 3 - JACKPOT GLOBAL POOL -->
+<!-- GAME 3 - JACKPOT GLOBAL POOL - DATA LAMA TIDAK DIRUBAH -->
 <div class='card'><div class='cover' style="background:linear-gradient(135deg,#ffedd5,#f97316);display:flex;align-items:center;justify-content:center;font-size:40px">💣<div class='badge' style="background:#c2410c">SIMULASI 3 - JACKPOT</div></div><div class='info'><div class='title'>JEBAKAN JACKPOT GLOBAL</div><div class='sub'><b>Setting: Menang besar hingga habiskan saldo Global Pool.</b> Kamu lihat orang lain JP besar, padahal itu kumpulan saldo korban lain yang disedot balik.</div><a class='play' href='fruit3.html'>MAIN SIMULASI 3</a></div></div>
 
-<!-- GAME 4 - SEDOT 1 MENIT -->
+<!-- GAME 4 - SEDOT 1 MENIT - DATA LAMA TIDAK DIRUBAH -->
 <div class='card'><div class='cover' style="background:linear-gradient(135deg,#fee2e2,#0f172a);display:flex;align-items:center;justify-content:center;font-size:40px">🕳️<div class='badge' style="background:#000">SIMULASI 4 - SEDOT</div></div><div class='info'><div class='title'>MODE SEDOT 1 MENIT</div><div class='sub'><b>Setting: Kalah total, disedot habis dalam 1 menit.</b> Setting asli saat bandar butuh uang. Inilah ujung nyata semua pemain judol.</div><a class='play' href='fruit4.html' style="background:linear-gradient(90deg,#334155,#000)">MAIN SIMULASI 4</a></div></div>
 
-<!-- GAME 5 - MANUAL / GOD MODE - BARU -->
+<!-- GAME 5 - MANUAL / GOD MODE - DATA LAMA TIDAK DIRUBAH -->
 <div class='card' style="border-color:#d8b4fe;box-shadow:0 4px 20px rgba(168,85,247,.25);"><div class='cover' style="background:linear-gradient(135deg,#f3e8ff,#a855f7);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;">🎛️<div class='badge' style="background:#7e22ce;animation: pulse 1.5s infinite;">SIMULASI 5 - MANUAL • BARU</div><div style="position:absolute;right:8px;top:8px;background:#ffcc00;color:#000;font-size:8px;font-weight:900;padding:3px 6px;border-radius:20px;">GOD MODE</div></div><div class='info'><div class='title'>SETTING SEMAUMU - SEOLAH-OLAH KAMU BANDARNYA</div><div class='sub'><b>Setting: Kamu atur sendiri kapan scatter, kapan zonk, kapan jackpot 10jt / 100jt.</b><br><br>🎮 6 pilihan ceklis, hanya boleh 1 aktif, auto reset tiap pindah ceklis.<br>👁️ <b>Simak naik turun saldo nya sesuai yang kamu ceklis</b> - lihat grafik biar sadar polanya.<br><br>• C1: Spin 1-10 scatter geser<br>• C2: 3x spin 10jt<br>• C3: 10x zonk<br>• C4: Scatter zonk<br>• C5: Spin 1 scatter<br>• C6: Spin 1 scatter 100jt</div><a class='play' href='manual.html' style="background:linear-gradient(90deg,#a855f7,#7e22ce);font-size:13px;padding:12px;">🎛️ MAIN SIMULASI 5 - MANUAL (JADI BANDAR)</a></div></div>
+
+<!-- GAME 6 - BARU - PENGALAMAN PLAYER DITERAPKAN DI SINI -->
+<div class='card' style="border-color:#22c55e;box-shadow:0 4px 20px rgba(34,197,94,.25);grid-column:span 2"><div class='cover' style="background:linear-gradient(135deg,#dcfce7,#16a34a);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;">📝<div class='badge' style="background:#15803d;animation: pulse 1.5s infinite;">SIMULASI 6 - PENGALAMAN PLAYER • REAL DATA</div><div style="position:absolute;right:8px;top:8px;background:#fff;color:#15803d;font-size:8px;font-weight:900;padding:3px 6px;border-radius:20px;border:1px solid #15803d">DATA ASLI</div></div><div class='info'><div class='title'>PENGALAMAN PLAYER DITERAPKAN DI SINI</div><div class='sub'>
+<b>INI LOGIKA NYA (DARI DATA ASLI PLAYER):</b><br><br>
+<span style="background:#f0fdf4;border:1px solid #bbf7d0;padding:6px;border-radius:8px;display:block;line-height:1.5">
+• <b>Deposit awal: Rp20.000</b><br>
+• <b>Saldo dimainkan hingga tersisa sekitar Rp1.000</b> - Fase NYEDOT 70% ZONK, 20% kalah kecil, 10% menang kecil. Saldo turun dari 20k ke 1k<br>
+• <b>Setelah sisa 1k → Dapat Scatter = 10 Free Spin dengan total kemenangan sekitar Rp45.000</b> - Scatter 4 wajib muncul, masuk free 10x<br>
+• <b>Melanjutkan permainan sebanyak 2 spin</b> - Jeda 2 spin biasa (zonk/rendah), tidak ada scatter<br>
+• <b>Setelah 2 spin → Kembali mendapatkan Scatter = 10 Free Spin + tambahan 5 Free Spin</b> - Total 15 Free Spin<br>
+• <b>Total kemenangan pada sesi Scatter kedua mencapai sekitar Rp52.000</b> - Dibagi rata di 15 free spin, retrigger +5 di tengah free<br><br>
+<b>Scatter = 10 Free Spin (bukan langsung menang)</b>
+</span><br>
+<b>Silahkan mainkan - Rasakan pola nyedot 20k→1k nya!</b> Ini pengalaman nyata player yang di-simulasikan untuk edukasi.
+</div><a class='play' href='logika_player.html' style="background:linear-gradient(90deg,#16a34a,#15803d);font-size:13px;padding:12px;">📝 MAIN SIMULASI 6 - PENGALAMAN PLAYER (DATA ASLI)</a></div></div>
 
 </div>
 
@@ -108,18 +121,5 @@ auth.onAuthStateChanged(async(user)=>{
 function logout(){ if(unsubscribe) unsubscribe(); auth.signOut().then(()=>location.replace("index.html")); }
 function openMenu(){ document.getElementById("sideMenu").classList.add("show"); document.getElementById("overlay").classList.add("show"); }
 function closeMenu(){ document.getElementById("sideMenu").classList.remove("show"); document.getElementById("overlay").classList.remove("show"); }
-</script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
-<script>
-firebase.initializeApp({apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",projectId:"game-demo-4db7f"});
-firebase.firestore().collection("page_visits").add({
- page: location.pathname,
- url: location.href,
- time: firebase.firestore.FieldValue.serverTimestamp(),
- ua: navigator.userAgent,
- ref: document.referrer,
- dateStr: new Date().toISOString().slice(0,10)
-});
 </script>
 </body></html>
