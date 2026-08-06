@@ -30,9 +30,7 @@
 header{background:#fff;border-bottom:2px solid #bfdbfe;padding:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
 .btn{width:100%;height:56px;border:none;border-radius:14px;font-weight:900;font-size:14px;cursor:pointer;margin-top:12px}
 .card{margin:12px;padding:16px;background:#fff;border:2px solid #bfdbfe;border-radius:16px}
-.input{width:100%;padding:14px;border-radius:12px;border:2px solid #bfdbfe;background:#f8fafc;font-weight:700;margin-top:8px;font-size:15px}
-.qrisBox{background:#fff;border:2px solid #0d47a1;border-radius:16px;padding:14px;text-align:center;margin-top:14px}
-.qrisImg{width:100%;max-width:320px;border-radius:16px;border:2px solid #0d47a1;margin:10px auto;display:block}
+@keyframes popIn{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -53,29 +51,22 @@ header{background:#fff;border-bottom:2px solid #bfdbfe;padding:12px;display:flex
 <div class="card">
 <div style="text-align:center;font-weight:900;color:#15803d;font-size:15px">🎁 MINTA 50.000 GRATIS - AUTO MASUK</div>
 <button class="btn" style="background:linear-gradient(90deg,#22c55e,#15803d);color:#fff" onclick="mintaAuto()">🎁 MINTA 50.000 COIN GRATIS</button>
-
-<div style="margin:20px 0;height:2px;background:#e2e8f0"></div>
-
-
-<div id="qrisBox" style="display:none">
-<div class="qrisBox">
-<div style="font-weight:900;color:#0d47a1;font-size:15px">📱 MINTA DI ATAS 50RB - SILAHKAN DONASI SEIKHLASNYA</div>
-<div style="font-size:11px;color:#64748b;margin:6px 0">Minta: <b id="coinText" style="color:#15803d">-</b> | Donasi Seikhlasnya</div>
-
-<img src="qris.jpg?v=4" class="qrisImg" alt="QRIS Alinsta Cellular" onerror="this.src='qris_final.jpg'">
-
-<div style="display:flex;gap:8px">
-<a href="qris.jpg" target="_blank" style="flex:1;background:#f1f5f9;color:#0d47a1;padding:12px;border-radius:10px;text-decoration:none;font-weight:800;font-size:11px;text-align:center;border:1px solid #bfdbfe">🔍 BUKA QRIS.JPG</a>
-<a id="tgLink" target="_blank" style="flex:1;background:linear-gradient(90deg,#1a73e8,#0d47a1);color:#fff;padding:12px;border-radius:10px;text-decoration:none;font-weight:900;font-size:11px;text-align:center">💬 KIRIM BUKTI</a>
-</div>
-
-<div style="background:#eff6ff;border-radius:10px;padding:10px;font-size:11px;text-align:left;margin-top:10px">
-<b>💙 Minta di atas 50RB silahkan donasi seikhlasnya:</b><br>• Scan QRIS.JPG di bawah<br>• Donasi bebas seikhlasnya (tidak wajib nominal besar)<br>• Screenshot bukti → Kirim ke Admin untuk ACC
-</div>
-</div>
-</div>
-
 <div id="msg" style="text-align:center;margin-top:14px;font-size:12px;font-weight:800;min-height:20px;color:#0d47a1"></div>
+</div>
+
+<!-- POPUP BATAS COIN -->
+<div id="limitPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border:2px solid #bfdbfe;border-radius:20px;padding:22px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:popIn 0.25s ease">
+    <div style="width:64px;height:64px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:32px">⚠️</div>
+    <div style="font-weight:900;color:#0d47a1;font-size:16px">COIN MASIH ADA!</div>
+    <div style="font-size:12px;color:#64748b;margin:8px 0 4px;line-height:1.5">Habiskan dulu coin yang ada baru minta lagi ya.</div>
+    <div style="background:#f0f7ff;border:1px dashed #93c5fd;border-radius:12px;padding:10px;margin:12px 0">
+      <div style="font-size:11px;color:#64748b">Saldo kamu sekarang</div>
+      <div id="popupCoin" style="font-weight:900;color:#0d47a1;font-size:18px">0 Coin</div>
+    </div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:14px">Mainkan dulu sampai di bawah 5.000 coin baru bisa minta lagi.</div>
+    <button onclick="closeLimitPopup()" style="width:100%;height:48px;border:none;border-radius:12px;background:linear-gradient(90deg,#0d47a1,#1a73e8);color:#fff;font-weight:900;font-size:13px;cursor:pointer">OKE, HABISKAN DULU</button>
+  </div>
 </div>
 
 <script>
@@ -83,26 +74,48 @@ const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomai
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();const db=firebase.firestore();
 let curUser=null;
-auth.onAuthStateChanged(u=>{if(!u){location.href="index.html";return;}curUser=u;document.getElementById("myEmail").textContent=u.email;db.collection("players").doc(u.uid).onSnapshot(doc=>{let coin=doc.exists?doc.data().wallet?.coin||0:0;document.getElementById("topCoin").textContent=Number(coin).toLocaleString()+" Coin";document.getElementById("walletCoin").textContent=Number(coin).toLocaleString();});});
-async function mintaAuto(){
- const msg=document.getElementById("msg");msg.textContent="⏳ Menambahkan 50.000...";
- try{let ref=db.collection("players").doc(curUser.uid);let doc=await ref.get();let now=doc.exists?doc.data().wallet?.coin||0:0;await ref.set({profile:{email:curUser.email},wallet:{coin:now+50000}},{merge:true});msg.style.color="#15803d";msg.textContent="✅ +50.000 Masuk!";}catch(e){msg.style.color="#dc2626";msg.textContent="❌ "+e.message}
+let curCoinGlobal = 0;
+const BATAS_COIN = 5000; // kalau saldo >= ini, muncul popup habiskan dulu
+
+function showLimitPopup(coin){
+  document.getElementById("popupCoin").textContent = Number(coin).toLocaleString() + " Coin";
+  document.getElementById("limitPopup").style.display="flex";
 }
-async function mintaDonasi(){
- let coinVal=Number(document.getElementById("reqCoin").value);
- const msg=document.getElementById("msg");
- if(!coinVal||coinVal<=50000){alert("Harus >50.000");return;}
- msg.textContent="⏳ Kirim permintaan "+coinVal.toLocaleString()+"...";
- try{
-  await db.collection("coin_requests").add({
-   userId:curUser.uid,email:curUser.email,amount:coinVal,donasi:"seikhlasnya",status:"pending",
-   createdAt:firebase.firestore.FieldValue.serverTimestamp()
+function closeLimitPopup(){
+  document.getElementById("limitPopup").style.display="none";
+}
+document.getElementById("limitPopup").addEventListener("click", function(e){
+  if(e.target.id === "limitPopup") closeLimitPopup();
+});
+
+auth.onAuthStateChanged(u=>{
+  if(!u){location.href="index.html";return;}
+  curUser=u;
+  document.getElementById("myEmail").textContent=u.email;
+  db.collection("players").doc(u.uid).onSnapshot(doc=>{
+    let coin=doc.exists?doc.data().wallet?.coin||0:0;
+    curCoinGlobal=coin;
+    document.getElementById("topCoin").textContent=Number(coin).toLocaleString()+" Coin";
+    document.getElementById("walletCoin").textContent=Number(coin).toLocaleString();
   });
-  document.getElementById("coinText").textContent=coinVal.toLocaleString()+" Coin";
-  document.getElementById("qrisBox").style.display="block";
-  document.getElementById("tgLink").href="https://t.me/Legends_Portal?text=Halo%20Admin%20Minta%20"+coinVal+"%20Coin%20Email%20"+encodeURIComponent(curUser.email)+"%20Sudah%20Donasi%20via%20qris.jpg";
-  msg.style.color="#15803d";msg.textContent="✅ Terkirim! Scan qris.jpg dibawah";
-  document.getElementById("qrisBox").scrollIntoView({behavior:"smooth"});
+});
+
+async function mintaAuto(){
+ const msg=document.getElementById("msg");
+ try{
+  let ref=db.collection("players").doc(curUser.uid);
+  let doc=await ref.get();
+  let now=doc.exists?doc.data().wallet?.coin||0:0;
+  curCoinGlobal = now;
+  if(now >= BATAS_COIN){
+    showLimitPopup(now);
+    msg.style.color="#dc2626";
+    msg.textContent="⚠️ Saldo masih "+Number(now).toLocaleString()+" - habiskan dulu!";
+    return;
+  }
+  msg.textContent="⏳ Menambahkan 50.000...";
+  await ref.set({profile:{email:curUser.email},wallet:{coin:now+50000}},{merge:true});
+  msg.style.color="#15803d";msg.textContent="✅ +50.000 Masuk!";
  }catch(e){msg.style.color="#dc2626";msg.textContent="❌ "+e.message}
 }
 </script>
