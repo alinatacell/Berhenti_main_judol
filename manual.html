@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>SIMULASI 7 - 7X SPIN 100JT REEL</title>
+<title>SIMULASI 7 - 7X SPIN 100JT REEL TURUN</title>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
@@ -11,29 +11,29 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 body{width:100%;min-height:100dvh;font-family:Arial,Helvetica,sans-serif;background:#000 url("portal.png") no-repeat center top/cover;display:flex;justify-content:center;align-items:flex-start;}
 .mainShell{width:100%;max-width:540px;min-height:100dvh;margin:0 auto;display:flex;flex-direction:column;gap:8px;padding:8px 10px 12px;}
-.panel-sadow{background:linear-gradient(180deg, rgba(38,38,42,0.96) 0%, rgba(18,20,0.98) 100%);border:1px solid rgba(255,255,0.13);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,0.8);position:relative;width:100%;}
+.panel-sadow{background:linear-gradient(180deg, rgba(38,38,42,0.96) 0%, rgba(18,18,20,0.98) 100%);border:1px solid rgba(255,255,255,0.13);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0.8);position:relative;width:100%;}
 .panel-inner{position:relative;z-index:2;}
 .topPanel{padding:12px 14px;text-align:center;color:#fff;}
 #topWinDisplay{font-size:16px;font-weight:900;text-shadow:0 2px 0 #000,0 0 12px rgba(255,215,0,0.6);}
 #cycleDisplay{font-size:8px;color:#00e5ff;margin-top:4px;font-weight:800;background:rgba(0,229,255,0.1);padding:3px 8px;border-radius:20px;border:1px solid rgba(0,229,255,0.25);display:inline-block;}
-.board{padding:10px;display:flex;justify-content:center;align-items:center;border-radius:18px;background:radial-gradient(ellipse at center, rgba(20,20,25,0.9) 0%, rgba(5,5,8,0.98) 100%);border:1px solid rgba(255,255,0.10);overflow:hidden;}
+.board{padding:10px;display:flex;justify-content:center;align-items:center;border-radius:18px;background:radial-gradient(ellipse at center, rgba(20,20,25,0.9) 0%, rgba(5,5,8,0.98) 100%);border:1px solid rgba(255,255,255,0.10);overflow:hidden;min-height:320px;}
 #grid{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;width:100%;aspect-ratio:1/1;max-height:62vh;}
-.cell{position:relative;aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:28px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,0.04);border-radius:8px;overflow:visible;}
+.cell{position:relative;aspect-ratio:1;display:flex;justify-content:center;align-items:center;font-size:28px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);border-radius:8px;overflow:visible;}
 .cell.scatter{background:radial-gradient(circle at 50% 50%, rgba(255,215,0,0.38), transparent 78%);}
-.cell.scatter-img{width:82%;height:82%;object-fit:contain;filter:drop-shadow(0 14px rgba(255,215,0,0.9));animation:scatterFloat 2.5s ease-in-out infinite alternate;}
+.cell.scatter-img{width:82%;height:82%;object-fit:contain;filter:drop-shadow(0 0 14px rgba(255,215,0,0.9));animation:scatterFloat 2.5s ease-in-out infinite alternate;}
 @keyframes scatterFloat{from{transform:scale(1) rotate(-2deg);}to{transform:scale(1.08) rotate(2deg);}}
-.cell.shattering{animation:shatterAnim 0.50s cubic-bezier(.7,0,.85,.6) forwards;z-index:20;}
 @keyframes shatterAnim{0%{transform:scale(1);opacity:1;}100%{transform:scale(0.15) rotate(35deg) translateY(35px);opacity:0;}}
+.cell.shattering{animation:shatterAnim 0.50s cubic-bezier(.7,0,.85,.6) forwards;z-index:20;}
 .cell.scatter-last{animation:scatterLastGlow 0.9s ease-in-out infinite alternate;z-index:30;}
-@keyframes scatterLastGlow{from{filter:drop-shadow(0 0 12px gold) brightness(1.2);transform:scale(1);}to{filter:drop-shadow(0 28px gold) brightness(1.7);transform:scale(1.18);}}
+@keyframes scatterLastGlow{from{filter:drop-shadow(0 0 12px gold) brightness(1.2);transform:scale(1);}to{filter:drop-shadow(0 0 28px gold) brightness(1.7);transform:scale(1.18);}}
 .controlArea{padding:10px;display:flex;flex-direction:column;gap:8px;}
-.spinRow{width:100%;display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(30,34,0.9);border-radius:12px;}
-#spinBtn{width:70px;height:70px;border-radius:50%;border:3px solid #fff;background:linear-gradient(180deg,#b8ff44 0%,#7ed321 30%,#2e7d00 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,.7);}
+.spinRow{width:100%;display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(30,30,34,0.9);border-radius:12px;}
+#spinBtn{width:70px;height:70px;border-radius:50%;border:3px solid #fff;background:linear-gradient(180deg,#b8ff44 0%,#7ed321 30%,#2e7d00 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.7);}
 #spinBtn span{font-size:30px;color:#fff;font-weight:bold;}
 .bottomStats{display:flex;justify-content:space-between;gap:8px;}
-.saldoDisplay,.betDisplay{flex:1;text-align:center;padding:8px;background:rgba(40,45,0.95);border:1px solid rgba(255,215,0,0.18);border-radius:10px;}
+.saldoDisplay,.betDisplay{flex:1;text-align:center;padding:8px;background:rgba(40,40,45,0.95);border:1px solid rgba(255,215,0,0.18);border-radius:10px;}
 .saldoDisplay b,.betDisplay b{font-size:14px;color:#fff;font-weight:900;display:block;margin-top:3px;}
-#message{font-size:9px;font-weight:800;color:#fff;text-align:center;padding:6px;background:rgba(0,0,0.35);border-radius:8px;margin-top:6px;}
+#message{font-size:9px;font-weight:800;color:#fff;text-align:center;padding:6px;background:rgba(0,0,0,0.35);border-radius:8px;margin-top:6px;}
 </style>
 </head>
 <body>
@@ -52,9 +52,9 @@ body{width:100%;min-height:100dvh;font-family:Arial,Helvetica,sans-serif;backgro
 <script>
 const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
 firebase.initializeApp(firebaseConfig); const auth=firebase.auth(); const db=firebase.firestore();
-let globalPool=0; const POOL_KEY="fruitBobanza_sim7_pool"; let poolDocRef=db.collection("global").doc("pool");
+let globalPool=100000000; const POOL_KEY="fruitBobanza_sim7_pool"; let poolDocRef=db.collection("global").doc("pool");
 async function initGlobalPool(){try{let doc=await poolDocRef.get();if(!doc.exists){await poolDocRef.set({pool:100000000,profit:0});}else{globalPool=doc.data().pool||100000000;}poolDocRef.onSnapshot(snap=>{if(snap.exists)globalPool=snap.data().pool||100000000;});}catch(e){globalPool=100000000;}}
-async function addToGlobalPool(poolAdd,houseCut){try{await db.runTransaction(async tx=>{let doc=await tx.get(poolDocRef);tx.update(poolDocRef,{pool:(doc.data().pool||0)+poolAdd});}catch(e){globalPool+=poolAdd;}}
+async function addToGlobalPool(poolAdd,houseCut){try{await db.runTransaction(async tx=>{let doc=await tx.get(poolDocRef);tx.update(poolDocRef,{pool:(doc.data().pool||0)+poolAdd});});}catch(e){globalPool+=poolAdd;}}
 async function takeFromGlobalPool(winAmount){try{let taken=0;await db.runTransaction(async tx=>{let doc=await tx.get(poolDocRef);let pool=doc.data().pool||0;if(pool>=winAmount){tx.update(poolDocRef,{pool:pool-winAmount});taken=winAmount;}else{taken=pool;tx.update(poolDocRef,{pool:0});}});return taken;}catch(e){let t=Math.min(winAmount,globalPool);globalPool-=t;return t;}}
 
 let cycleSpinCount=1,freeSpinAccumulated=0,freeSpinWinCap=100000000;
@@ -64,4 +64,85 @@ const grid=document.getElementById("grid"); let cells=[];
 function randomFruit(){return symbols[Math.floor(Math.random()*symbols.length)];}
 function isScatter(v){return v===SCATTER;}
 function createBoard(){board=[];for(let r=0;r<ROWS;r++){let row=[];for(let c=0;c<COLS;c++)row.push(randomFruit());board.push(row);}drawBoard();}
-function drawBoard(){grid.innerHTML="";cells=[];for(let r=0;r
+function drawBoard(){grid.innerHTML="";cells=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const cell=document.createElement("div");cell.className="cell";if(isScatter(board[r][c])){cell.classList.add("scatter");cell.innerHTML='<img src="scatter.png" class="scatter-img" alt="SCATTER" onerror="this.outerHTML=\'💎\'">';}else{cell.textContent=board[r][c];}grid.appendChild(cell);cells.push(cell);}}
+function updateCycleDisplay(){let el=document.getElementById('cycleDisplay');if(inFreeSpin){el.textContent=`FREE SPIN ${freeSpins} | TARGET 100JT : ${freeSpinAccumulated.toLocaleString('id-ID')}/100.000.000 🎁`;el.style.color="#00ff88";}else{if(cycleSpinCount<=6){el.textContent=`SPIN ${cycleSpinCount}/7 - ZONK`;el.style.color="#ff5555";}else if(cycleSpinCount==7){el.textContent=`SPIN 7/7 - TRIGGER 100JT 💎`;el.style.color="#ffcc00";}}}
+function updatePanel(){document.getElementById('score').textContent=score.toLocaleString("id-ID");updateCycleDisplay();}
+
+async function animateReelDrop(targetData,isFree){
+  const existingOverlay=document.getElementById('trainOverlay');if(existingOverlay)existingOverlay.remove();
+  cells.forEach(c=>{try{c.getAnimations().forEach(a=>a.cancel());}catch(e){}});
+  const targetBoard=targetData.board, scatterPositions=targetData.scatterPositions;
+  let suspensePos=null; if(!isFree&&scatterPositions.length>=4){let sorted=[...scatterPositions].sort((a,b)=>(a.c-b.c)||(a.r-b.r));suspensePos=sorted[sorted.length-1];}
+  const cellH=cells[0]?cells[0].offsetHeight:68, gap=2, trainH=5*(cellH+gap), initialY=-trainH;
+  grid.style.opacity='0'; const boardInner=document.querySelector('.board.panel-inner'); boardInner.style.position='relative';
+  let overlay=document.createElement('div'); overlay.id='trainOverlay'; overlay.style.cssText='position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;pointer-events:none;overflow:hidden;z-index:5;'; boardInner.appendChild(overlay);
+  let columns=[];
+  for(let c=0;c<COLS;c++){
+    let colDiv=document.createElement('div'); colDiv.style.cssText=`display:flex;flex-direction:column;gap:2px;transform:translateY(${initialY}px);`;
+    for(let r=0;r<ROWS;r++){let val=targetBoard[r][c];let el=document.createElement('div');el.className='cell'+(isScatter(val)?' scatter':'');if(isScatter(val)){el.innerHTML='<img src="scatter.png" class="scatter-img">';}else{el.textContent=val??'';}colDiv.appendChild(el);}
+    for(let r=0;r<ROWS;r++){let val=board[r][c];let el=document.createElement('div');el.className='cell'+(isScatter(val)?' scatter':'');if(isScatter(val)){el.innerHTML='<img src="scatter.png" class="scatter-img">';}else{el.textContent=val??'';}colDiv.appendChild(el);}
+    overlay.appendChild(colDiv); columns.push(colDiv);
+  }
+  let suspenseCol=suspensePos?suspensePos.c:-1; let anims=[];
+  for(let c=0;c<COLS;c++){
+    if(c===suspenseCol)continue; let colDiv=columns[c]; let delay=c*85;
+    try{let anim=colDiv.animate([{transform:`translateY(${initialY}px)`},{transform:`translateY(0px)`}],{duration:600,delay:delay,easing:'cubic-bezier(.2,.9,.25,1)',fill:'forwards'});anims.push(anim.finished.catch(()=>{}));}catch(e){}
+  }
+  await Promise.all(anims);
+  if(suspensePos){
+    await new Promise(r=>setTimeout(r,800)); let colDiv=columns[suspenseCol]; let scatterEl=colDiv.children[suspensePos.r]; if(scatterEl)scatterEl.classList.add('scatter-last');
+    try{await colDiv.animate([{transform:`translateY(${initialY}px)`},{transform:`translateY(0px)`}],{duration:750,easing:'cubic-bezier(.1,.8,.2,1)',fill:'forwards'}).finished;}catch(e){await new Promise(r=>setTimeout(r,750));}
+  }
+  overlay.remove(); grid.style.opacity='1'; board=targetBoard; drawBoard();
+}
+
+function getPoolCategory(isFree){
+  if(isFree){if(freeSpinAccumulated>=freeSpinWinCap)return"ZONK";let r=Math.random();if(r<0.05)return"ZONK";if(r<0.15)return"RENDAH";if(r<0.40)return"SEDANG";return"TINGGI";}
+  if(cycleSpinCount>=1&&cycleSpinCount<=6)return"ZONK";
+  if(cycleSpinCount==7)return"SCATTER";
+  return"ZONK";
+}
+function calculateWin(category,isFree){
+  let pool=globalPool,win=0;
+  if(isFree){if(freeSpinAccumulated>=freeSpinWinCap)return 0;let remainingWin=freeSpinWinCap-freeSpinAccumulated,remainingSpins=Math.max(1,freeSpins+1);if(remainingSpins<=1){win=remainingWin;}else{let avg=remainingWin/remainingSpins,variance=0.6+Math.random()*0.9,base=Math.floor(avg*variance);if(category==="ZONK")win=0;else if(category==="RENDAH")win=Math.floor(Math.max(1000000,Math.min(base,4500000)));else if(category==="SEDANG")win=Math.floor(Math.max(3000000,Math.min(base,7500000)));else if(category==="TINGGI")win=Math.floor(Math.max(5000000,Math.min(base*1.2,13000000)));}if(freeSpinAccumulated+win>freeSpinWinCap)win=Math.max(0,freeSpinWinCap-freeSpinAccumulated);if(win>0){let maxFromPool=Math.floor(pool*0.90);if(win>maxFromPool)win=maxFromPool;}return win;}
+  if(cycleSpinCount>=1&&cycleSpinCount<=6)return 0;
+  if(cycleSpinCount==7)return 100000000;
+  return 0;
+}
+function generateTargetBoard(category,isFree){
+  let newBoard=Array.from({length:ROWS},()=>Array(COLS).fill(null)); let scatterCount=0;
+  if(isFree){let r=Math.random();if(r<0.03)scatterCount=3;else if(r<0.10)scatterCount=2;else if(r<0.22)scatterCount=1;}else{if(cycleSpinCount>=1&&cycleSpinCount<=6){scatterCount=0;}else if(cycleSpinCount==7){scatterCount=4;}}
+  let allPos=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)allPos.push({r,c});for(let i=allPos.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[allPos[i],allPos[j]]=[allPos[j],allPos[i]];}
+  let scatterPositions=allPos.slice(0,scatterCount);scatterPositions.forEach(p=>newBoard[p.r][p.c]=SCATTER);
+  if(category==="ZONK"){let cnt={};for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(newBoard[r][c]!==SCATTER){let fruit,attempt=0;do{fruit=randomFruit();attempt++;}while((cnt[fruit]||0)>=5&&attempt<20);newBoard[r][c]=fruit;cnt[fruit]=(cnt[fruit]||0)+1;}}else{let winSym=symbols[Math.floor(Math.random()*symbols.length)];let winCount=10;let available=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(newBoard[r][c]!==SCATTER)available.push({r,c});for(let i=available.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[available[i],available[j]]=[available[j],available[i]];}for(let i=0;i<winCount;i++){let p=available[i];newBoard[p.r][p.c]=winSym;}let cnt={[winSym]:winCount};for(let i=winCount;i<available.length;i++){let p=available[i];let fruit,at=0;do{fruit=randomFruit();at++;}while((cnt[fruit]||0)>=5&&at<20&&fruit!==winSym);newBoard[p.r][p.c]=fruit;cnt[fruit]=(cnt[fruit]||0)+1;}}
+  return{board:newBoard,scatterPositions};
+}
+async function spin(){
+  if(spinning)return;if(score<currentBet){showMessage("💰 Saldo habis! Reset game...");setTimeout(()=>{cycleSpinCount=1;score=1000000;updatePanel();},800);return;}
+  spinning=true;let houseCut=Math.floor(currentBet*0.20);let poolAdd=currentBet-houseCut;
+  await addToGlobalPool(poolAdd,houseCut);let poolNow=globalPool;
+  let category=getPoolCategory(false),winAmount=calculateWin(category,false);
+  if((category==="TINGGI"||category==="SCATTER")&&winAmount>poolNow){winAmount=Math.floor(poolNow*0.6);}
+  let targetData=generateTargetBoard(category,false);await animateReelDrop(targetData,false);
+  if(cycleSpinCount>=1&&cycleSpinCount<=6){score=Math.max(0,score-currentBet);cycleSpinCount++;updatePanel();spinning=false;return;}
+  if(cycleSpinCount==7){freeSpinStartSaldo=score;freeSpinWinCap=100000000;freeSpinAccumulated=0;freeSpins+=10;inFreeSpin=true;await startFreeSpins();spinning=false;return;}
+  let actualWin=winAmount;if(winAmount>=currentBet*1.5){actualWin=await takeFromGlobalPool(winAmount);await new Promise(r=>setTimeout(r,350));}else{actualWin=await takeFromGlobalPool(winAmount);}
+  score=Math.max(0,score-currentBet+actualWin);updatePanel();cycleSpinCount++;spinning=false;
+}
+async function startFreeSpins(){
+  let totalFreeWin=0,spinsDone=0;updateCycleDisplay();
+  while(freeSpins>0){
+    freeSpins--;spinsDone++;let poolNow=globalPool,remainingCap=Math.max(0,freeSpinWinCap-freeSpinAccumulated);
+    let category=getPoolCategory(true),winAmount=calculateWin(category,true);if(freeSpinAccumulated>=freeSpinWinCap){category="ZONK";winAmount=0;}if(winAmount>poolNow)winAmount=Math.floor(poolNow*0.6);
+    let targetData=generateTargetBoard(category,true);await animateReelDrop(targetData,true);
+    let actualWin=0;if(winAmount>0){actualWin=await takeFromGlobalPool(winAmount);if(freeSpinAccumulated+actualWin>freeSpinWinCap){actualWin=Math.max(0,freeSpinWinCap-freeSpinAccumulated);}}
+    if(actualWin>0){totalFreeWin+=actualWin;freeSpinAccumulated+=actualWin;score+=actualWin;updatePanel();updateCycleDisplay();}
+  }
+  inFreeSpin=false;cycleSpinCount=1;updateCycleDisplay();updatePanel();
+}
+function showMessage(t){document.getElementById('message').textContent=t;}
+document.getElementById('spinBtn').onclick=spin;
+auth.onAuthStateChanged(async u=>{if(!u){try{await auth.signInAnonymously();}catch(e){}}await initGlobalPool();createBoard();updatePanel();});
+</script>
+</body>
+</html>
