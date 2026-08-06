@@ -11,7 +11,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 body{width:100%;min-height:100dvh;font-family:Arial,Helvetica,sans-serif;background:#000 url("portal.png") no-repeat center top/cover;display:flex;justify-content:center;align-items:flex-start;}
 .mainShell{width:100%;max-width:540px;min-height:100dvh;margin:0 auto;display:flex;flex-direction:column;gap:8px;padding:8px 10px 12px;}
-.panel-sadow{background:linear-gradient(180deg, rgba(38,38,42,0.96) 0%, rgba(18,18,20,0.98) 100%);border:1px solid rgba(255,255,255,0.13);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0.8);position:relative;width:100%;}
+.panel-sadow{background:linear-gradient(180deg, rgba(38,38,42,0.96) 0%, rgba(18,18,20,0.98) 100%);border:1px solid rgba(255,255,255,0.13);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,0.8);position:relative;width:100%;}
 .panel-inner{position:relative;z-index:2;}
 .topPanel{padding:12px 14px;text-align:center;color:#fff;}
 #topWinDisplay{font-size:16px;font-weight:900;text-shadow:0 2px 0 #000,0 0 12px rgba(255,215,0,0.6);}
@@ -29,17 +29,41 @@ body{width:100%;min-height:100dvh;font-family:Arial,Helvetica,sans-serif;backgro
 .controlArea{padding:10px;display:flex;flex-direction:column;gap:8px;}
 .spinRow{width:100%;display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(30,30,34,0.9);border-radius:12px;}
 #spinBtn{width:70px;height:70px;border-radius:50%;border:3px solid #fff;background:linear-gradient(180deg,#b8ff44 0%,#7ed321 30%,#2e7d00 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.7);}
+#spinBtn:active{transform:scale(0.95);}
 #spinBtn span{font-size:30px;color:#fff;font-weight:bold;}
 .bottomStats{display:flex;justify-content:space-between;gap:8px;}
 .saldoDisplay,.betDisplay{flex:1;text-align:center;padding:8px;background:rgba(40,40,45,0.95);border:1px solid rgba(255,215,0,0.18);border-radius:10px;}
 .saldoDisplay b,.betDisplay b{font-size:14px;color:#fff;font-weight:900;display:block;margin-top:3px;}
 #message{font-size:9px;font-weight:800;color:#fff;text-align:center;padding:6px;background:rgba(0,0,0,0.35);border-radius:8px;margin-top:6px;}
+
+/* REEL KERETA TURUN */
+.reel-container{
+  position:absolute;inset:0;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:2px;
+  pointer-events:none;overflow:hidden;z-index:10;
+}
+.reel-col{
+  display:flex;flex-direction:column;gap:2px;
+  transform:translateY(-100%);
+}
+.reel-col.spin{
+  animation: reelSpin 0.08s linear infinite;
+}
+@keyframes reelSpin{
+  0%{transform:translateY(-50%)}
+  100%{transform:translateY(0%)}
+}
+.reel-col.stop{
+  animation:none;
+  transition:transform 0.6s cubic-bezier(.2,.9,.25,1);
+  transform:translateY(0%)!important;
+}
 </style>
 </head>
 <body>
 <div class="mainShell">
   <div class="panel-sadow topPanel"><div class="panel-inner"><div id="topWinDisplay">💰 MENANG : Rp 0</div><div id="cycleDisplay">SPIN 1/7 - 6X ZONK, 1X 100JT 🎯</div></div></div>
-  <div class="panel-sadow board"><div class="panel-inner" style="width:100%;display:flex;justify-content:center;"><div id="grid"></div></div></div>
+  <div class="panel-sadow board"><div class="panel-inner" style="width:100%;display:flex;justify-content:center;position:relative;"><div id="grid"></div></div></div>
   <div class="panel-sadow controlArea"><div class="panel-inner">
       <div class="spinRow"><button id="spinBtn"><span>⟳</span></button></div>
       <div class="bottomStats">
@@ -52,7 +76,7 @@ body{width:100%;min-height:100dvh;font-family:Arial,Helvetica,sans-serif;backgro
 <script>
 const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
 firebase.initializeApp(firebaseConfig); const auth=firebase.auth(); const db=firebase.firestore();
-let globalPool=100000000; const POOL_KEY="fruitBobanza_sim7_pool"; let poolDocRef=db.collection("global").doc("pool");
+let globalPool=100000000; let poolDocRef=db.collection("global").doc("pool");
 async function initGlobalPool(){try{let doc=await poolDocRef.get();if(!doc.exists){await poolDocRef.set({pool:100000000,profit:0});}else{globalPool=doc.data().pool||100000000;}poolDocRef.onSnapshot(snap=>{if(snap.exists)globalPool=snap.data().pool||100000000;});}catch(e){globalPool=100000000;}}
 async function addToGlobalPool(poolAdd,houseCut){try{await db.runTransaction(async tx=>{let doc=await tx.get(poolDocRef);tx.update(poolDocRef,{pool:(doc.data().pool||0)+poolAdd});});}catch(e){globalPool+=poolAdd;}}
 async function takeFromGlobalPool(winAmount){try{let taken=0;await db.runTransaction(async tx=>{let doc=await tx.get(poolDocRef);let pool=doc.data().pool||0;if(pool>=winAmount){tx.update(poolDocRef,{pool:pool-winAmount});taken=winAmount;}else{taken=pool;tx.update(poolDocRef,{pool:0});}});return taken;}catch(e){let t=Math.min(winAmount,globalPool);globalPool-=t;return t;}}
@@ -66,34 +90,66 @@ function isScatter(v){return v===SCATTER;}
 function createBoard(){board=[];for(let r=0;r<ROWS;r++){let row=[];for(let c=0;c<COLS;c++)row.push(randomFruit());board.push(row);}drawBoard();}
 function drawBoard(){grid.innerHTML="";cells=[];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const cell=document.createElement("div");cell.className="cell";if(isScatter(board[r][c])){cell.classList.add("scatter");cell.innerHTML='<img src="scatter.png" class="scatter-img" alt="SCATTER" onerror="this.outerHTML=\'💎\'">';}else{cell.textContent=board[r][c];}grid.appendChild(cell);cells.push(cell);}}
 function updateCycleDisplay(){let el=document.getElementById('cycleDisplay');if(inFreeSpin){el.textContent=`FREE SPIN ${freeSpins} | TARGET 100JT : ${freeSpinAccumulated.toLocaleString('id-ID')}/100.000.000 🎁`;el.style.color="#00ff88";}else{if(cycleSpinCount<=6){el.textContent=`SPIN ${cycleSpinCount}/7 - ZONK`;el.style.color="#ff5555";}else if(cycleSpinCount==7){el.textContent=`SPIN 7/7 - TRIGGER 100JT 💎`;el.style.color="#ffcc00";}}}
-function updatePanel(){document.getElementById('score').textContent=score.toLocaleString("id-ID");updateCycleDisplay();}
+function updatePanel(){document.getElementById('score').textContent=score.toLocaleString("id-ID");document.getElementById('betText').textContent=currentBet.toLocaleString("id-ID");updateCycleDisplay();}
 
-async function animateReelDrop(targetData,isFree){
-  const existingOverlay=document.getElementById('trainOverlay');if(existingOverlay)existingOverlay.remove();
-  cells.forEach(c=>{try{c.getAnimations().forEach(a=>a.cancel());}catch(e){}});
-  const targetBoard=targetData.board, scatterPositions=targetData.scatterPositions;
-  let suspensePos=null; if(!isFree&&scatterPositions.length>=4){let sorted=[...scatterPositions].sort((a,b)=>(a.c-b.c)||(a.r-b.r));suspensePos=sorted[sorted.length-1];}
-  const cellH=cells[0]?cells[0].offsetHeight:68, gap=2, trainH=5*(cellH+gap), initialY=-trainH;
-  grid.style.opacity='0'; const boardInner=document.querySelector('.board.panel-inner'); boardInner.style.position='relative';
-  let overlay=document.createElement('div'); overlay.id='trainOverlay'; overlay.style.cssText='position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;pointer-events:none;overflow:hidden;z-index:5;'; boardInner.appendChild(overlay);
-  let columns=[];
-  for(let c=0;c<COLS;c++){
-    let colDiv=document.createElement('div'); colDiv.style.cssText=`display:flex;flex-direction:column;gap:2px;transform:translateY(${initialY}px);`;
-    for(let r=0;r<ROWS;r++){let val=targetBoard[r][c];let el=document.createElement('div');el.className='cell'+(isScatter(val)?' scatter':'');if(isScatter(val)){el.innerHTML='<img src="scatter.png" class="scatter-img">';}else{el.textContent=val??'';}colDiv.appendChild(el);}
-    for(let r=0;r<ROWS;r++){let val=board[r][c];let el=document.createElement('div');el.className='cell'+(isScatter(val)?' scatter':'');if(isScatter(val)){el.innerHTML='<img src="scatter.png" class="scatter-img">';}else{el.textContent=val??'';}colDiv.appendChild(el);}
-    overlay.appendChild(colDiv); columns.push(colDiv);
+async function animateReelDrop(targetData){
+  const oldOverlay=document.getElementById('reelOverlay');
+  if(oldOverlay) oldOverlay.remove();
+
+  grid.style.opacity='0';
+  const overlay=document.createElement('div');
+  overlay.id='reelOverlay';
+  overlay.className='reel-container';
+  grid.parentNode.appendChild(overlay);
+
+  const scatterPositions=targetData.scatterPositions||[];
+  let suspensePos=null;
+  if(scatterPositions.length>=4){
+    let sorted=[...scatterPositions].sort((a,b)=>(a.c-b.c)||(a.r-b.r));
+    suspensePos=sorted[sorted.length-1];
   }
-  let suspenseCol=suspensePos?suspensePos.c:-1; let anims=[];
+
+  // Bikin 5 kolom reel muter
   for(let c=0;c<COLS;c++){
-    if(c===suspenseCol)continue; let colDiv=columns[c]; let delay=c*85;
-    try{let anim=colDiv.animate([{transform:`translateY(${initialY}px)`},{transform:`translateY(0px)`}],{duration:600,delay:delay,easing:'cubic-bezier(.2,.9,.25,1)',fill:'forwards'});anims.push(anim.finished.catch(()=>{}));}catch(e){}
+    const col=document.createElement('div');
+    col.className='reel-col spin';
+
+    // 10 buah: 5 baru + 5 lama biar muter kayak kereta
+    for(let r=0;r<10;r++){
+      const val = r<5? targetData.board[r][c] : board[r-5][c];
+      const el=document.createElement('div');
+      el.className='cell'+(isScatter(val)?' scatter':'');
+      if(isScatter(val)) el.innerHTML='<img src="scatter.png" class="scatter-img">';
+      else el.textContent=val||'';
+      col.appendChild(el);
+    }
+    overlay.appendChild(col);
   }
-  await Promise.all(anims);
+
+  // Stop berurutan kayak slot: kiri→tengah→kanan
+  const suspenseCol=suspensePos?suspensePos.c:-1;
+
+  await new Promise(r=>setTimeout(r,600));
+  for(let c=0;c<COLS;c++){
+    if(c===suspenseCol) continue;
+    overlay.children[c].className='reel-col stop';
+    await new Promise(r=>setTimeout(r,150));
+  }
+
+  // Suspense reel terakhir kalau ada 4 scatter
   if(suspensePos){
-    await new Promise(r=>setTimeout(r,800)); let colDiv=columns[suspenseCol]; let scatterEl=colDiv.children[suspensePos.r]; if(scatterEl)scatterEl.classList.add('scatter-last');
-    try{await colDiv.animate([{transform:`translateY(${initialY}px)`},{transform:`translateY(0px)`}],{duration:750,easing:'cubic-bezier(.1,.8,.2,1)',fill:'forwards'}).finished;}catch(e){await new Promise(r=>setTimeout(r,750));}
+    await new Promise(r=>setTimeout(r,300));
+    let scatterEl=overlay.children[suspenseCol].children[suspensePos.r];
+    if(scatterEl) scatterEl.classList.add('scatter-last');
+    overlay.children[suspenseCol].className='reel-col stop';
+    await new Promise(r=>setTimeout(r,750));
   }
-  overlay.remove(); grid.style.opacity='1'; board=targetBoard; drawBoard();
+
+  await new Promise(r=>setTimeout(r,200));
+  overlay.remove();
+  grid.style.opacity='1';
+  board=targetData.board;
+  drawBoard();
 }
 
 function getPoolCategory(isFree){
@@ -123,22 +179,23 @@ async function spin(){
   await addToGlobalPool(poolAdd,houseCut);let poolNow=globalPool;
   let category=getPoolCategory(false),winAmount=calculateWin(category,false);
   if((category==="TINGGI"||category==="SCATTER")&&winAmount>poolNow){winAmount=Math.floor(poolNow*0.6);}
-  let targetData=generateTargetBoard(category,false);await animateReelDrop(targetData,false);
+  let targetData=generateTargetBoard(category,false);
+  await animateReelDrop(targetData);
   if(cycleSpinCount>=1&&cycleSpinCount<=6){score=Math.max(0,score-currentBet);cycleSpinCount++;updatePanel();spinning=false;return;}
-  if(cycleSpinCount==7){freeSpinStartSaldo=score;freeSpinWinCap=100000000;freeSpinAccumulated=0;freeSpins+=10;inFreeSpin=true;await startFreeSpins();spinning=false;return;}
+  if(cycleSpinCount==7){freeSpinWinCap=100000000;freeSpinAccumulated=0;freeSpins+=10;inFreeSpin=true;await startFreeSpins();spinning=false;return;}
   let actualWin=winAmount;if(winAmount>=currentBet*1.5){actualWin=await takeFromGlobalPool(winAmount);await new Promise(r=>setTimeout(r,350));}else{actualWin=await takeFromGlobalPool(winAmount);}
   score=Math.max(0,score-currentBet+actualWin);updatePanel();cycleSpinCount++;spinning=false;
 }
 async function startFreeSpins(){
-  let totalFreeWin=0,spinsDone=0;updateCycleDisplay();
+  let totalFreeWin=0;updateCycleDisplay();
   while(freeSpins>0){
-    freeSpins--;spinsDone++;let poolNow=globalPool,remainingCap=Math.max(0,freeSpinWinCap-freeSpinAccumulated);
+    freeSpins--;let poolNow=globalPool;
     let category=getPoolCategory(true),winAmount=calculateWin(category,true);if(freeSpinAccumulated>=freeSpinWinCap){category="ZONK";winAmount=0;}if(winAmount>poolNow)winAmount=Math.floor(poolNow*0.6);
-    let targetData=generateTargetBoard(category,true);await animateReelDrop(targetData,true);
+    let targetData=generateTargetBoard(category,true);await animateReelDrop(targetData);
     let actualWin=0;if(winAmount>0){actualWin=await takeFromGlobalPool(winAmount);if(freeSpinAccumulated+actualWin>freeSpinWinCap){actualWin=Math.max(0,freeSpinWinCap-freeSpinAccumulated);}}
     if(actualWin>0){totalFreeWin+=actualWin;freeSpinAccumulated+=actualWin;score+=actualWin;updatePanel();updateCycleDisplay();}
   }
-  inFreeSpin=false;cycleSpinCount=1;updateCycleDisplay();updatePanel();
+  inFreeSpin=false;cycleSpinCount=1;updateCycleDisplay();updatePanel();showMessage("FREE SPIN SELESAI - TOTAL: "+totalFreeWin.toLocaleString('id-ID'));
 }
 function showMessage(t){document.getElementById('message').textContent=t;}
 document.getElementById('spinBtn').onclick=spin;
