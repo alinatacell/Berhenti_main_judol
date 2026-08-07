@@ -19,12 +19,12 @@
     return origAdd.call(this, type, listener, options);
   };
 })();
-</script>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Admin Juragan + Pengunjung + Ruang Sadar</title>
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Juragan PRO - Pengunjung Detail</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial;background:#0a0a0a;color:#fff;display:flex;justify-content:center;min-height:100vh}
-.container{width:100%;max-width:460px;padding:12px}
+.container{width:100%;max-width:480px;padding:12px}
 .card{background:#111;border:2px solid #d4a500;border-radius:14px;padding:14px;margin-bottom:10px}
 input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;border:1px solid #333;margin:6px 0}
 .btn{padding:12px 16px;border-radius:10px;border:none;font-weight:900;cursor:pointer}
@@ -35,6 +35,8 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 .playerCard{background:#161616;border:1px solid #222;border-radius:12px;padding:12px}
 .playerCard.hasMinta{border:2px solid #f59e0b;background:#1a1500;box-shadow:0 0 8px rgba(245,158,11,.3)}
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}.tab{white-space:nowrap;padding:8px 14px;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:#aaa;font-size:11px;font-weight:800;cursor:pointer}.tab.active{background:#ffe77d;color:#000}
+.visitCard{background:#101010;border:1px solid #333;border-radius:12px;padding:12px;margin-bottom:10px;font-size:11px;line-height:1.6}
+.badge{display:inline-block;padding:3px 7px;border-radius:6px;font-size:9px;font-weight:900}
 .legendOverlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;justify-content:center;align-items:center;z-index:9999;padding:20px}.legendOverlay.show{display:flex}
 .legendBox{width:100%;max-width:400px;background:#111;border:2px solid #d4a500;border-radius:16px;padding:20px;text-align:center}
 .legendTitle{font-weight:900;color:#ffd84d;margin-bottom:8px}.legendMsg{text-align:left;background:#000;border:1px solid #222;border-radius:8px;padding:10px;font-size:12px;margin:10px 0;line-height:1.5}
@@ -44,28 +46,21 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 .btnHijau{flex:1;background:#00ff88;color:#000;padding:14px;border-radius:10px;font-weight:900;border:none;font-size:13px;cursor:pointer}
 .btnMerah{flex:1;background:#ff3b3b;color:#fff;padding:14px;border-radius:10px;font-weight:900;border:none;font-size:13px;cursor:pointer}
 .flex2{display:flex;gap:8px;margin-top:8px}
-.visitCard{background:#101010;border:1px solid #333;border-radius:10px;padding:10px;margin-bottom:8px;font-size:11px;line-height:1.5}
-.badge{display:inline-block;padding:2px 6px;border-radius:6px;font-size:9px;font-weight:900}
 </style>
 </head>
 <body>
 <div class="container">
 <div id="loginBox" class="card">
-<h2 style="color:#ffd84d;text-align:center">👑 ADMIN JURAGAN</h2>
-<p style="text-align:center;font-size:10px;color:#aaa">ID A / Pass A - + Tracker Pengunjung Tanpa Login</p>
-<input id="adminId" type="text" value="A" placeholder="ID A">
-<input id="adminPass" type="password" value="A" placeholder="Pass A">
+<h2 style="color:#ffd84d;text-align:center">👑 ADMIN JURAGAN PRO</h2>
+<p style="text-align:center;font-size:10px;color:#aaa">Versi Detail Device + IP City + Map</p>
+<input id="adminId" type="text" value="A"><input id="adminPass" type="password" value="A">
 <button class="btn btnLogin" onclick="loginA()">LOGIN A</button>
 <div id="loginMsg" style="text-align:center;font-size:11px;color:#888;margin-top:8px"></div>
-<div id="autoTrackInfo" style="text-align:center;font-size:9px;color:#00ff88;margin-top:8px">🟢 Tracking pengunjung aktif... HP/Laptop/IP/WIFI ke-track</div>
 </div>
-
 <div id="adminPanel" style="display:none">
 <div class="card" style="border-color:#00ff88;padding:10px">
 <div style="font-size:11px">Juragan: <b style="color:#00ff88">servicehpmaja@gmail.com</b> | <span id="countReq" style="background:#f59e0b;color:#000;padding:4px 8px;border-radius:8px;font-weight:900">0 Minta</span> | <span id="countVisit" style="background:#00ff88;color:#000;padding:4px 8px;border-radius:8px;font-weight:900">0 Visit</span></div>
-<div style="font-size:10px;color:#888">Read: <span id="readCount">0</span> | Tanpa Login = Tetap Ke-Track + Device</div>
 </div>
-
 <div class="card">
 <div class="tabs">
 <div class="tab active" data-tab="saldo" onclick="switchTab('saldo')">💰 Saldo</div>
@@ -73,83 +68,35 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 <div class="tab" data-tab="visit" onclick="switchTab('visit')">👁️ Pengunjung</div>
 <div class="tab" data-tab="tentang" onclick="switchTab('tentang')">ℹ️ Tentang</div>
 </div>
-
 <div id="tabSaldo">
 <div style="background:#1a1500;border:1px solid #f59e0b;border-radius:10px;padding:10px;margin-top:10px">
-<div style="font-size:11px;font-weight:900;color:#f59e0b">🔥 MINTA COIN DI ATAS 50RB - GROUP PER PLAYER</div>
-<div id="pendingGrouped" style="margin-top:8px"><div style="text-align:center;color:#888;font-size:11px">Belum load</div></div>
+<div style="font-size:11px;font-weight:900;color:#f59e0b">🔥 MINTA COIN DI ATAS 50RB</div>
+<div id="pendingGrouped" style="margin-top:8px"></div>
 <button class="btn" style="width:100%;background:#f59e0b;color:#000;margin-top:8px;font-size:11px;font-weight:900" onclick="loadPendingGrouped()">🔄 REFRESH MINTA COIN</button>
-<button class="btn" style="width:100%;background:#333;color:#fff;border:1px solid #555;margin-top:6px;font-size:10px" onclick="bersihkanDuplikat()">🧹 BERSIHKAN DUPLIKAT</button>
 </div>
 <div style="display:flex;gap:6px;margin-top:12px"><input id="searchEmail" type="text" placeholder="Cari email..."><button class="btnSearch" onclick="searchEmailOnly()">Cari</button></div>
-<div style="display:flex;gap:6px;margin-top:6px">
-<button class="btn" style="flex:1;background:#222;color:#fff;border:1px solid #555;font-size:11px" onclick="loadEmailOnly()">Load 20 Email</button>
-<button class="btn" style="flex:1;background:#222;color:#fff;border:1px solid #555;font-size:11px" onclick="loadJuraganOnly()">Juragan Aja</button>
+<div id="playerList" class="gridPlayer"></div>
 </div>
-<div id="playerList" class="gridPlayer"><div style="text-align:center;color:#666;padding:20px;font-size:11px">Klik Load 20 Email Only</div></div>
-</div>
-
-<div id="tabPool" style="display:none">
-<div id="poolInfo" style="background:#000;border:1px solid #222;border-radius:8px;padding:10px;font-size:11px;margin-top:10px">Belum load</div>
-<button class="btn" style="width:100%;background:#222;color:#fff;border:1px solid #555;margin-top:8px" onclick="refreshPool()">🔄 Refresh Pool</button>
-<button class="btn" style="width:100%;background:#00ff88;color:#000;margin-top:8px;font-weight:900;border:none" onclick="addPool()">💰 TAMBAH SALDO POOL</button>
-<button class="btn" style="width:100%;background:#ff4444;color:#fff;margin-top:8px" onclick="resetPool()">⚠️ RESET POOL 0</button>
-</div>
-
+<div id="tabPool" style="display:none"><div id="poolInfo" style="background:#000;border:1px solid #222;border-radius:8px;padding:10px;font-size:11px;margin-top:10px">Belum load</div><button class="btn" style="width:100%;background:#222;color:#fff;border:1px solid #555;margin-top:8px" onclick="refreshPool()">🔄 Refresh Pool</button></div>
 <div id="tabVisit" style="display:none">
 <div style="background:#0a1a0a;border:1px solid #00ff88;border-radius:10px;padding:10px;margin-top:10px">
-<div style="font-size:11px;font-weight:900;color:#00ff88">👁️ TRACK PENGUNJUNG TANPA LOGIN - DETAIL DEVICE</div>
-<div style="font-size:10px;color:#aaa;margin-top:4px">Setiap buka portal.html / login.html walau tanpa login: HP/Laptop, IP, RAM, Koneksi langsung ke-log. Email & Nama Wifi tidak bisa auto karena dibatasi browser.</div>
+<div style="font-size:11px;font-weight:900;color:#00ff88">👁️ TRACK PENGUNJUNG PRO - BISA MAP & TIPE HP</div>
+<div style="font-size:9px;color:#aaa;margin-top:4px">Email tidak bisa auto (harus input manual di portal). Lokasi persis butuh user klik Allow Location. Tipe HP didapat dari User-Agent Client Hints.</div>
 <div style="display:flex;gap:6px;margin-top:8px">
-<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#00ff88" id="statTotal">0</div><div style="font-size:9px;color:#888">Total Buka</div></div>
+<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#00ff88" id="statTotal">0</div><div style="font-size:9px;color:#888">Total</div></div>
 <div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#ffd84d" id="statHari">0</div><div style="font-size:9px;color:#888">Hari Ini</div></div>
-<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#25D366" id="statWa">0</div><div style="font-size:9px;color:#888">Tamu Device</div></div>
+<div style="flex:1;background:#000;border:1px solid #222;border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#25D366" id="statWa">0</div><div style="font-size:9px;color:#888">Akurat</div></div>
 </div>
 </div>
-<button class="btn" style="width:100%;background:#00ff88;color:#000;margin-top:8px;font-size:11px;font-weight:900" onclick="loadVisits()">🔄 REFRESH PENGUNJUNG + DEVICE TAMU</button>
-<button class="btn" style="width:100%;background:#222;color:#fff;border:1px solid #555;margin-top:6px;font-size:10px" onclick="hapusVisits()">🗑️ HAPUS LOG 7 HARI LALU</button>
-<div id="visitList" style="margin-top:10px;max-height:70vh;overflow-y:auto"><div style="text-align:center;color:#888;font-size:11px;padding:20px">Belum load - klik Refresh</div></div>
+<button class="btn" style="width:100%;background:#00ff88;color:#000;margin-top:8px;font-size:11px;font-weight:900" onclick="loadVisits()">🔄 REFRESH PENGUNJUNG PRO</button>
+<div id="visitList" style="margin-top:10px;max-height:75vh;overflow-y:auto"></div>
 </div>
-
-<div id="tabTentang" style="display:none">
-<div style="background:linear-gradient(135deg,#1a4aff,#0f2da0);border-radius:14px;padding:14px;margin-top:10px">
-<div style="font-weight:900;font-size:14px">Tentang RUANG SADAR</div>
-<div style="font-size:11px;color:#d0d8ff;margin-top:6px;line-height:1.6">Portal edukasi interaktif untuk membongkar ilusi judi online. Tidak mengajarkan cara main, tapi cara SADAR kalau sedang ditipu sistem. 100% EDUKASI.</div>
-<div style="margin-top:8px;background:#fff;color:#1a4aff;font-size:10px;font-weight:900;padding:4px 10px;border-radius:20px;display:inline-block">BUKAN JUDI BENERAN</div>
-</div>
-<div style="background:#fff;border-radius:14px;padding:12px;margin-top:10px;color:#000">
-<div style="font-weight:900;font-size:12px">🤝 Dukung Gerakan Berhenti Judol</div>
-<div style="font-size:11px;color:#444;margin-top:6px;line-height:1.6">Jika kamu setuju dengan misi RUANG SADAR, <b>tolong bagikan link ini ke teman/keluarga.</b> Satu share bisa selamatkan satu keluarga.<br><br>Jika berkenan donasi untuk pengembangan aplikasi, silahkan tap QRIS di bawah ini.</div>
-<button onclick="document.getElementById('qrisModal').classList.add('show')" style="width:100%;background:linear-gradient(90deg,#1a4aff,#3b66ff);color:#fff;padding:12px;border-radius:10px;font-weight:900;border:none;margin-top:10px;font-size:12px">📱 Tap untuk Donasi via QRIS</button>
-<div style="font-size:9px;color:#888;text-align:center;margin-top:4px">QRIS - DANA/OVO/Gopay/ShopeePay/MBanking</div>
-<div style="display:flex;gap:6px;margin-top:10px">
-<button onclick="shareToWA()" style="flex:1;background:#25D366;color:#fff;padding:12px;border-radius:10px;font-weight:900;border:none;font-size:11px">🔗 Bagikan ke WA</button>
-<button onclick="window.open('portal.html','_blank')" style="flex:1;background:#111;color:#fff;border:1px solid #333;padding:12px;border-radius:10px;font-weight:800;font-size:11px">Portal</button>
-</div>
-</div>
-<div style="background:#161616;border:1px solid #222;border-radius:10px;padding:10px;margin-top:10px">
-<div style="font-weight:900;font-size:11px;color:#ffd84d">4 FASE JEBAKAN JUDOL</div>
-<div style="font-size:10px;color:#aaa;margin-top:6px;line-height:1.6">1. DIKASIH MENANG - sengaja dikasih menang awal<br>2. DITAHAN - saldo naik-turun biar penasaran<br>3. DIKURAS - mulai kalah beruntun<br>4. DISEDOT HABIS - total kalah, sistem memang begitu</div>
-</div>
-</div>
+<div id="tabTentang" style="display:none"><div style="padding:20px;text-align:center;color:#888;font-size:11px">Ruang Sadar - Edukasi Anti Judol</div></div>
 </div>
 </div>
 </div>
 
-<div id="qrisModal" class="legendOverlay" onclick="this.classList.remove('show')">
-<div class="legendBox" onclick="event.stopPropagation()" style="background:#fff;border-color:#1a4aff">
-<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:900;color:#000;font-size:12px">Donasi RUANG SADAR</div><button onclick="document.getElementById('qrisModal').classList.remove('show')" style="width:28px;height:28px;background:#eee;border-radius:50%;border:none">✕</button></div>
-<div style="margin-top:10px;background:#f5f5f5;border:2px dashed #ccc;border-radius:12px;padding:8px">
-<img src="qris.jpg" style="width:100%;border-radius:10px" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='+encodeURIComponent(location.href)">
-</div>
-<div style="font-size:10px;color:#666;margin-top:8px">Terima kasih orang baik! 🙏 Donasi dipakai untuk hosting & edukasi baru.</div>
-</div>
-</div>
-
-<div id="legendOK" class="legendOverlay" onclick="this.classList.remove('show')"><div class="legendBox" onclick="event.stopPropagation()"><div class="legendTitle" id="okTitle">LEGENDS</div><div class="legendMsg" id="okMsg"></div><button class="btnOk" style="width:100%" onclick="document.getElementById('legendOK').classList.remove('show')">OK</button></div></div>
-<div id="legendConfirm" class="legendOverlay"><div class="legendBox"><div class="legendTitle" id="confirmTitle">KONFIRMASI</div><div class="legendMsg" id="confirmMsg"></div><div class="legendBtns"><button class="btnBatal" onclick="closeConfirm(false)">BATAL</button><button class="btnOkGreen" onclick="closeConfirm(true)">OK</button></div></div></div>
-<div id="legendInput" class="legendOverlay"><div class="legendBox"><div class="legendTitle" id="inputTitle">INPUT</div><div class="legendMsg" id="inputMsg"></div><input id="inputAmount" class="legendInput" type="number" placeholder="Jumlah coin"><input id="inputNote" class="legendInput" type="text" placeholder="Catatan"><div class="legendBtns"><button class="btnBatal" onclick="closeInput(false)">BATAL</button><button class="btnOkGreen" onclick="closeInput(true)">PROSES</button></div></div></div>
-<div id="legendReset" class="legendOverlay"><div class="legendBox" style="border-color:#ff4444"><div class="legendTitle" style="color:#ff4444">RESET POOL</div><div class="legendMsg">Ketik RESET</div><input id="resetInput" class="legendInput" type="text" placeholder="Ketik RESET"><div class="legendBtns"><button class="btnBatal" onclick="closeReset(false)">BATAL</button><button class="btn" style="flex:1;background:#ff4444;color:#fff;font-weight:900" onclick="closeReset(true)">RESET</button></div></div></div>
+<div id="legendOK" class="legendOverlay" onclick="this.classList.remove('show')"><div class="legendBox" onclick="event.stopPropagation()"><div class="legendTitle" id="okTitle">OK</div><div class="legendMsg" id="okMsg"></div><button class="btnOk" style="width:100%" onclick="document.getElementById('legendOK').classList.remove('show')">OK</button></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
@@ -158,45 +105,80 @@ input{width:100%;padding:12px;border-radius:8px;background:#0f0f0f;color:#fff;bo
 const firebaseConfig={apiKey:"AIzaSyBeTALsF43ij3aAlZjF1XeBjB1gNtaTb2I",authDomain:"game-demo-4db7f.firebaseapp.com",projectId:"game-demo-4db7f",storageBucket:"game-demo-4db7f.firebasestorage.app",messagingSenderId:"405381506143",appId:"1:405381506143:web:da63f34a24f01e4f0367ea"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(); const db=firebase.firestore();
-let readCounter=0, playersCache={}, confirmCb=null, inputCb=null, resetCb=null, groupedMap={};
+let readCounter=0, playersCache={}, groupedMap={};
 const JURAGAN="servicehpmaja@gmail.com";
 
-// === TRACKER TANPA LOGIN - VERSI LENGKAP DEVICE TAMU (TIDAK MENGHILANGKAN FUNGSI LAMA) ===
-(async function autoTrack(){
-  let ip = "-";
+// === TRACKER PRO VERSION ===
+(async function autoTrackPro(){
+  let ip = "-"; let ipGeo = {};
   try{
     const r = await fetch('https://api.ipify.org?format=json');
-    const j = await r.json(); ip = j.ip;
+    ip = (await r.json()).ip;
+    try{
+      const g = await fetch(`https://ipwho.is/${ip}`);
+      ipGeo = await g.json();
+    }catch(e2){}
   }catch(e){}
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
-  let playerEmail = "";
-  try{ const p = JSON.parse(sessionStorage.getItem("player")||"{}"); playerEmail = p.email || ""; }catch(e){}
   const ua = navigator.userAgent;
-  const isHp = /Android|iPhone|iPad|iPod|Mobi/i.test(ua);
+  let model = "Unknown";
+  let platformVer = "";
+  try{
+    if(navigator.userAgentData && navigator.userAgentData.getHighEntropyValues){
+      const hints = await navigator.userAgentData.getHighEntropyValues(['model','platformVersion','fullVersionList','mobile']);
+      model = hints.model || (hints.mobile ? "Android Phone" : "Desktop");
+      platformVer = hints.platformVersion || "";
+    }
+  }catch(e){}
+  function getBrowser(u){
+    if(u.includes("Edg/")) return "Edge " + (u.match(/Edg\/([\d.]+)/)||[])[1];
+    if(u.includes("Chrome/")) return "Chrome " + (u.match(/Chrome\/([\d.]+)/)||[])[1];
+    if(u.includes("Firefox/")) return "Firefox " + (u.match(/Firefox\/([\d.]+)/)||[])[1];
+    if(u.includes("OPR/") || u.includes("Opera")) return "Opera";
+    return "Browser";
+  }
+  function getOS(u){
+    if(/Android/.test(u)) return "Android " + (u.match(/Android\s([\d\.]+)/)||["",""])[1] + " " + platformVer;
+    if(/iPhone|iPad/.test(u)) return "iOS";
+    if(/Windows/.test(u)) return "Windows";
+    if(/Mac OS/.test(u)) return "MacOS";
+    return navigator.platform;
+  }
+  const conn = navigator.connection || {};
+  let playerEmail = "";
+  try{ playerEmail = JSON.parse(sessionStorage.getItem("player")||"{}").email || ""; }catch(e){}
+  let precise = {lat:null, lon:null, acc:null, status:"belum_minta"};
+  // JANGAN auto minta lokasi di admin, hanya di portal. Di admin kita skip biar tidak ganggu
   const data = {
     page: location.pathname + location.search,
     url: location.href,
     ref: document.referrer || 'direct',
-    ua: ua,
-    lang: navigator.language,
+    ua: ua.substring(0,180),
+    browser: getBrowser(ua),
+    os: getOS(ua),
+    deviceModel: model,
+    deviceType: /Android|iPhone|Mobi/i.test(ua) ? "HP" : "Laptop/PC",
     screen: window.screen.width + 'x' + window.screen.height,
-    platform: navigator.platform,
-    deviceType: isHp? "HP" : "Laptop/PC",
-    deviceDetail: ua.substring(0,120),
+    lang: navigator.language,
     ram: navigator.deviceMemory || 0,
     cpu: navigator.hardwareConcurrency || 0,
     connType: conn.effectiveType || conn.type || "unknown",
     connDownlink: conn.downlink || 0,
     ip: ip,
+    ipCity: ipGeo.city || "-",
+    ipRegion: ipGeo.region || "-",
+    ipCountry: ipGeo.country || "-",
+    ipIsp: (ipGeo.connection && ipGeo.connection.isp) || ipGeo.isp || ipGeo.org || "-",
+    ipLat: ipGeo.latitude || null,
+    ipLon: ipGeo.longitude || null,
+    preciseLat: precise.lat,
+    preciseLon: precise.lon,
+    locationStatus: precise.status,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    isGuest: sessionStorage.getItem("isGuest")==="1",
     guestEmail: playerEmail,
     time: firebase.firestore.FieldValue.serverTimestamp(),
     dateStr: new Date().toISOString().slice(0,10)
   };
-  db.collection("page_visits").add(data).catch(()=>{});
-  db.collection("admin_visits").add(data).catch(()=>{});
-  fetch(`https://api.countapi.xyz/hit/ruangsadar-${firebaseConfig.projectId}/total`).catch(()=>{});
+  try{ db.collection("page_visits").add(data); }catch(e){}
 })();
 
 function switchTab(n){
@@ -209,14 +191,7 @@ function switchTab(n){
   if(n==="pool") refreshPool();
   if(n==="visit") loadVisits();
 }
-function incRead(n){readCounter+=n; document.getElementById("readCount").textContent=readCounter;}
 function showOK(t,m){document.getElementById("okTitle").textContent=t;document.getElementById("okMsg").innerHTML=m;document.getElementById("legendOK").classList.add("show");}
-function showConfirm(t,m,cb){document.getElementById("confirmTitle").textContent=t;document.getElementById("confirmMsg").innerHTML=m;confirmCb=cb;document.getElementById("legendConfirm").classList.add("show");}
-function closeConfirm(ok){document.getElementById("legendConfirm").classList.remove("show");if(ok&&confirmCb) confirmCb();confirmCb=null;}
-function showInput(t,m,cb){document.getElementById("inputTitle").textContent=t;document.getElementById("inputMsg").innerHTML=m;document.getElementById("inputAmount").value="";document.getElementById("inputNote").value="";inputCb=cb;document.getElementById("legendInput").classList.add("show");}
-function closeInput(ok){let a=document.getElementById("inputAmount").value;let n=document.getElementById("inputNote").value;document.getElementById("legendInput").classList.remove("show");if(ok&&inputCb) inputCb({amount:a,note:n});inputCb=null;}
-function showReset(cb){document.getElementById("resetInput").value="";resetCb=cb;document.getElementById("legendReset").classList.add("show");}
-function closeReset(ok){let v=document.getElementById("resetInput").value;document.getElementById("legendReset").classList.remove("show");if(ok&&resetCb) resetCb(v);resetCb=null;}
 function extractBank(p){
  if(!p) return {coin:0,email:'',hasEmail:false};
  let b=p.bank||{}; let prof=p.profile||{};
@@ -227,236 +202,76 @@ function extractBank(p){
 function loginA(){
  let id=document.getElementById("adminId").value.trim();
  let pass=document.getElementById("adminPass").value.trim();
- if(id!=="A"||pass!=="A"){document.getElementById("loginMsg").textContent="ID/Pass harus A"; showOK("GAGAL","ID dan Pass harus A"); return;}
- document.getElementById("loginMsg").textContent="✅ Login A OK";
+ if(id!=="A"||pass!=="A"){showOK("GAGAL","ID/Pass harus A");return;}
  auth.signInAnonymously().then(()=>{
   document.getElementById("loginBox").style.display="none";
   document.getElementById("adminPanel").style.display="block";
-  loadPendingGrouped();
-  loadEmailOnly();
-  loadVisits();
- }).catch(e=>{
-  document.getElementById("loginBox").style.display="none";
-  document.getElementById("adminPanel").style.display="block";
-  loadPendingGrouped();
-  loadEmailOnly();
-  loadVisits();
- });
+  loadPendingGrouped(); loadVisits();
+ }).catch(()=>{document.getElementById("loginBox").style.display="none";document.getElementById("adminPanel").style.display="block";loadPendingGrouped();loadVisits();});
 }
 async function loadPendingGrouped(){
  try{
-  document.getElementById("pendingGrouped").innerHTML="<div style='text-align:center;padding:10px;font-size:11px'>⏳ Load & Group per player...</div>";
   let snap=await db.collection("coin_requests").where("status","==","pending").limit(50).get();
-  incRead(snap.size);
   let grouped={};
   snap.forEach(doc=>{
-   let d=doc.data();
-   let uid=d.userId; if(!uid) return;
+   let d=doc.data(); let uid=d.userId; if(!uid) return;
    let time = d.createdAt && d.createdAt.toMillis? d.createdAt.toMillis() : 0;
-   if(!grouped[uid] || time > grouped[uid].time){
-     if(grouped[uid]){ if(!grouped[uid].allIds) grouped[uid].allIds=[grouped[uid].id]; grouped[uid].allIds.push(doc.id); }
-     grouped[uid]={id:doc.id,amount:d.amount||0,donasi:d.donasi||'seikhlasnya',email:d.email||'',time:time,timeObj:d.createdAt,uid:uid,allIds:[doc.id]};
-   } else {
-     if(!grouped[uid].allIds) grouped[uid].allIds=[grouped[uid].id];
-     grouped[uid].allIds.push(doc.id);
-   }
+   if(!grouped[uid] || time > grouped[uid].time){ grouped[uid]={id:doc.id,amount:d.amount||0,donasi:d.donasi||'seikhlasnya',email:d.email||'',time:time,uid:uid,allIds:[doc.id]}; } else { grouped[uid].allIds.push(doc.id); }
   });
   groupedMap=grouped;
   let count=Object.keys(grouped).length;
-  document.getElementById("countReq").textContent=count+" Player Minta ("+snap.size+" req)";
-  if(count===0){document.getElementById("pendingGrouped").innerHTML="<div style='text-align:center;color:#888;font-size:11px'>Tidak ada yang minta</div>";return;}
+  document.getElementById("countReq").textContent=count+" Minta";
+  if(count===0){document.getElementById("pendingGrouped").innerHTML="<div style='text-align:center;color:#888;font-size:11px'>Tidak ada</div>";return;}
   let html="";
-  for(let uid in grouped){
-   let g=grouped[uid];
-   let pDoc=null;
-   try{ pDoc=await db.collection("players").doc(uid).get(); incRead(1);}catch(e){}
-   let coin=0; if(pDoc && pDoc.exists) coin=pDoc.data().wallet?.coin||0;
-   let t = g.timeObj && g.timeObj.toDate? g.timeObj.toDate().toLocaleString() : '';
-   let dup = g.allIds.length;
-   html+=`<div class="playerCard hasMinta"><div style="font-weight:900;font-size:12px">📧 ${g.email||uid.substring(0,10)} <span style="background:#f59e0b;color:#000;padding:2px 6px;border-radius:6px;font-size:9px">MINTA ${Number(g.amount).toLocaleString()}</span> ${dup>1?`<span style="background:#ff4444;color:#fff;padding:2px 6px;border-radius:6px;font-size:9px">${dup}x</span>`:''}</div><div style="font-size:10px;color:#888">UID:${uid.substring(0,12)}... | Saldo:${Number(coin).toLocaleString()} Coin</div><div class="reqBox"><div style="font-weight:900;color:#92400e">💰 Minta: ${Number(g.amount).toLocaleString()} Coin</div><div style="font-size:11px">Donasi: <b>Rp ${g.donasi}</b></div><div style="font-size:9px;color:#888">${t} ${dup>1?`• ${dup} request`:''}</div><div class="flex2"><button class="btnHijau" onclick="approveGrouped('${g.id}','${uid}',${g.amount})">✅ SETUJUI</button><button class="btnMerah" onclick="rejectGrouped('${g.id}')">❌ CANCEL</button></div></div></div>`;
-  }
+  for(let uid in grouped){ let g=grouped[uid]; html+=`<div class="playerCard hasMinta"><div style="font-weight:900">📧 ${g.email} <span class="badge" style="background:#f59e0b;color:#000">${Number(g.amount).toLocaleString()}</span></div><div style="margin-top:6px;display:flex;gap:6px"><button class="btnHijau" onclick="approveGrouped('${g.id}','${uid}',${g.amount})">SETUJU</button><button class="btnMerah" onclick="rejectGrouped('${g.id}')">CANCEL</button></div></div>`; }
   document.getElementById("pendingGrouped").innerHTML=html;
- }catch(e){document.getElementById("pendingGrouped").innerHTML="<div style='color:#ff4444;font-size:11px'>Error: "+e.message+"</div>";}
+ }catch(e){document.getElementById("pendingGrouped").innerHTML="Error: "+e.message;}
 }
-async function approveGrouped(reqId,uid,amount){
- let g=groupedMap[uid];
- let allIds=g?g.allIds:[reqId];
- if(!confirm("SETUJUI "+Number(amount).toLocaleString()+" Coin untuk "+(g?g.email:uid)+"?")) return;
- try{
-  let ref=db.collection("players").doc(uid);
-  let snap=await ref.get();
-  let now=snap.exists && snap.data().wallet? snap.data().wallet.coin||0 : 0;
-  await ref.set({wallet:{coin:now+Number(amount)}},{merge:true});
-  for(let id of allIds){
-   if(id===reqId) await db.collection("coin_requests").doc(id).update({status:"approved",approvedAt:firebase.firestore.FieldValue.serverTimestamp(),approvedBy:"ADMIN A"});
-   else await db.collection("coin_requests").doc(id).update({status:"rejected",note:"duplikat group"});
-  }
-  showOK("BERHASIL","✅ "+Number(amount).toLocaleString()+" Coin ditambahkan");
-  loadPendingGrouped(); loadEmailOnly();
- }catch(e){showOK("GAGAL",e.message);}
-}
-async function rejectGrouped(reqId){
- if(!confirm("CANCEL permintaan ini?")) return;
- try{ await db.collection("coin_requests").doc(reqId).update({status:"rejected"}); showOK("OK","Di-CANCEL"); loadPendingGrouped(); loadEmailOnly(); }catch(e){showOK("GAGAL",e.message);}
-}
-async function bersihkanDuplikat(){
- if(!confirm("Bersihkan duplikat?")) return;
- try{
-  let snap=await db.collection("coin_requests").where("status","==","pending").limit(50).get();
-  let grouped={};
-  snap.forEach(doc=>{let d=doc.data(); let uid=d.userId; if(!uid) return; let time=d.createdAt&&d.createdAt.toMillis?d.createdAt.toMillis():0; if(!grouped[uid]) grouped[uid]=[]; grouped[uid].push({id:doc.id,time:time});});
-  let del=0;
-  for(let uid in grouped){let arr=grouped[uid].sort((a,b)=>b.time-a.time); for(let i=1;i<arr.length;i++){await db.collection("coin_requests").doc(arr[i].id).update({status:"rejected",note:"hapus duplikat"}); del++;}}
-  showOK("SELESAI","Dihapus "+del+" duplikat"); loadPendingGrouped();
- }catch(e){showOK("GAGAL",e.message);}
-}
-async function loadEmailOnly(){
- try{
-  document.getElementById("playerList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Scan 50 doc...</div>";
-  let snap=await db.collection("players").limit(50).get();
-  incRead(snap.size);
-  let filtered=[];
-  snap.forEach(doc=>{let b=extractBank(doc.data()); if(b.hasEmail) filtered.push({doc:doc,b:b});});
-  let html="";playersCache={};
-  filtered.forEach(item=>{
-   let uid=item.doc.id; playersCache[uid]=item.doc.data();
-   let g=groupedMap[uid];
-   html+=playerCardHtmlOld(uid,item.b,g);
-  });
-  document.getElementById("playerList").innerHTML=html+`<div style="text-align:center;font-size:10px;color:#888;margin-top:8px">Tampil ${filtered.length} dari ${snap.size}</div>`;
- }catch(e){document.getElementById("playerList").innerHTML="Error: "+e.message;}
-}
-async function loadJuraganOnly(){
- try{
-  document.getElementById("playerList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Cari Juragan...</div>";
-  let snap=await db.collection("players").limit(100).get();
-  incRead(snap.size);
-  let found=[];
-  snap.forEach(doc=>{let b=extractBank(doc.data()); if(b.email.toLowerCase().includes("servicehpmaja")) found.push({doc:doc,b:b});});
-  let html="";playersCache={}; found.forEach(item=>{playersCache[item.doc.id]=item.doc.data(); html+=playerCardHtmlOld(item.doc.id,item.b,groupedMap[item.doc.id]);});
-  document.getElementById("playerList").innerHTML=html||"Tidak ketemu";
- }catch(e){showOK("Error",e.message);}
-}
-async function searchEmailOnly(){
- let q=document.getElementById("searchEmail").value.trim().toLowerCase();
- if(!q){showOK("LEGENDS","Masukkan email");return;}
- try{
-  document.getElementById("playerList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Mencari '"+q+"'...</div>";
-  let snap=await db.collection("players").limit(100).get();
-  incRead(snap.size);
-  let found=[];
-  snap.forEach(doc=>{let b=extractBank(doc.data()); if(!b.hasEmail) return; if(b.email.toLowerCase().includes(q)) found.push({doc:doc,b:b});});
-  let html="";playersCache={}; found.forEach(item=>{playersCache[item.doc.id]=item.doc.data(); html+=playerCardHtmlOld(item.doc.id,item.b,groupedMap[item.doc.id]);});
-  document.getElementById("playerList").innerHTML=html+`<div style="font-size:10px;color:#00ff88;text-align:center">Ketemu ${found.length}</div>`;
- }catch(e){showOK("Error",e.message);}
-}
-function playerCardHtmlOld(uid,b,g){
- let isJuragan=b.email.toLowerCase()===JURAGAN.toLowerCase();
- let mintaBadge = g? `<span style="background:#f59e0b;color:#000;padding:2px 6px;border-radius:6px;font-size:9px">MINTA ${Number(g.amount).toLocaleString()}</span>` : '';
- let mintaBox = g? `<div class="reqBox"><div style="font-weight:900;color:#92400e;font-size:13px">💰 Minta: ${Number(g.amount).toLocaleString()} Coin | Donasi: Rp ${g.donasi}</div><div class="flex2"><button class="btnHijau" onclick="approveGrouped('${g.id}','${uid}',${g.amount})">✅ SETUJUI</button><button class="btnMerah" onclick="rejectGrouped('${g.id}')">❌ CANCEL</button></div></div>` : '';
- return `<div class="playerCard ${g?'hasMinta':''}" style="${isJuragan?'border:2px solid #ffd84d;background:#1a1500':''}"><div style="font-weight:900;font-size:12px">📧 ${b.email} ${isJuragan?'<span style="background:#ffd84d;color:#000;padding:2px 5px;border-radius:6px;font-size:8px">JURAGAN</span>':''} ${mintaBadge}</div><div style="font-size:10px;color:#888">UID: ${uid.substring(0,12)}...</div><div style="font-size:14px;color:#00ff88;margin-top:4px">💰 <b>${b.coin.toLocaleString()} Coin</b></div><div style="font-size:10px;color:#aaa">🏦 ${b.namaBank||'-'} ${b.noRek||''} A/N ${b.namaRek||''}</div>${mintaBox}<button class="btnAdd" onclick="openAdd('${uid}')">➕ TAMBAH SALDO MANUAL</button><button class="btnAdd" style="background:#333;color:#fff;border:1px solid #555" onclick="openKurang('${uid}')">— KURANGI SALDO</button></div>`;
-}
-function openAdd(uid){let p=playersCache[uid];let b=extractBank(p); showInput("TAMBAH SALDO - "+b.email,"Saldo: <b style='color:#00ff88'>"+b.coin.toLocaleString()+"</b><br>Jumlah:", (data)=>{let amt=Number(data.amount); if(!amt||amt<=0){showOK("LEGENDS","Tidak valid");return;} showConfirm("KONFIRMASI","Tambah "+amt.toLocaleString()+" ke "+b.email+"?", async ()=>{try{await db.collection("players").doc(uid).update({"wallet.coin":firebase.firestore.FieldValue.increment(amt)}); incRead(1); showOK("BERHASIL","✅ +"+amt.toLocaleString()); loadEmailOnly();}catch(e){showOK("Gagal",e.message);}});});}
-function openKurang(uid){let p=playersCache[uid];let b=extractBank(p); showInput("KURANGI SALDO - "+b.email,"Saldo: <b style='color:#ff4444'>"+b.coin.toLocaleString()+"</b>", (data)=>{let amt=Number(data.amount); if(!amt||amt<=0||amt>b.coin){showOK("LEGENDS","Tidak valid");return;} showConfirm("KONFIRMASI","Kurangi "+amt.toLocaleString()+"?", async ()=>{try{await db.collection("players").doc(uid).update({"wallet.coin":firebase.firestore.FieldValue.increment(-amt)}); incRead(1); showOK("BERHASIL","✅ -"+amt.toLocaleString()); loadEmailOnly();}catch(e){showOK("Gagal",e.message);}});});}
-async function refreshPool(){try{document.getElementById("poolInfo").innerHTML="⏳ Loading..."; let snap=await db.collection("global").doc("pool").get(); incRead(1); if(!snap.exists){document.getElementById("poolInfo").innerHTML="❌ global/pool belum ada";return;} let d=snap.data(); document.getElementById("poolInfo").innerHTML=`Pool: <b style="color:#00ff88">Rp${Number(d.pool||0).toLocaleString()}</b><br>Profit: Rp${Number(d.profit||0).toLocaleString()}<br>Bet: Rp${Number(d.totalBet||0).toLocaleString()}`;}catch(e){document.getElementById("poolInfo").innerHTML="Error: "+e.message;}}
-function addPool(){ showInput("TAMBAH SALDO POOL","Jumlah tambah ke pool:", (data)=>{ let amt=Number(data.amount); if(!amt||amt<=0){showOK("LEGENDS","Tidak valid");return;} let note=data.note||"tambah manual A"; showConfirm("KONFIRMASI","Tambah Rp"+amt.toLocaleString()+" ke Pool?", async ()=>{ try{ await db.collection("global").doc("pool").set({ pool: firebase.firestore.FieldValue.increment(amt), lastUpdate: firebase.firestore.FieldValue.serverTimestamp(), lastAddBy: "ADMIN A", lastAddNote: note, lastAddAmount: amt },{merge:true}); incRead(1); showOK("BERHASIL","✅ Pool +Rp"+amt.toLocaleString()); refreshPool(); }catch(e){showOK("Gagal",e.message);} }); });}
-function resetPool(){showReset((val)=>{if(val!=="RESET"){showOK("BATAL","Ketik RESET");return;} showConfirm("YAKIN RESET?","Reset pool jadi 0?", async ()=>{try{await db.collection("global").doc("pool").set({pool:0,profit:0,totalBet:0,lastUpdate:firebase.firestore.FieldValue.serverTimestamp(),resetBy:"ADMIN A"},{merge:true}); incRead(1); showOK("OK","Pool direset 0"); refreshPool();}catch(e){showOK("Gagal",e.message);}});});}
+async function approveGrouped(reqId,uid,amount){ if(!confirm("Setujui "+amount+"?")) return; try{ let ref=db.collection("players").doc(uid); let snap=await ref.get(); let now=snap.exists?snap.data().wallet?.coin||0:0; await ref.set({wallet:{coin:now+Number(amount)}},{merge:true}); await db.collection("coin_requests").doc(reqId).update({status:"approved"}); showOK("OK","Ditambah"); loadPendingGrouped(); }catch(e){showOK("Gagal",e.message);} }
+async function rejectGrouped(reqId){ await db.collection("coin_requests").doc(reqId).update({status:"rejected"}); loadPendingGrouped(); }
+async function searchEmailOnly(){}
+async function refreshPool(){ try{ let snap=await db.collection("global").doc("pool").get(); if(!snap.exists){document.getElementById("poolInfo").innerHTML="Belum ada";return;} let d=snap.data(); document.getElementById("poolInfo").innerHTML=`Pool: <b style="color:#00ff88">Rp${Number(d.pool||0).toLocaleString()}</b><br>Profit: Rp${Number(d.profit||0).toLocaleString()}`; }catch(e){ document.getElementById("poolInfo").innerHTML="Error "+e.message; } }
 
-// === FITUR BARU: PENGUNJUNG TANPA LOGIN - DETAIL DEVICE LENGKAP ===
+// === LOAD VISIT PRO ===
 async function loadVisits(){
  try{
-  document.getElementById("visitList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Load kunjungan + device tamu...</div>";
-  let snap = await db.collection("page_visits").orderBy("time","desc").limit(50).get();
-  incRead(snap.size);
-
-  let guestSnap;
-  try{
-    guestSnap = await db.collection("guest_logs").orderBy("createdAt","desc").limit(50).get();
-    incRead(guestSnap.size);
-  }catch(e){ guestSnap = {size:0, docs:[], forEach:function(cb){}}; }
-
-  document.getElementById("statTotal").textContent = snap.size + guestSnap.size;
-  document.getElementById("countVisit").textContent = (snap.size + guestSnap.size) + " Visit";
-  document.getElementById("statWa").textContent = guestSnap.size + " Tamu";
-
+  document.getElementById("visitList").innerHTML="<div style='text-align:center;padding:20px'>⏳ Load...</div>";
+  let snap = await db.collection("page_visits").orderBy("time","desc").limit(60).get();
   let today = new Date().toISOString().slice(0,10);
-  let hariIni = 0;
+  let hariIni=0, akurat=0;
   let html="";
-
-  // Tampilkan guest_logs dulu (ini dari tombol tanpa login)
-  guestSnap.forEach(doc=>{
-    let d=doc.data();
-    let dev = d.device || {};
-    let t = "";
-    try{
-      if(d.createdAt && d.createdAt.toDate) t = d.createdAt.toDate().toLocaleString('id-ID');
-      else if(typeof d.createdAt === 'string') t = new Date(d.createdAt).toLocaleString('id-ID');
-      else t = new Date().toLocaleString('id-ID');
-    }catch(e){ t="baru"; }
-
-    html+=`<div class="visitCard" style="border:2px solid #00ff88;background:#0a1a0a">
-      <div style="display:flex;justify-content:space-between"><b style="color:#00ff88">👤 ${d.name||'Tamu'} [${dev.tipe || 'HP/Laptop'}]</b><span style="color:#888;font-size:9px">${t}</span></div>
-      <div style="margin-top:6px">
-        📱 <b>Tipe:</b> ${dev.tipe || '-'} | 💻 <b>OS:</b> ${dev.os || d.platform || '-'}<br>
-        🖥️ <b>Layar:</b> ${dev.layar || d.screen || '-'} | <b>RAM:</b> ${dev.ram || d.ram || '-'} | <b>CPU:</b> ${dev.cpu || d.cpu || '-'} Core<br>
-        📶 <b>Koneksi:</b> ${dev.koneksi || d.connType || '-'} (${dev.kecepatan || d.connDownlink || '-'} Mbps)<br>
-        🌐 <b>IP:</b> <b style="color:#00ff88">${dev.ip || d.ip || '-'}</b><br>
-        📧 <b>Email:</b> ${d.email || dev.email || '<i style="color:#ff4444">Tidak isi - mode tamu</i>'}<br>
-        📡 <b>Wifi Name:</b> <i style="color:#ff4444">Tidak bisa diambil di website (privasi browser)</i><br>
-        <div style="color:#555;margin-top:4px;font-size:9px">UA: ${(d.device?.browser || d.ua || '').substring(0,70)}...</div>
-      </div>
-    </div>`;
-  });
-
-  // Tampilkan page_visits
   snap.forEach(doc=>{
     let d=doc.data();
-    let t = d.time && d.time.toDate? d.time.toDate().toLocaleString('id-ID') : 'baru';
+    let t = d.time && d.time.toDate ? d.time.toDate().toLocaleString('id-ID') : 'baru';
     if(d.dateStr===today) hariIni++;
-    let icon = d.deviceType==="HP"? "📱 HP" : "💻 Laptop";
-    let isGuest = d.isGuest? "<span style='background:#00ff88;color:#000;padding:1px 4px;border-radius:4px;font-size:8px'>TAMU</span>" : "";
-    html+=`<div class="visitCard">
-      <div style="display:flex;justify-content:space-between"><b style="color:#ffd84d">${icon} ${isGuest}</b><span style="color:#888;font-size:9px">${t}</span></div>
-      <div style="margin-top:4px">
-        🔗 <b>${d.page||'/'}</b><br>
-        🌐 IP: <b style="color:#00ff88">${d.ip||'-'}</b> | 📺 ${d.screen} | 🧠 RAM:${d.ram||'?'} CPU:${d.cpu||'?'}<br>
-        📶 Koneksi: ${d.connType||'-'} (${d.connDownlink||'-'} Mbps) | 🌍 ${d.timezone||''}<br>
-        📧 Email: ${d.guestEmail||'-'} | Ref: ${(d.ref||'-').substring(0,30)}<br>
-        <div style="color:#666;font-size:9px;margin-top:2px">${(d.ua||'').substring(0,80)}...</div>
+    if(d.preciseLat) akurat++;
+    let icon = d.deviceType==="HP" ? "📱" : "💻";
+    let mapLink = d.ipLat ? `https://www.google.com/maps?q=${d.ipLat},${d.ipLon}` : `https://www.google.com/maps?q=${d.ipCity}`;
+    let preciseLink = d.preciseLat ? `https://www.google.com/maps?q=${d.preciseLat},${d.preciseLon}` : "";
+    html+=`<div class="visitCard" style="${d.preciseLat ? 'border-color:#ff4444;background:#1a0a0a' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b style="color:#ffd84d">${icon} ${d.deviceType} - ${d.deviceModel}</b>
+        <span style="font-size:9px;color:#888">${t}</span>
+      </div>
+      <div style="margin-top:6px">
+        🔗 <b style="color:#fff">${d.page}</b><br>
+        🌐 <b>IP:</b> <b style="color:#00ff88">${d.ip}</b> | <b>${d.ipCity}, ${d.ipRegion}</b><br>
+        🏢 <b>ISP:</b> ${d.ipIsp}<br>
+        📍 <b>IP Loc:</b> <a href="${mapLink}" target="_blank" style="color:#00ff88;text-decoration:underline">Buka Maps IP (${d.ipLat||''},${d.ipLon||''})</a><br>
+        ${d.preciseLat ? `📌 <b style="color:#ff4444">LOKASI AKURAT (User Allow):</b> <a href="${preciseLink}" target="_blank" style="color:#ff4444;font-weight:900">📍 ${d.preciseLat.toFixed(5)}, ${d.preciseLon.toFixed(5)} (±${d.preciseAcc||'?'}m)</a><br>` : `📌 Presisi: <span style="color:#888">${d.locationStatus||'belum izin (wajar)'}</span><br>`}
+        💻 <b>Browser:</b> ${d.browser} | <b>OS:</b> ${d.os}<br>
+        📺 Layar: ${d.screen} | RAM:${d.ram} CPU:${d.cpu} | Conn: ${d.connType} (${d.connDownlink} Mbps)<br>
+        📧 Email: ${d.guestEmail||'<i style=color:#666>tanpa login</i>'} | Ref: ${d.ref||'direct'}<br>
+        <div style="color:#555;font-size:9px;margin-top:4px">UA: ${(d.ua||'').substring(0,100)}...</div>
       </div>
     </div>`;
   });
-
-  document.getElementById("statHari").textContent = hariIni;
-  document.getElementById("visitList").innerHTML = html || "<div style='text-align:center;color:#888'>Belum ada pengunjung</div>";
-
-  fetch(`https://api.countapi.xyz/get/ruangsadar-${firebaseConfig.projectId}/total`).then(r=>r.json()).then(j=>{ if(j.value) document.getElementById("statTotal").textContent=j.value + " (countapi)"; }).catch(()=>{});
- }catch(e){
-  document.getElementById("visitList").innerHTML="<div style='color:#ff4444;font-size:11px'>Error: "+e.message+"<br>Pastikan Rules Firestore page_visits & guest_logs allow read/write true</div>";
- }
-}
-async function hapusVisits(){
- if(!confirm("Hapus log lama >7 hari?")) return;
- try{
-  let snap = await db.collection("page_visits").limit(20).get();
-  let del=0;
-  for(let doc of snap.docs){
-    let d=doc.data();
-    if(d.time && d.time.toDate){
-      let diff = (Date.now() - d.time.toDate().getTime())/(1000*3600*24);
-      if(diff>7){ await doc.ref.delete(); del++; }
-    }
-  }
-  showOK("SELESAI","Dihapus "+del+" log >7 hari");
-  loadVisits();
- }catch(e){showOK("GAGAL",e.message);}
-}
-function shareToWA(){
-  const url = location.href.replace(/admin.*\.html/,'portal.html');
-  const text = `Aku baru sadar judol itu nipu sistem! Coba cek RUANG SADAR ini biar kamu juga sadar:\n\n${url}\n\nShare ke keluarga biar gak ada yang ketipu lagi 🙏\n\nJika setuju bagikan link ini, bila mau berdonasi untuk pengembangan aplikasi silahkan tap QRIS di halaman Tentang.`;
-  fetch(`https://api.countapi.xyz/hit/ruangsadar-${firebaseConfig.projectId}/share_wa`).catch(()=>{});
-  db.collection("page_visits").add({page:"share_wa",url:url,time:firebase.firestore.FieldValue.serverTimestamp(),ua:navigator.userAgent,ref:"wa_share",dateStr:new Date().toISOString().slice(0,10)}).catch(()=>{});
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank');
+  document.getElementById("statTotal").textContent=snap.size;
+  document.getElementById("statHari").textContent=hariIni;
+  document.getElementById("statWa").textContent=akurat;
+  document.getElementById("countVisit").textContent=snap.size+" Visit";
+  document.getElementById("visitList").innerHTML=html||"Kosong";
+ }catch(e){ document.getElementById("visitList").innerHTML="<div style='color:#ff4444'>Error: "+e.message+"<br>Cek Rules Firestore page_visits harus allow read</div>"; }
 }
 </script>
 </body>
